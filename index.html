@@ -6929,6 +6929,7 @@ function _rmDrawAllLinesV2(svg, d, cvWrap){
     const [ex2,ey2] = _rmCardEdgePt(cx1,cy1, cx2,cy2, hw,hh);
 
     // ② 같은 두 카드 사이 선이 여러 개면 수직 offset 계산
+    //    → 반드시 sorted 기준 방향으로 계산해야 양방향 rel도 반대쪽으로 갈라짐
     const key = [rel.from,rel.to].sort().join('__');
     const pairRels = pairMap[key];
     const idx = pairRels.indexOf(rel);
@@ -6936,12 +6937,15 @@ function _rmDrawAllLinesV2(svg, d, cvWrap){
 
     let ox=0, oy=0;
     if(total > 1){
-      const dx = cx2-cx1, dy = cy2-cy1;
-      const len = Math.sqrt(dx*dx+dy*dy)||1;
+      const [sid1, sid2] = [rel.from, rel.to].sort();
+      const sc1 = d.chars.find(c=>c.id===sid1);
+      const sc2 = d.chars.find(c=>c.id===sid2);
+      const sdx = (sc2.x+55)-(sc1.x+55), sdy = (sc2.y+60)-(sc1.y+60);
+      const slen = Math.sqrt(sdx*sdx+sdy*sdy)||1;
       const gap = 14;
       const offset = (idx - (total-1)/2) * gap;
-      ox = (-dy/len) * offset;
-      oy = (dx/len)  * offset;
+      ox = (-sdy/slen) * offset;
+      oy = (sdx/slen)  * offset;
     }
 
     // ③ 테두리 교차점에 수직 offset만 더해서 평행선 완성
