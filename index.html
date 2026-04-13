@@ -832,7 +832,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 /* ── 관계도 ── */
 .rm-container{flex:1;display:flex;overflow:hidden}
 .rm-canvas-wrap{flex:1;position:relative;overflow:visible;background:var(--surf);cursor:default;min-height:300px}
-.rm-canvas{position:absolute;inset:0;pointer-events:none}
+.rm-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .rm-char-card{
   position:absolute;width:110px;
   background:var(--surf2);border:2px solid var(--bdr);border-radius:10px;
@@ -6612,33 +6612,34 @@ const RM_LINE_STYLES = [
 // _rmDrawLine 전체 교체 (선 스타일 완전 지원)
 function _rmDrawLineSt(svg, x1,y1,x2,y2, rel, d){
   const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.dataset.relId = rel.id;
   const style = RM_LINE_STYLES.find(s=>s.id===rel.lineStyle) || RM_LINE_STYLES[0];
   const color = rel.color || '#388bfd';
   const sw = style.strokeWidth;
 
   // 마커 ID
-  const markerId = 'arrow-'+rel.id;
+  const markerId  = 'arrow-'+rel.id;
   const markerIdB = 'arrowB-'+rel.id;
 
-  // defs (화살표)
-  const mkMarker=(id,col)=>{
+  // defs는 _rmDrawAllLinesV2에서 이미 확보 — 여기서는 마커만 추가
+  const mkMarker=(id,col,reverse)=>{
     const m=document.createElementNS('http://www.w3.org/2000/svg','marker');
-    m.setAttribute('id',id); m.setAttribute('markerWidth','8'); m.setAttribute('markerHeight','8');
-    m.setAttribute('refX','6'); m.setAttribute('refY','3'); m.setAttribute('orient','auto');
+    m.setAttribute('id',id);
+    m.setAttribute('markerWidth','10'); m.setAttribute('markerHeight','7');
+    m.setAttribute('refX', reverse ? '2' : '8'); m.setAttribute('refY','3.5');
+    m.setAttribute('orient', reverse ? 'auto-start-reverse' : 'auto');
+    m.setAttribute('markerUnits','userSpaceOnUse');
     const p=document.createElementNS('http://www.w3.org/2000/svg','path');
-    p.setAttribute('d','M0,0 L0,6 L8,3 z'); p.setAttribute('fill',col);
+    p.setAttribute('d','M0,0 L0,7 L10,3.5 z'); p.setAttribute('fill',col);
     m.appendChild(p); return m;
   };
 
-  // SVG defs에 마커 등록 (기존 defs 재사용)
   if(rel.dir==='to'||rel.dir==='both'){
-    let defs=svg.querySelector('defs');
-    if(!defs){defs=document.createElementNS('http://www.w3.org/2000/svg','defs');svg.insertBefore(defs,svg.firstChild);}
-    // 기존 마커 제거 후 재등록
-    svg.querySelector('#'+markerId)?.remove();
-    svg.querySelector('#'+markerIdB)?.remove();
-    defs.appendChild(mkMarker(markerId,color));
-    if(rel.dir==='both') defs.appendChild(mkMarker(markerIdB,color));
+    const defs = svg.querySelector('defs');
+    if(defs){
+      defs.appendChild(mkMarker(markerId, color, false));
+      if(rel.dir==='both') defs.appendChild(mkMarker(markerIdB, color, true));
+    }
   }
 
   // 물결선: SVG path로 그리기
@@ -6878,8 +6879,16 @@ function _rmEditRelPopupV2(e, rel, d, svg, cvWrap){
 // _rmDrawAllLines V2 (선 스타일 지원 + 범례)
 function _rmDrawAllLinesV2(svg, d, cvWrap){
   if(!svg) return;
-  // preview 선 제외 모두 제거
-  Array.from(svg.children).forEach(el=>{if(!el.id||!el.id.startsWith('rm-prev'))el.remove();});
+  // defs와 preview 선 제외하고 제거 (defs 보존 — 화살표 마커 소실 방지)
+  Array.from(svg.children).forEach(el=>{
+    if(el.tagName==='defs') return;
+    if(el.id && el.id.startsWith('rm-prev')) return;
+    el.remove();
+  });
+  // defs 확보 후 기존 마커만 초기화 (재등록 전)
+  let defs = svg.querySelector('defs');
+  if(!defs){ defs=document.createElementNS('http://www.w3.org/2000/svg','defs'); svg.insertBefore(defs,svg.firstChild); }
+  Array.from(defs.querySelectorAll('marker')).forEach(m=>m.remove());
 
   // 같은 두 캐릭터 사이 선 묶기 (평행선 offset 계산용)
   const pairMap = {};
