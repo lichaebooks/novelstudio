@@ -689,6 +689,8 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .scell:focus{background:rgba(56,139,253,.06);box-shadow:inset 0 0 0 1.5px var(--ac);position:relative;z-index:1}
 .today-hdr{background:rgba(56,139,253,.12)!important;color:var(--ac)!important}
 .today-col{background:rgba(56,139,253,.04)!important}
+.scell-wc{background:rgba(56,139,253,.05)!important;color:var(--ac);font-weight:600;cursor:default;user-select:none}
+.scell-deadline-active{background:rgba(239,68,68,.05)!important}
 /* tracker panel */
 .tracker{width:260px;flex-shrink:0;background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
 .trktitle{padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
@@ -1468,10 +1470,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
         </div>
       </div>
       <div class="treewrap" id="writing-tree" style="flex:1;overflow-y:auto;min-height:80px"></div>
-      <!-- 트래커 resize 핸들 + 트래커 영역 -->
-      <div id="writing-tracker-resize" style="height:5px;cursor:ns-resize;background:var(--bdr);flex-shrink:0;transition:background .15s;display:none"
-           onmouseenter="this.style.background='var(--ac)'" onmouseleave="this.style.background='var(--bdr)'"></div>
-      <div id="writing-tracker-wrap" style="display:flex;flex-direction:column;flex-shrink:0;height:220px;min-height:60px;overflow:hidden"></div>
+
     </div>
 
     <!-- 우측: 에디터 영역 -->
@@ -1568,8 +1567,9 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
         <div class="mlabel" id="sched-mlabel"></div>
         <button class="mnavbtn" onclick="chMonth(1)">▶</button>
       </div>
-      <div id="sched-work-label" style="font-size:11px;color:var(--tx3)"></div>
-      <div style="margin-left:auto;display:flex;gap:6px">
+      <!-- 작품별 마감일 입력 칩 -->
+      <div id="sched-deadlines" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1;padding:0 10px;overflow:hidden;font-size:11px;color:var(--tx3)"></div>
+      <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0">
         <button class="splitbtn" onclick="exportSchedImg()" title="이미지 내보내기">🖼 내보내기</button>
       </div>
     </div>
@@ -1987,6 +1987,7 @@ async function save(){
 }
 
 function dsave(){
+  try{ saveWcSnapshot(); }catch(e){}
   clearTimeout(_st);
   _st=setTimeout(()=>{save().then(()=>gdScheduleAuto());},400);
 }
@@ -2331,9 +2332,38 @@ function renderHome(){
 //  SCHEDULE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const DY=['월','화','수','목','금'];
-const SCHED_CH=['집필','퇴고','투고','완결'];
+const SCHED_CH=['글자수','연재','송고·마감','비고'];
 
 function mkey(y,m){return y+'-'+(m<10?'0'+m:m);}
+
+// ── 마감일 헬퍼
+function getDeadlines(){
+  const k=mkey(S.sy,S.sm);
+  if(!S.scheds[k]) S.scheds[k]={cells:{}};
+  if(!S.scheds[k].deadlines || typeof S.scheds[k].deadlines!=='object')
+    S.scheds[k].deadlines={};
+  return S.scheds[k].deadlines;
+}
+
+// ── 글자수 스냅샷 헬퍼
+function getWcSnap(y,m){
+  const k=mkey(y,m);
+  if(!S.scheds[k]) S.scheds[k]={cells:{}};
+  if(!S.scheds[k].wc) S.scheds[k].wc={};
+  return S.scheds[k].wc;
+}
+// 오늘 날짜 글자수 스냅샷 저장 (dsave 호출 시점에 실행)
+function saveWcSnapshot(){
+  const today=new Date();
+  const y=today.getFullYear(),m=today.getMonth()+1;
+  const dateStr=y+'-'+(m<10?'0'+m:m)+'-'+(today.getDate()<10?'0':'')+today.getDate();
+  const wc=getWcSnap(y,m);
+  wChapters && wWorks().forEach(w=>{
+    const total=wChapters(w.id).reduce((s,ch)=>s+charsOf(ch),0);
+    if(!wc[w.id]) wc[w.id]={};
+    wc[w.id][dateStr]=total;
+  });
+}
 function getWeeks(y,m){
   const days=[];
   const firstDow=new Date(y,m-1,1).getDay();
@@ -2367,9 +2397,67 @@ function setCell(y,m,wi,ch,di,val){
 
 function chMonth(d){S.sy=S.sm+d>12?(S.sy+1):(S.sm+d<1?(S.sy-1):S.sy);S.sm=S.sm+d>12?1:(S.sm+d<1?12:S.sm+d);renderSched();}
 
+// ── 마감일 칩 바 렌더
+function renderDeadlineBar(){
+  const bar=document.getElementById('sched-deadlines');
+  if(!bar) return;
+  const dls=getDeadlines();
+  bar.innerHTML='';
+  const works=allWorksForTracker();
+  if(!works.length){
+    bar.innerHTML='<span style="font-size:10px;color:var(--tx3)">집필 탭에서 작품을 추가하세요</span>';
+    return;
+  }
+  const label=document.createElement('span');
+  label.style.cssText='font-size:10px;color:var(--tx3);white-space:nowrap;flex-shrink:0';
+  label.textContent='📅 마감일:';
+  bar.appendChild(label);
+
+  works.forEach((w,i)=>{
+    const chip=document.createElement('div');
+    chip.style.cssText='display:flex;align-items:center;gap:3px;flex-shrink:0';
+
+    const dot=document.createElement('span');
+    dot.style.cssText=`width:7px;height:7px;border-radius:50%;background:${w.color||'var(--ac)'};flex-shrink:0`;
+
+    const nm=document.createElement('span');
+    nm.style.cssText='font-size:10px;color:var(--tx2);white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis';
+    nm.title=w.name; nm.textContent=w.name;
+
+    const inp=document.createElement('input');
+    inp.type='number'; inp.min='1'; inp.max='31'; inp.placeholder='일';
+    inp.value=dls[w.id]||'';
+    inp.style.cssText='width:32px;border:1px solid var(--bdr);border-radius:4px;background:var(--surf);color:var(--tx);font-size:10px;padding:1px 3px;text-align:center;font-family:inherit;outline:none';
+    inp.style.borderColor=dls[w.id]?'rgba(239,68,68,.5)':'var(--bdr)';
+    let _t;
+    inp.addEventListener('input',()=>{
+      const v=parseInt(inp.value)||0;
+      dls[w.id]=v||'';
+      inp.style.borderColor=v?'rgba(239,68,68,.5)':'var(--bdr)';
+      dsave();
+      clearTimeout(_t); _t=setTimeout(()=>renderSched(),600);
+    });
+
+    const dayLbl=document.createElement('span');
+    dayLbl.style.cssText='font-size:10px;color:var(--tx3)';
+    dayLbl.textContent='일';
+
+    chip.append(dot,nm,inp,dayLbl);
+    bar.appendChild(chip);
+
+    if(i<works.length-1){
+      const sep=document.createElement('span');
+      sep.style.cssText='font-size:10px;color:var(--bdr);margin:0 2px';
+      sep.textContent='·';
+      bar.appendChild(sep);
+    }
+  });
+}
+
 function renderSched(){
   const {sy:y,sm:m}=S;
   const el=document.getElementById('sched-mlabel');if(el)el.textContent=y+'년 '+m+'월';
+  renderDeadlineBar();
   const wks=getWeeks(y,m);
   const main=document.getElementById('sched-main');if(!main)return;
   main.innerHTML='';
@@ -2395,26 +2483,81 @@ function renderSched(){
     });
     sec.appendChild(hdr);
 
+    const dls=getDeadlines();
+    const wcSnap=getWcSnap(y,m);
+
     SCHED_CH.forEach(ch=>{
       const row=document.createElement('div');row.className='crow';
       const lbl=document.createElement('div');lbl.className='clabel';lbl.textContent=ch;
       row.appendChild(lbl);
+
       wk.forEach((d,di)=>{
         const isToday=isTM&&d===todayD;
         const cell=document.createElement('div');
-        if(d){
-          cell.className='scell'+(isToday?' today-col':'');
+
+        if(!d){
+          cell.className='scell';cell.style.background='var(--surf2)';cell.style.opacity='.4';
+          row.appendChild(cell); return;
+        }
+
+        cell.className='scell'+(isToday?' today-col':'');
+
+        // ── 글자수 행: 자동 계산, 읽기전용
+        if(ch==='글자수'){
+          cell.contentEditable='false';
+          cell.classList.add('scell-wc');
+          const dateStr=y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0':'')+d;
+          const prevDate=new Date(y,m-1,d-1);
+          const prevStr=prevDate.getFullYear()+'-'+(prevDate.getMonth()+1<10?'0':'')+
+            (prevDate.getMonth()+1)+'-'+(prevDate.getDate()<10?'0':'')+prevDate.getDate();
+          const works=wWorks ? wWorks() : [];
+          const parts=[];
+          works.forEach(w=>{
+            const todayWc=wcSnap[w.id]?.[dateStr]||0;
+            const prevWc=wcSnap[w.id]?.[prevStr]||0;
+            const diff=Math.max(0,todayWc-prevWc);
+            if(diff>0) parts.push((works.length>1?w.name+' ':'')+diff.toLocaleString());
+          });
+          cell.textContent=parts.join(' / ') || '';
+
+        // ── 송고·마감 행: 마감일 배지 자동 표시 + 편집 가능
+        } else if(ch==='송고·마감'){
           cell.contentEditable='true';
           cell.spellcheck=false;
-          cell.dataset.wi=wi;cell.dataset.ch=ch;cell.dataset.di=di;
+          // 마감일 배지
+          const dueDls=Object.entries(dls).filter(([wid,day])=>Number(day)===d);
+          if(dueDls.length>0){
+            cell.classList.add('scell-deadline-active');
+            const badge=document.createElement('div');
+            badge.contentEditable='false';
+            badge.style.cssText='font-size:9px;color:#ef4444;background:rgba(239,68,68,.1);border-radius:3px;padding:1px 4px;margin-bottom:2px;pointer-events:none;user-select:none;display:inline-block';
+            // workId → 작품명 변환
+            const names=dueDls.map(([wid])=>{
+              const w=(wWorks?wWorks():[]).find(x=>x.id===wid)||allWorksForTracker().find(x=>x.id===wid);
+              return w?w.name:wid;
+            }).join(' · ');
+            badge.textContent=names+' 마감';
+            cell.appendChild(badge);
+            cell.appendChild(document.createElement('br'));
+          }
+          const existing=getCell(y,m,wi,ch,di);
+          if(existing) cell.appendChild(document.createTextNode(existing));
+          cell.addEventListener('input',()=>{
+            let text='';
+            cell.childNodes.forEach(n=>{if(n.nodeType===3)text+=n.textContent;});
+            setCell(y,m,wi,ch,di,text.trim());
+          });
+          cell.addEventListener('keydown',e=>{if(e.key==='Tab')e.preventDefault();});
+
+        // ── 연재 / 비고: 일반 편집
+        } else {
+          cell.contentEditable='true';
+          cell.spellcheck=false;
           cell.innerText=getCell(y,m,wi,ch,di);
           cell.addEventListener('input',()=>setCell(y,m,wi,ch,di,cell.innerText));
-          cell.addEventListener('keydown',e=>{
-            if(e.key==='Tab'){e.preventDefault();}
-          });
-        } else {
-          cell.className='scell';cell.style.background='var(--surf2)';cell.style.opacity='.4';
+          cell.addEventListener('keydown',e=>{if(e.key==='Tab')e.preventDefault();});
         }
+
         row.appendChild(cell);
       });
       sec.appendChild(row);
@@ -3384,10 +3527,6 @@ function charsOf(ch){return ((ch.content||'').replace(/<[^>]*>/g,'').replace(/\s
 // ── 회차 목록 패널 ──
 function writingShowChList(workId){
   _writingSelWork=workId;
-  writingUpdateProgress(workId);
-  // 트래커 갱신
-  const trkWrap=document.getElementById('writing-tracker-wrap');
-  if(trkWrap) writingBuildTracker(trkWrap, workId);
 }
 
 function writingUpdateProgress(workId){
@@ -3403,7 +3542,7 @@ function writingUpdateProgress(workId){
   }
   chs.forEach((ch,ci)=>{
     const item=document.createElement('div');item.className='wt-ch-item'+(ch.id===_writingSelCh?' active':'')+(ch.done?' done':'');
-    const chk=document.createElement('input');chk.type='checkbox';chk.className='wt-ch-done';chk.checked=!!ch.done;chk.onclick=e=>{e.stopPropagation();ch.done=chk.checked;dsave();writingRenderTree();writingUpdateProgress(workId);writingUpdateProgress(workId);};
+    const chk=document.createElement('input');chk.type='checkbox';chk.className='wt-ch-done';chk.checked=!!ch.done;chk.onclick=e=>{e.stopPropagation();ch.done=chk.checked;dsave();writingRenderTree();writingUpdateProgress(workId);};
     const num=document.createElement('span');num.className='wt-ch-num';num.textContent=(ci+1)+'화';
     const tl=document.createElement('span');tl.className='wt-ch-title-lbl';tl.textContent=ch.title||'(제목 없음)';
     const wc=document.createElement('span');wc.className='wt-ch-wc';wc.textContent=charsOf(ch).toLocaleString()+'자';
@@ -3414,8 +3553,7 @@ function writingUpdateProgress(workId){
   const twEl=document.getElementById('writing-total-wc');
   if(twEl){const total=chs.reduce((s,ch)=>s+charsOf(ch),0);twEl.textContent='전체 '+total.toLocaleString()+'자';}
   // 트래커 빌드
-  const trkWrap=document.getElementById('writing-tracker-wrap');
-  if(trkWrap) writingBuildTracker(trkWrap, workId);
+
 }
 
 // ── 집필 탭 트래커 (컴팩트 사이드바형) ──
@@ -3684,12 +3822,8 @@ function writingOpenChapter(workId,chId){
   // 맞춤법 패널 숨김
   const spellPanel=document.getElementById('writing-spell-panel');if(spellPanel)spellPanel.style.display='none';
 
-  // ⑦ 트리 갱신 + 트래커 (마지막에, 오류가 나도 에디터에 영향 없음)
+  // 트리 갱신
   writingRenderTree();
-  try{
-    const trkWrap=document.getElementById('writing-tracker-wrap');
-    if(trkWrap) writingBuildTracker(trkWrap, workId);
-  }catch(e){console.warn('tracker build error',e);}
 }
 
 // ── 작품/회차 추가/삭제 ──
@@ -3737,7 +3871,7 @@ function writingDeleteWork(workId){
   if(!confirm(`"${w.name}" 작품과 모든 회차를 삭제하시겠습니까?`))return;
   // 해당 작품 및 회차 모두 소프트 삭제
   S.writingNodes=S.writingNodes.filter(n=>n.id!==workId&&n.workId!==workId);
-  if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';document.getElementById('writing-tracker-wrap').innerHTML='';}
+  if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';}
   dsave();writingRenderTree();renderHome();renderToolsTree();toast(`"${w.name}" 삭제됨`);
 }
 
