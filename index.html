@@ -120,7 +120,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .tbtn:hover{background:var(--surf2);color:var(--tx)}
 .tbtn.on{background:var(--surf2);color:var(--ac);font-weight:600}
 /* overflow menu */
-.tab-overflow-btn{background:none;border:1px solid var(--bdr);border-radius:var(--r);padding:4px 8px;color:var(--tx3);font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap;display:none}
+.tab-overflow-btn{background:none;border:1px solid var(--bdr);border-radius:var(--r);padding:4px 8px;color:var(--tx3);font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap;display:none;align-items:center}
 .tab-overflow-btn:hover{background:var(--surf2);color:var(--tx)}
 .tab-overflow-menu{position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:9999;min-width:160px;display:none;padding:4px}
 .tab-overflow-menu.open{display:block}
@@ -128,6 +128,10 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .tab-overflow-item:hover{background:var(--surf2);color:var(--tx)}
 .tab-overflow-item.on{color:var(--ac);font-weight:600}
 /* header right */
+.hright{display:flex;align-items:center;gap:4px;flex-shrink:0;min-width:fit-content}
+/* 좁은 화면: 저장/불러오기 텍스트 숨기고 아이콘만 표시 */
+.hbtn-label{margin-left:3px}
+@media(max-width:860px){.hbtn-label{display:none}}
 .hright{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .saveind{width:6px;height:6px;border-radius:50%;background:var(--gn);opacity:0;transition:opacity .3s;flex-shrink:0}
 .saveind.on{opacity:1}
@@ -441,21 +445,27 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 
 /* 캐릭터 시트 */
 .cs-container{flex:1;display:flex;overflow:hidden}
-.cs-left{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.cs-right{width:200px;flex-shrink:0;border-left:1px solid var(--bdr);background:var(--surf2);overflow-y:auto;padding:10px}
-.cs-info-row{display:flex;gap:12px;align-items:flex-start}
-.cs-img-area{width:80px;height:80px;border-radius:50%;background:var(--surf2);border:2px dashed var(--bdr);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden}
-.cs-img-area img{width:100%;height:100%;object-fit:cover}
+.cs-left{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.cs-right{width:260px;min-width:180px;background:var(--surf2);border-left:1px solid var(--bdr);overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+.cs-right-hdr{padding:10px 12px;font-size:12px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--bdr);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.cs-trait-cats{padding:8px 10px;display:flex;flex-direction:column;gap:10px}
+.cs-cat-title{font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid var(--bdr)}
+.cs-trait-item{display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer}
+.cs-trait-item input[type=checkbox]{cursor:pointer;accent-color:var(--ac)}
+.cs-trait-item label{font-size:11px;color:var(--tx2);cursor:pointer;flex:1}
+.cs-trait-item .cs-trait-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:0 2px;opacity:0}
+.cs-trait-item:hover .cs-trait-del{opacity:1}
+.cs-add-custom{padding:10px 12px;border-top:1px solid var(--bdr)}
+.cs-img-area{width:100px;height:120px;border:2px dashed var(--bdr);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;background:var(--surf2);overflow:hidden}
+.cs-img-area img{width:100%;height:100%;object-fit:cover;border-radius:6px}
 .cs-img-area:hover{border-color:var(--ac)}
-.cs-info-col{flex:1;display:flex;flex-direction:column;gap:6px}
-.cs-field-group{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:12px}
-.cs-field-group-title{font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.cs-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.cs-field-item{display:flex;flex-direction:column;gap:3px}
-.cs-field-item.full{grid-column:1/-1}
-.cs-field-label{font-size:10px;font-weight:600;color:var(--tx3)}
-.cs-field-input{background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--tx);font-family:inherit;outline:none;resize:vertical;line-height:1.5}
+.cs-info-row{display:flex;gap:14px;align-items:flex-start}
+.cs-info-col{flex:1;display:flex;flex-direction:column;gap:8px}
+.cs-field-input{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;line-height:1.7;width:100%;box-sizing:border-box}
 .cs-field-input:focus{border-color:var(--ac)}
+.cs-trait-field{display:flex;flex-direction:column;gap:4px}
+.cs-trait-field label{font-size:11px;font-weight:600;color:var(--tx3)}
+.cs-trait-section{margin-bottom:4px}
 
 /* 관계도 */
 .rm-container{flex:1;display:flex;overflow:hidden}
@@ -484,18 +494,53 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .rm-legend-item{display:flex;align-items:center;gap:6px;margin-bottom:3px;color:var(--tx3)}
 
 /* 용어사전 */
-.gs-table{width:100%;border-collapse:collapse}
-.gs-table th{background:var(--surf2);font-size:11px;font-weight:700;color:var(--tx3);padding:6px 10px;border:1px solid var(--bdr);text-align:left}
-.gs-table td{border:1px solid var(--bdr);padding:0;vertical-align:top}
-.gs-cell{width:100%;padding:6px 8px;background:transparent;border:none;outline:none;font-size:12px;font-family:inherit;color:var(--tx);resize:vertical;line-height:1.6;min-height:32px}
-.gs-cell:focus{background:rgba(56,139,253,.06)}
-.gs-row-del{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:4px 8px;width:100%;text-align:center}
+.gs-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.gs-tab-bar{display:flex;align-items:center;gap:0;border-bottom:2px solid var(--bdr);background:var(--surf2);flex-shrink:0;overflow-x:auto;overflow-y:hidden}
+.gs-tab-bar::-webkit-scrollbar{height:3px}
+.gs-tab-btn{
+  padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;
+  border:none;background:none;color:var(--tx3);white-space:nowrap;
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;
+}
+.gs-tab-btn.on{color:var(--ac);border-bottom-color:var(--ac);background:var(--surf)}
+.gs-tab-btn:hover:not(.on){color:var(--tx2);background:var(--surf)}
+.gs-tab-add{padding:8px 10px;font-size:16px;cursor:pointer;color:var(--tx3);background:none;border:none;flex-shrink:0}
+.gs-tab-add:hover{color:var(--ac)}
+.gs-body{flex:1;overflow:auto;padding:16px 20px}
+.gs-table{width:100%;border-collapse:collapse;font-size:12px}
+.gs-table thead th{
+  background:var(--surf2);border:1px solid var(--bdr);
+  padding:8px 12px;font-weight:700;color:var(--tx2);
+  text-align:left;position:sticky;top:0;z-index:2;
+}
+.gs-table tbody tr:hover{background:var(--surf2)}
+.gs-table td{
+  border:1px solid var(--bdr);padding:0;vertical-align:top;
+}
+.gs-cell{
+  width:100%;min-height:36px;padding:8px 10px;
+  background:transparent;border:none;outline:none;resize:none;
+  font-size:12px;font-family:inherit;color:var(--tx);line-height:1.6;
+  overflow:hidden;
+}
+.gs-cell:focus{background:var(--surf2);box-shadow:inset 0 0 0 2px var(--ac)}
+.gs-row-del{
+  width:28px;background:none;border:none;cursor:pointer;
+  color:var(--tx3);font-size:14px;opacity:0;transition:opacity .1s;padding:8px 4px;
+}
+.gs-table tbody tr:hover .gs-row-del{opacity:1}
 .gs-row-del:hover{color:var(--rd)}
-.gs-add-row{display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;color:var(--tx3);font-size:11px;border-top:1px solid var(--bdr)}
+.gs-add-row{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  cursor:pointer;color:var(--tx3);font-size:12px;border-top:1px solid var(--bdr);
+  background:var(--surf);border-radius:0 0 8px 8px;
+}
 .gs-add-row:hover{color:var(--ac);background:var(--surf2)}
-
-/* 무드보드 */
-.mb-board{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+.gs-tab-rename{
+  font-size:12px;padding:2px 6px;border:1.5px solid var(--ac);
+  border-radius:4px;background:var(--surf);color:var(--tx);
+  font-family:inherit;outline:none;
+}
 .mb-pin{position:absolute;background:var(--surf);border:2px solid var(--bdr);border-radius:8px;overflow:hidden;cursor:move;box-shadow:0 2px 8px rgba(0,0,0,.2);user-select:none;min-width:80px;min-height:60px}
 .mb-pin img{display:block;max-width:200px;max-height:200px;object-fit:cover}
 .mb-pin-note{padding:8px;font-size:12px;color:var(--tx);min-width:120px;min-height:60px;max-width:250px;white-space:pre-wrap;word-break:break-word;outline:none;line-height:1.6}
@@ -503,19 +548,29 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .mb-board-toolbar{padding:8px 14px;background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;align-items:center}
 
 /* 타임라인 */
-.tl-container{flex:1;overflow-y:auto;padding:16px}
-.tl-item{display:flex;gap:12px;margin-bottom:0;position:relative}
-.tl-item::before{content:'';position:absolute;left:117px;top:28px;bottom:-16px;width:2px;background:var(--bdr)}
-.tl-item:last-child::before{display:none}
-.tl-date-col{width:100px;flex-shrink:0;text-align:right;padding-top:4px}
-.tl-date-inp{background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:3px 6px;font-size:11px;color:var(--tx);text-align:center;outline:none;width:100%;font-family:inherit}
-.tl-date-inp:focus{border-color:var(--ac)}
-.tl-dot{width:16px;height:16px;border-radius:50%;background:var(--ac);flex-shrink:0;margin-top:5px;z-index:1;border:2px solid var(--bg)}
-.tl-content{flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;margin-bottom:16px}
-.tl-title-inp{width:100%;background:transparent;border:none;outline:none;font-size:13px;font-weight:600;color:var(--tx);font-family:inherit;margin-bottom:4px}
-.tl-desc-inp{width:100%;background:transparent;border:none;outline:none;font-size:12px;color:var(--tx2);font-family:inherit;resize:vertical;line-height:1.6;min-height:40px}
-.tl-add-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer;color:var(--tx3);font-size:12px;border-top:1px solid var(--bdr);margin-top:4px}
-.tl-add-btn:hover{color:var(--ac)}
+.tl-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tl-body{flex:1;overflow-y:auto;padding:20px 28px}
+.tl-list{display:flex;flex-direction:column;gap:0;position:relative;padding-left:110px}
+.tl-list::before{content:'';position:absolute;left:82px;top:0;bottom:0;width:2px;background:var(--bdr)}
+.tl-item{position:relative;margin-bottom:12px}
+.tl-item::before{content:'';position:absolute;left:-20px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--ac);border:2px solid var(--surf);z-index:1}
+.tl-item.dragging{opacity:.4}
+.tl-item.drag-over-top{border-top:2px solid var(--ac)}
+.tl-item.drag-over-bottom{border-bottom:2px solid var(--ac)}
+.tl-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.tl-card:hover{border-color:var(--ac)}
+.tl-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tl-drag-handle{color:var(--tx3);cursor:grab;font-size:14px;flex-shrink:0;padding:0 2px}
+.tl-drag-handle:active{cursor:grabbing}
+.tl-card-title{font-size:13px;font-weight:700;color:var(--tx);flex:1;min-width:0}
+.tl-chapter-badge{font-size:10px;color:var(--tx3);background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:1px 7px;flex-shrink:0}
+.tl-card-body{font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.tl-card-edit{display:none;flex-direction:column;gap:8px}
+.tl-card-edit.open{display:flex}
+.tl-edit-input{background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;width:100%;box-sizing:border-box}
+.tl-edit-input:focus{border-color:var(--ac)}
+.tl-card-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:4px}
+.tl-add-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border:2px dashed var(--bdr);border-radius:8px;color:var(--tx3);cursor:pointer;font-size:12px;background:none;width:100%;margin-top:4px}
 
 /* 트리트먼트 */
 .trt-container{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -533,6 +588,18 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .trt-add-scene:hover{color:var(--ac)}
 
 /* 아이디어 메모 */
+.im-field-wrap{display:flex;flex-direction:column;gap:4px;position:relative;margin-bottom:12px}
+.im-label-row{display:flex;align-items:center;gap:4px;cursor:pointer}
+.im-drag-handle{color:var(--tx3);cursor:grab;font-size:13px;flex-shrink:0;padding:0 2px;user-select:none}
+.im-drag-handle:active{cursor:grabbing}
+.im-label{font-size:11px;font-weight:600;color:var(--tx3);flex:1;cursor:text;border-radius:3px;padding:1px 3px}
+.im-label.editing{background:var(--surf2);border:1px solid var(--ac);outline:none;color:var(--tx)}
+.im-field-wrap.dragging{opacity:.4}
+.im-field-wrap.drag-over-top{border-top:2px solid var(--ac)}
+.im-field-wrap.drag-over-bottom{border-bottom:2px solid var(--ac)}
+.im-del-btn{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;opacity:0;padding:0 3px}
+.im-label-row:hover .im-del-btn{opacity:1}
+.writing-section-title{font-size:13px;font-weight:700;color:var(--tx);padding-bottom:6px;border-bottom:2px solid var(--ac);margin-bottom:4px}
 .idea-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .idea-toolbar{padding:8px 14px;background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;gap:6px;align-items:center;flex-shrink:0}
 .idea-grid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;align-content:start}
@@ -641,6 +708,15 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .writing-toolbar-title{font-size:13px;font-weight:700;color:var(--tx);flex:1}
 .writing-toolbar .wt-btn{padding:4px 12px;border-radius:6px;border:1px solid var(--bdr);background:var(--surf);color:var(--tx2);font-size:11px;cursor:pointer}
 .writing-toolbar .wt-btn:hover{background:var(--surf2)}
+/* ── wt-btn 전역 (툴바 밖 버튼: 태그패널 닫기, 태그 추가 등) ── */
+.wt-btn{
+  border-radius:6px;padding:4px 12px;
+  font-size:11px;transition:background .12s,opacity .12s;
+  cursor:pointer;border:1px solid var(--bdr);
+  background:var(--surf2);color:var(--tx2);
+  font-family:inherit;
+}
+.wt-btn:hover{background:var(--surf3,var(--surf));opacity:.85}
 .writing-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
 .writing-field{display:flex;flex-direction:column;gap:4px}
 .writing-field label{font-size:11px;font-weight:600;color:var(--tx3)}
@@ -707,8 +783,8 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
   <div class="tab-overflow-menu" id="overflow-menu"></div>
   <div class="hright">
     <div class="saveind" id="saveind" title="저장됨"></div>
-    <button class="hbtn green" id="hpushbtn" onclick="gdPush()" title="Google Drive에 저장">💾 저장</button>
-    <button class="hbtn purple" id="hpullbtn" onclick="gdPull()" title="Google Drive에서 불러오기">💾 불러오기</button>
+    <button class="hbtn green" id="hpushbtn" onclick="gdPush()" title="Google Drive에 저장">💾<span class="hbtn-label">저장</span></button>
+    <button class="hbtn purple" id="hpullbtn" onclick="gdPull()" title="Google Drive에서 불러오기">📥<span class="hbtn-label">불러오기</span></button>
     <button class="lockbtn" onclick="doLogout()" title="잠금">🔒</button>
   </div>
 </div>
@@ -1413,6 +1489,7 @@ function initOverflowTabs(){
   const container=document.getElementById('tabs-container');
   const overflowBtn=document.getElementById('overflow-btn');
   const overflowMenu=document.getElementById('overflow-menu');
+  const hdr=document.querySelector('.hdr');
   if(!container||!overflowBtn||!overflowMenu)return;
 
   // overflow 메뉴 항목 빌드
@@ -1428,55 +1505,61 @@ function initOverflowTabs(){
     overflowMenu.appendChild(item);
   });
 
-  // ResizeObserver — 컨테이너 크기 변할 때마다 재계산
+  // ResizeObserver — hdr 전체 크기 변화 감지 (탭 컨테이너보다 정확)
+  const target = hdr||container;
   if(window.ResizeObserver){
-    const ro=new ResizeObserver(entries=>{
-      // rAF로 감싸서 레이아웃 완료 후 실행
-      requestAnimationFrame(()=>checkTabOverflow());
-    });
-    ro.observe(container);
+    const ro=new ResizeObserver(()=>requestAnimationFrame(()=>checkTabOverflow()));
+    ro.observe(target);
   } else {
     window.addEventListener('resize',()=>checkTabOverflow());
   }
-  // 초기 실행은 폰트/레이아웃 완전히 잡힌 뒤
-  requestAnimationFrame(()=>requestAnimationFrame(()=>checkTabOverflow()));
+
+  // 초기 실행: 폰트·레이아웃 완전히 잡힌 뒤 (rAF 2회 + 50ms)
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    checkTabOverflow();
+    setTimeout(()=>checkTabOverflow(), 100);
+  }));
 }
 
 function checkTabOverflow(){
+  const hdr=document.querySelector('.hdr');
   const container=document.getElementById('tabs-container');
   const overflowBtn=document.getElementById('overflow-btn');
-  if(!container||!overflowBtn)return;
+  const hright=document.querySelector('.hright');
+  if(!hdr||!container||!overflowBtn)return;
 
   const btns=[...container.querySelectorAll('.tbtn')];
   if(!btns.length)return;
 
   // 1) 모두 보이게 초기화
-  btns.forEach(b=>{ b.style.display=''; });
-  overflowBtn.style.display='none';
-  // overflow 버튼 강제 숨김 상태에서 너비 재측정
-  const OVERFLOW_W=56; // ··· ▾ 버튼 폭 예약
-  const containerW=container.getBoundingClientRect().width;
-  if(!containerW)return;
+  btns.forEach(b=>b.style.display='');
+  overflowBtn.style.display='none'; // CSS display:none을 inline으로 유지
 
-  // 2) 각 버튼의 실제 렌더 너비 측정 (display:none 아닌 상태에서)
-  let cumW=0;
-  let overflowStart=-1;
+  // 가용 탭 영역 = hdr 전체 - 로고 - hright - overflow버튼 예약폭 - padding/gap
+  const hdrW=hdr.getBoundingClientRect().width;
+  const logoW=document.querySelector('.hlogo')?.getBoundingClientRect().width||32;
+  const hrightW=hright?.getBoundingClientRect().width||180;
+  const OVERHEAD=40; // 패딩·갭 여백
+  const OVERFLOW_BTN_W=50;
+  const availW=hdrW - logoW - hrightW - OVERHEAD - OVERFLOW_BTN_W;
+  if(availW<=0)return;
+
+  // 2) 탭 버튼 폭 누적
+  let cumW=0, overflowStart=-1;
   for(let i=0;i<btns.length;i++){
-    const rect=btns[i].getBoundingClientRect();
-    const bw=rect.width || btns[i].scrollWidth || 72;
-    cumW+=bw+2;
-    if(overflowStart===-1 && cumW>(containerW-OVERFLOW_W)){
-      overflowStart=i;
-    }
+    const bw=btns[i].getBoundingClientRect().width||btns[i].scrollWidth||80;
+    cumW+=bw+4;
+    if(overflowStart===-1&&cumW>availW) overflowStart=i;
   }
 
-  // 3) 오버플로우 버튼 표시 + 넘치는 탭 숨기기
+  // 3) 오버플로우 처리
   if(overflowStart!==-1){
-    overflowBtn.style.display='';
+    overflowBtn.style.display='inline-flex'; // ← CSS:none을 inline으로 override
     for(let i=overflowStart;i<btns.length;i++) btns[i].style.display='none';
-    // 현재 활성 탭이 숨겨졌으면 overflow 메뉴에서 on 표시
+    // overflow 메뉴에서 활성 탭 표시
+    const activeId=document.querySelector('.tbtn.on')?.id?.replace('tb-','')||'';
     document.querySelectorAll('.tab-overflow-item').forEach(el=>{
-      el.classList.toggle('on',el.dataset.tab===(document.querySelector('.tbtn.on')?.id?.replace('tb-','') || ''));
+      el.classList.toggle('on',el.dataset.tab===activeId);
     });
   }
 }
@@ -1562,24 +1645,39 @@ function renderHome(){
     <div class="home-grid">
       <div class="home-card" onclick="switchTab('writing')">
         <div class="home-card-icon">✍️</div>
-        <div class="home-card-title">집필 탭</div>
+        <div class="home-card-title">집필</div>
         <div class="home-card-desc">작품과 회차를 관리하고<br>집필 에디터로 글을 씁니다</div>
         ${totalChapters>0?`<div class="home-card-badge">${totalChapters}회차</div>`:''}
       </div>
       <div class="home-card" onclick="switchTab('schedule')">
         <div class="home-card-icon">📅</div>
-        <div class="home-card-title">스케줄 탭</div>
+        <div class="home-card-title">스케줄</div>
         <div class="home-card-desc">월간 집필 계획과<br>작품별 진행 트래커</div>
       </div>
       <div class="home-card" onclick="switchTab('tools')">
         <div class="home-card-icon">🛠️</div>
-        <div class="home-card-title">작품도구 탭</div>
-        <div class="home-card-desc">시놉시스, 세계관, 캐릭터시트 등<br>창작 자료를 관리합니다</div>
+        <div class="home-card-title">작품도구</div>
+        <div class="home-card-desc">시놉시스·세계관·캐릭터시트 등<br>창작 자료를 관리합니다</div>
       </div>
       <div class="home-card" onclick="switchTab('archive')">
         <div class="home-card-icon">📁</div>
-        <div class="home-card-title">자료실 탭</div>
+        <div class="home-card-title">자료실</div>
         <div class="home-card-desc">작품 관련 파일 관리<br>${S.archives.length}개 파일 보관 중</div>
+      </div>
+      <div class="home-card" onclick="switchTab('settle')">
+        <div class="home-card-icon">💰</div>
+        <div class="home-card-title">정산관리</div>
+        <div class="home-card-desc">플랫폼별 회차 정산 입력<br>수익 차트 (준비 중)</div>
+      </div>
+      <div class="home-card" onclick="switchTab('analysis')">
+        <div class="home-card-icon">🤖</div>
+        <div class="home-card-title">작품분석</div>
+        <div class="home-card-desc">AI 작품·회차 분석<br>(준비 중)</div>
+      </div>
+      <div class="home-card" onclick="switchTab('settings')">
+        <div class="home-card-icon">⚙️</div>
+        <div class="home-card-title">설정</div>
+        <div class="home-card-desc">작품 관리·테마·알림<br>Google Drive 연동</div>
       </div>
     </div>
   </div>
@@ -2730,6 +2828,14 @@ function writingLogToday(){
 }
 
 // ── 에디터 열기 ──
+function writingNavChapter(dir){
+  if(!_writingSelWork||!_writingSelCh) return;
+  const chs=wChapters(_writingSelWork);
+  const ci=chs.findIndex(c=>c.id===_writingSelCh);
+  if(ci<0) return;
+  const next=chs[ci+dir];
+  if(next) writingOpenChapter(_writingSelWork,next.id);
+}
 function writingOpenChapter(workId,chId){
   _writingSelWork=workId;_writingSelCh=chId;
   const w=wNodes().find(n=>n.id===workId);
@@ -3428,6 +3534,21 @@ function toolsOpenSheetNode(node){
 
 // ── 노드 저장 헬퍼 ──
 function _toolsSave(node){ dsave(); }
+// ── _saveWritingData / _writingAutoSave (mbhub 코드 호환 헬퍼) ──
+let _writingSaveTimer2 = null;
+function _saveWritingData(nodeId, data){
+  const node = (S.toolNodes||[]).find(n=>n.id===nodeId);
+  if(!node) return;
+  node.data = Object.assign({}, node.data||{}, data);
+  dsave();
+}
+function _writingAutoSave(nodeId, data){
+  const node = (S.toolNodes||[]).find(n=>n.id===nodeId);
+  if(!node) return;
+  node.data = Object.assign({}, node.data||{}, data);
+  clearTimeout(_writingSaveTimer2);
+  _writingSaveTimer2 = setTimeout(()=>dsave(), 400);
+}
 
 // ── 공통 필드 헬퍼 ──
 function _wField(label, type, val, onChange, opts={}){
@@ -3695,158 +3816,400 @@ function _syBindPanelDrag(panel){
 // ────────────────────────────────────
 //  2. 세계관/배경 (WS)
 // ────────────────────────────────────
-const WS_SECTIONS=[
-  {id:'map',title:'🗺 세계 지도',type:'image'},
-  {id:'overview',title:'🌐 세계관 개요',type:'group',fields:[
-    {id:'world',label:'세계관 이름/설명',ph:'이 세계의 이름과 기본 설명'},
-    {id:'era',label:'시대 배경',ph:'현대/중세/판타지 등'},
-    {id:'magic',label:'마법/기술 체계',ph:'마법, 기술, 초능력 등이 존재하는지'},
+
+const WS_SECTIONS = [
+  { id:'map',      title:'🗺 세계 지도', type:'image',
+    desc:'세계관의 전체적인 지도 및 주요 지역 설정 이미지' },
+  { id:'protagonist_bg', title:'🧑 주인공의 핵심 배경', type:'group', fields:[
+    {id:'origin',  label:'출신 지역 및 환경',  placeholder:'예: 귀족 가문, 빈민가, 마법사 길드 등'},
+    {id:'family',  label:'가족 및 혈통',        placeholder:'가족 구성원, 가문의 역사, 유전적 특성 등'},
+    {id:'org',     label:'소속 조직/사회적 위치',placeholder:'길드, 기사단, 왕족, 범죄 조직 등'},
   ]},
-  {id:'society',title:'🏛 사회/정치',type:'group',fields:[
-    {id:'government',label:'정치 체계',ph:'왕국, 공화국, 신정 등'},
-    {id:'class',label:'계급/신분 체계',ph:''},
-    {id:'conflict',label:'주요 갈등/세력',ph:'세계 내의 주요 갈등과 세력'},
+  { id:'world_structure', title:'🌐 세계관 구조 및 주요 지역', type:'group', fields:[
+    {id:'overall',   label:'전체적인 구조',      placeholder:'예: 하나의 대륙, 다섯 개의 부유섬, 여러 차원으로 나뉨 등'},
+    {id:'regions',   label:'주요 국가 및 도시',  placeholder:'각 지역 특징과 역할'},
+    {id:'contact',   label:'주인공과 접점 지역', placeholder:'차후 주인공과 접점이 있을 만한 지역'},
   ]},
-  {id:'power',title:'✨ 능력/힘의 체계',type:'group',fields:[
-    {id:'ability',label:'능력 체계',ph:'마법, 무공, 헌터 등급 등'},
-    {id:'avg_level',label:'평균 능력치',ph:'일반인 대비 주인공의 위치'},
-    {id:'forbidden',label:'금기/금지된 것',ph:'세계관 내 터부, 신급 존재 등'},
+  { id:'history', title:'📜 역사 및 시대적 배경', type:'group', fields:[
+    {id:'hist_flow', label:'역사적 흐름',         placeholder:'세계관의 역사적 흐름'},
+    {id:'era',       label:'현재 시대의 특징',    placeholder:'예: 암흑기, 혁명기, 부흥기 등'},
+    {id:'social',    label:'사회 계급 및 권력 구조',placeholder:'귀족제, 공화정, 계급 간 격차 등'},
   ]},
-  {id:'lifestyle',title:'🏠 생활 방식',type:'group',fields:[
-    {id:'life',label:'일반적 생활 양식',ph:''},
-    {id:'culture',label:'문화/관습',ph:'특이한 문화, 종교, 관습 등'},
+  { id:'geo', title:'🏔 지리 & 환경', type:'group', fields:[
+    {id:'terrain',   label:'지형 및 기후',        placeholder:''},
+    {id:'resource',  label:'자연 자원',           placeholder:'예: 마석, 특수 금속, 희귀 광물'},
+    {id:'transport', label:'교통 & 이동 수단',    placeholder:'예: 마차, 말, 텔레포트 등'},
   ]},
-  {id:'geography',title:'🏔 지리/장소',type:'group',fields:[
-    {id:'places',label:'주요 장소',ph:'이야기에 등장하는 주요 장소들'},
-    {id:'special',label:'특수 구역/금지 구역',ph:''},
+  { id:'culture', title:'🎭 문화와 사회', type:'group', fields:[
+    {id:'religion',  label:'종교 및 신화',        placeholder:'세계관 내 신앙, 주술적 요소'},
+    {id:'law',       label:'법과 질서',           placeholder:'주요 법 체계, 범죄 및 처벌 방식'},
+    {id:'edu',       label:'교육 시스템',         placeholder:'귀족 교육, 마법 학교, 무술 문파 등'},
+    {id:'family_c',  label:'결혼과 가족 구조',    placeholder:'예: 일부일처제, 혈통 계승 방식'},
+    {id:'arts',      label:'예술과 오락',         placeholder:''},
+  ]},
+  { id:'economy', title:'💰 경제와 산업', type:'group', fields:[
+    {id:'industry',  label:'생업 & 산업',         placeholder:'대다수의 종사 직업군'},
+    {id:'trade',     label:'무역 & 경제 구조',    placeholder:'국가 간 무역, 화폐 외 거래 방식'},
+    {id:'currency',  label:'주화 & 부의 시스템',  placeholder:''},
+  ]},
+  { id:'politics', title:'⚖️ 정치 & 권력 구조', type:'group', fields:[
+    {id:'gov',       label:'정부 형태',           placeholder:'왕정, 부족 연합, 독재 등'},
+    {id:'class',     label:'계급 체계',           placeholder:''},
+    {id:'diplomacy', label:'외교 관계',           placeholder:''},
+    {id:'conflict',  label:'세력 & 정치적 갈등',  placeholder:''},
+    {id:'situation', label:'정세',               placeholder:''},
+  ]},
+  { id:'lifestyle', title:'🏠 생활 방식', type:'group', fields:[
+    {id:'life',      label:'대다수의 생활 양식',  placeholder:''},
+    {id:'food',      label:'식습관',              placeholder:'예: 육류 중심, 특정 음식의 신성함 등'},
+    {id:'clothes',   label:'의복 문화',           placeholder:'예: 전통 복장, 계급별 의복 차이 등'},
+  ]},
+  { id:'combat', title:'⚔️ 무기 & 전투', type:'group', fields:[
+    {id:'weapons',   label:'주요 무기 체계',      placeholder:''},
+    {id:'armor',     label:'방어구 및 갑옷',      placeholder:''},
+    {id:'tactics',   label:'전투 방식 및 전략',   placeholder:'예: 개별 전투 중심, 대규모 전투 중심 등'},
+  ]},
+  { id:'power', title:'✨ 능력 체계 & 힘의 균형', type:'group', fields:[
+    {id:'ability',   label:'능력 및 스킬 체계',   placeholder:'마법, 초능력, 무공 등'},
+    {id:'avg_level', label:'평균 능력치 및 경지',  placeholder:'세계관 내 인물 평균 능력치 및 경지 설정'},
+    {id:'forbidden', label:'금지된 힘 / 전설적 존재',placeholder:'세계관 내 금기로 여겨지는 능력, 신급 존재'},
   ]},
 ];
 
-function renderToolsWS(node,container){
-  const d=node.data;
-  const save=(key,val)=>{d[key]=val;_toolsSave(node);};
+function renderToolsWS(node, container){
+  container.innerHTML = '';
+  const d = node.data || {};
 
-  const tb=document.createElement('div');tb.className='writing-toolbar';
-  tb.innerHTML='<span class="writing-toolbar-title">🌍 세계관/배경</span><span style="font-size:10px;color:var(--tx3)">섹션별 작성, 자동 저장</span>';
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WWS');
+  tb.innerHTML = `<span class="writing-toolbar-title">🌍 세계관/배경</span>
+    <span style="font-size:10px;color:var(--tx3)">섹션별로 작성하고 자동 저장됩니다</span>`;
   container.appendChild(tb);
 
-  const body=document.createElement('div');body.className='writing-body';
+  const body = document.createElement('div');
+  body.className = 'writing-body';
 
   WS_SECTIONS.forEach(sec=>{
-    const card=document.createElement('div');card.className='ws-section-card';
-    card.appendChild(_wSection(sec.title));
+    // 섹션 카드 래핑
+    const secCard = document.createElement('div');
+    secCard.className = 'ws-section-card';
+    const secTitle = _wSection(sec.title);
+    secCard.appendChild(secTitle);
 
-    if(sec.type==='image'){
-      const imgWrap=document.createElement('div');imgWrap.style.cssText='border:2px dashed var(--bdr);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--surf2)';
-      const imgData=d[sec.id];
+    if(sec.type === 'image'){
+      // 이미지 업로드 영역
+      const imgWrap = document.createElement('div');
+      imgWrap.style.cssText = 'border:2px dashed var(--bdr);border-radius:8px;padding:16px;text-align:center;cursor:pointer;background:var(--surf2)';
+      const imgData = d[sec.id];
       if(imgData){
-        const img=document.createElement('img');img.src=imgData;img.style.cssText='max-width:100%;max-height:240px;border-radius:6px;display:block;margin:0 auto';imgWrap.innerHTML='';imgWrap.appendChild(img);
-        const delBtn=document.createElement('button');delBtn.className='wt-btn';delBtn.style.cssText='margin-top:8px;color:var(--rd)';delBtn.textContent='🗑 이미지 제거';
-        delBtn.onclick=e=>{e.stopPropagation();d[sec.id]=null;_toolsSave(node);toolsOpenSheetNode(node);};
+        const img = document.createElement('img');
+        img.src = imgData;
+        img.style.cssText = 'max-width:100%;max-height:300px;border-radius:6px;display:block;margin:0 auto';
+        imgWrap.innerHTML = '';
+        imgWrap.appendChild(img);
+        const delBtn = document.createElement('button');
+        delBtn.className = 'wt-btn';
+        delBtn.style.cssText = 'margin-top:8px;color:var(--rd)';
+        delBtn.textContent = '🗑 이미지 제거';
+        delBtn.onclick = e=>{e.stopPropagation(); _saveWritingData(node.id,{[sec.id]:null}); renderToolsWS(node,container);};
         imgWrap.appendChild(delBtn);
       } else {
-        imgWrap.innerHTML='<span style="font-size:28px">🗺</span><br><span style="font-size:12px;color:var(--tx3)">클릭하여 세계 지도 이미지 업로드</span>';
+        imgWrap.innerHTML = `<span style="font-size:28px">🗺</span><br><span style="font-size:12px;color:var(--tx3)">클릭하여 세계 지도 이미지 업로드</span>`;
       }
-      imgWrap.onclick=()=>{if(imgData)return;const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{d[sec.id]=ev.target.result;_toolsSave(node);toolsOpenSheetNode(node);};r.readAsDataURL(file);};inp.click();};
-      card.appendChild(imgWrap);
-    } else if(sec.type==='group'){
-      const secData=d[sec.id]||{};
+      imgWrap.onclick = ()=>{
+        const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*';
+        inp.onchange = e=>{
+          const file=e.target.files[0]; if(!file)return;
+          const r=new FileReader(); r.onload=ev=>{
+            _saveWritingData(node.id,{[sec.id]:ev.target.result});
+            renderToolsWS(node,container);
+          }; r.readAsDataURL(file);
+        }; inp.click();
+      };
+      secCard.appendChild(imgWrap);
+
+    } else if(sec.type === 'group'){
+      // 필드 그룹
+      const secData = d[sec.id] || {};
       sec.fields.forEach(field=>{
-        const{wrap}=_wField(field.label,'textarea',secData[field.id],v=>{if(!d[sec.id])d[sec.id]={};d[sec.id][field.id]=v;_toolsSave(node);},{placeholder:field.ph,rows:2});
-        card.appendChild(wrap);
+        const isShort = field.placeholder && field.placeholder.length < 30;
+        const f = _wField(field.label, isShort?'text':'textarea', secData[field.id],
+          v=>{
+            if(!d[sec.id]) d[sec.id]={};
+            d[sec.id][field.id]=v;
+            _writingAutoSave(node.id,{[sec.id]:{...(d[sec.id]||{})}});
+          },
+          {placeholder:field.placeholder, rows:3}
+        );
+        secCard.appendChild(f.wrap);
       });
     }
-    body.appendChild(card);
+    body.appendChild(secCard);
   });
+
   container.appendChild(body);
 }
 
 // ────────────────────────────────────
 //  3. 캐릭터 시트 (CS)
 // ────────────────────────────────────
-function renderToolsCS(node,container){
-  const d=node.data;
-  if(!d.chars)d.chars=[];
-  const save=()=>_toolsSave(node);
+const CS_DEFAULT_TEMPLATE = [
+  { cat:'핵심', desc:'캐릭터의 근본적 동기와 갈등', items:[
+    {id:'role',    label:'역할',      on:true},
+    {id:'age_sex', label:'나이/성별', on:true},
+    {id:'desire',  label:'욕망',      on:true},
+    {id:'lack',    label:'결핍',      on:true},
+    {id:'bg',      label:'배경',      on:true},
+    {id:'intent',  label:'의도',      on:false},
+    {id:'goal',    label:'목표',      on:true},
+    {id:'desc',    label:'설명',      on:false},
+    {id:'obstacle',label:'방해물',    on:false},
+  ]},
+  { cat:'성격', desc:'캐릭터 내면과 행동의 특성', items:[
+    {id:'personality', label:'성격 특성', on:true},
+    {id:'speech',      label:'말투',      on:false},
+    {id:'habit',       label:'습관',      on:false},
+    {id:'belief',      label:'신념/가치관',on:false},
+  ]},
+  { cat:'배경', desc:'캐릭터와 환경적 요소', items:[
+    {id:'job',    label:'직업', on:true},
+    {id:'family', label:'가족', on:false},
+    {id:'secret', label:'비밀', on:false},
+  ]},
+  { cat:'외면', desc:'외모와 시각적 인상', items:[
+    {id:'look',    label:'외모',      on:false},
+    {id:'fashion', label:'패션',      on:false},
+    {id:'body',    label:'신체적 특징',on:false},
+  ]},
+  { cat:'고급', desc:'서사 구조와 상징적 요소', items:[
+    {id:'arc',    label:'변화(아크)', on:false},
+    {id:'symbol', label:'상징',       on:false},
+    {id:'motive', label:'모티브',     on:false},
+  ]},
+];
 
-  const tb=document.createElement('div');tb.className='writing-toolbar';
-  tb.innerHTML='<span class="writing-toolbar-title">👤 캐릭터 시트</span>';
-  const addBtn=document.createElement('button');addBtn.className='wt-btn';addBtn.textContent='+ 캐릭터 추가';
-  addBtn.onclick=()=>{d.chars.push({id:uid(),name:'새 캐릭터',role:'',age:'',gender:'',personality:'',appearance:'',background:'',goal:'',secret:'',image:null});save();toolsOpenSheetNode(node);};
-  tb.appendChild(addBtn);container.appendChild(tb);
-
-  const body=document.createElement('div');body.className='writing-body';
-  if(!d.chars.length){
-    const empty=document.createElement('div');empty.style.cssText='text-align:center;padding:40px;color:var(--tx3);font-size:12px';
-    empty.textContent='+ 캐릭터 추가 버튼으로 캐릭터를 추가하세요';body.appendChild(empty);
-  }
-
-  d.chars.forEach((ch,ci)=>{
-    const card=document.createElement('div');card.className='cs-field-group';
-
-    // 이미지 + 이름 행
-    const infoRow=document.createElement('div');infoRow.className='cs-info-row';
-    const imgArea=document.createElement('div');imgArea.className='cs-img-area';imgArea.title='클릭하여 이미지 업로드';
-    if(ch.image){const img=document.createElement('img');img.src=ch.image;imgArea.appendChild(img);}
-    else imgArea.innerHTML='<span style="font-size:28px">👤</span>';
-    imgArea.onclick=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{ch.image=ev.target.result;save();const curImg=imgArea.querySelector('img');if(curImg){curImg.src=ev.target.result;}else{imgArea.innerHTML='';const img=document.createElement('img');img.src=ev.target.result;imgArea.appendChild(img);}};r.readAsDataURL(file);};inp.click();};
-
-    const infoCol=document.createElement('div');infoCol.className='cs-info-col';
-    const nameInp=document.createElement('input');nameInp.type='text';nameInp.value=ch.name||'';nameInp.placeholder='캐릭터 이름';nameInp.style.cssText='font-size:15px;font-weight:700;background:transparent;border:none;border-bottom:2px solid var(--bdr);outline:none;color:var(--tx);width:100%;padding:4px 0;font-family:inherit';
-    nameInp.oninput=()=>{ch.name=nameInp.value;save();};nameInp.addEventListener('keydown',e=>e.stopPropagation());
-
-    const delBtn=document.createElement('button');delBtn.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 6px;align-self:flex-end';delBtn.textContent='삭제';
-    delBtn.onclick=()=>{if(!confirm(`"${ch.name||'캐릭터'}" 삭제하시겠습니까?`))return;d.chars.splice(ci,1);save();toolsOpenSheetNode(node);};
-    infoCol.append(nameInp,delBtn);infoRow.append(imgArea,infoCol);card.appendChild(infoRow);
-
-    // 필드 그리드
-    const grid=document.createElement('div');grid.className='cs-field-grid';
-    [
-      {label:'역할',key:'role',ph:'주인공/히로인/악당 등'},
-      {label:'나이/성별',key:'age_sex',ph:'예: 24세 / 여성'},
-      {label:'직업/신분',key:'job',ph:''},
-      {label:'성격',key:'personality',ph:''},
-      {label:'욕망',key:'desire',ph:'이 캐릭터가 원하는 것',full:true},
-      {label:'결핍',key:'lack',ph:'이 캐릭터에게 없는 것'},
-      {label:'목표',key:'goal',ph:'작품에서의 목표'},
-      {label:'외모',key:'appearance',ph:'외모/패션 특징',full:true},
-      {label:'배경',key:'background',ph:'출신/과거 이력',full:true},
-      {label:'비밀',key:'secret',ph:'숨기고 있는 것',full:true},
-      {label:'말투',key:'speech',ph:'특징적인 말투/습관'},
-      {label:'상징',key:'symbol',ph:'상징하는 것/모티브'},
-    ].forEach(f=>{
-      const item=document.createElement('div');item.className='cs-field-item'+(f.full?' full':'');
-      const lbl=document.createElement('div');lbl.className='cs-field-label';lbl.textContent=f.label;
-      const inp=document.createElement('textarea');inp.className='cs-field-input';inp.value=ch[f.key]||'';inp.placeholder=f.ph||'';inp.rows=f.full?2:1;
-      inp.oninput=()=>{ch[f.key]=inp.value;save();};inp.addEventListener('keydown',e=>e.stopPropagation());
-      item.append(lbl,inp);grid.appendChild(item);
-    });
-    card.appendChild(grid);body.appendChild(card);
-  });
-  container.appendChild(body);
+// 작품 항목 단위 템플릿 관리
+function _csGetTemplate(itemId){
+  const item = (S.toolNodes||[]).find(n=>n.id===itemId);
+  if(!item) return JSON.parse(JSON.stringify(CS_DEFAULT_TEMPLATE));
+  if(!item.charTemplate) item.charTemplate = JSON.parse(JSON.stringify(CS_DEFAULT_TEMPLATE));
+  return item.charTemplate;
+}
+function _csSaveTemplate(itemId, tpl){
+  const item = (S.toolNodes||[]).find(n=>n.id===itemId);
+  if(!item) return;
+  item.charTemplate = tpl;
+  dsave();
 }
 
-// ────────────────────────────────────
-//  4. 인물 관계도 (RM)
-// ────────────────────────────────────
-const RM_REL_COLORS=['#388bfd','#f85149','#3fb950','#d29922','#bc8cff','#ffa657','#e91e63','#00bcd4'];
-const RM_LINE_STYLES=[
-  {id:'solid',  label:'실선',     dash:null,       sw:2},
-  {id:'dashed', label:'점선',     dash:'8,4',      sw:2},
-  {id:'dotted', label:'점점',     dash:'2,4',      sw:2},
-  {id:'double', label:'굵은 선', dash:null,       sw:4},
-  {id:'wave',   label:'파선(경계)',dash:'12,3,3,3', sw:2},
-  {id:'zigzag', label:'물결선',   dash:'6,2,2,2',  sw:2},
-  {id:'cut',    label:'단점(X)',  dash:'1,6',      sw:2},
-];
-const RM_DIR = {
-  one:  '→ 단방향',
-  both: '↔ 양방향',
-  none: '— 연결선만',
-};
+// ── 캐릭터 시트 렌더 ──
+function renderToolsCS(node, container){
+  container.innerHTML = '';
+  const d = node.data || {};
+  const itemId = node.p;
+  const tpl = _csGetTemplate(itemId);
 
-let _rmNode=null,_rmSvg=null,_rmCvWrap=null,_rmD=null,_rmConnecting=null;
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WCS');
+  tb.innerHTML = `<span class="writing-toolbar-title">👤 캐릭터 시트</span>
+    <span style="font-size:10px;color:var(--tx3)">우측 패널에서 표시할 특성을 선택하세요</span>`;
+  container.appendChild(tb);
 
+  // 좌우 컨테이너
+  const cs = document.createElement('div');
+  cs.className = 'cs-container';
+
+  // ── 좌측: 캐릭터 내용 ──
+  const left = document.createElement('div');
+  left.className = 'cs-left';
+  left.id = 'cs-left-'+node.id;
+
+  // 이미지 + 이름 + 요약
+  const infoRow = document.createElement('div');
+  infoRow.className = 'cs-info-row';
+
+  // 이미지 업로드
+  const imgArea = document.createElement('div');
+  imgArea.className = 'cs-img-area';
+  imgArea.title = '클릭하여 캐릭터 이미지 업로드';
+  if(d.image){
+    const img = document.createElement('img');
+    img.src = d.image;
+    imgArea.appendChild(img);
+  } else {
+    imgArea.innerHTML = '<span style="font-size:28px">👤</span><span style="font-size:10px;color:var(--tx3);margin-top:4px">이미지 업로드</span>';
+  }
+  imgArea.onclick = ()=>{
+    const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*';
+    inp.onchange = e=>{
+      const file=e.target.files[0]; if(!file)return;
+      const r=new FileReader(); r.onload=ev=>{
+        d.image=ev.target.result; _saveWritingData(node.id,{image:ev.target.result});
+        renderToolsCS(node,container);
+      }; r.readAsDataURL(file);
+    }; inp.click();
+  };
+
+  // 이름 + 요약
+  const infoCol = document.createElement('div');
+  infoCol.className = 'cs-info-col';
+
+  const nameInp = document.createElement('input');
+  nameInp.type='text'; nameInp.className='cs-field-input';
+  nameInp.placeholder='인물명'; nameInp.value=d.name||'';
+  nameInp.style.cssText+='font-size:15px;font-weight:700';
+  nameInp.oninput=()=>_writingAutoSave(node.id,{name:nameInp.value});
+
+  const summaryTa = document.createElement('textarea');
+  summaryTa.className='cs-field-input'; summaryTa.rows=4;
+  summaryTa.placeholder='인물 요약 (한두 줄로 핵심 정리)';
+  summaryTa.value=d.summary||'';
+  summaryTa.oninput=()=>_writingAutoSave(node.id,{summary:summaryTa.value});
+
+  infoCol.append(nameInp, summaryTa);
+  infoRow.append(imgArea, infoCol);
+  left.appendChild(infoRow);
+
+  // 이미지 삭제 버튼
+  if(d.image){
+    const delImgBtn = document.createElement('button');
+    delImgBtn.className='wt-btn'; delImgBtn.style.cssText='font-size:10px;color:var(--rd);margin-top:-8px;align-self:flex-start';
+    delImgBtn.textContent='🗑 이미지 제거';
+    delImgBtn.onclick=()=>{d.image=null;_saveWritingData(node.id,{image:null});renderToolsCS(node,container);};
+    left.appendChild(delImgBtn);
+  }
+
+  // 활성화된 특성 필드 렌더
+  _csRenderActiveFields(left, node, d, tpl);
+
+  cs.appendChild(left);
+
+  // ── 우측: 특성 관리 패널 ──
+  const right = document.createElement('div');
+  right.className = 'cs-right';
+
+  const rightHdr = document.createElement('div');
+  rightHdr.className = 'cs-right-hdr';
+  rightHdr.innerHTML = '<span>캐릭터 특성</span>';
+  right.appendChild(rightHdr);
+
+  const catsWrap = document.createElement('div');
+  catsWrap.className = 'cs-trait-cats';
+  catsWrap.id = 'cs-traits-'+node.id;
+  _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d);
+  right.appendChild(catsWrap);
+
+  // 커스텀 항목 추가
+  const addWrap = document.createElement('div');
+  addWrap.className = 'cs-add-custom';
+  const addBtn = document.createElement('button');
+  addBtn.className = 'wt-btn'; addBtn.style.cssText='width:100%;font-size:11px';
+  addBtn.textContent = '＋ 커스텀 항목 추가';
+  addBtn.onclick = ()=>{
+    const catName = prompt('추가할 카테고리 이름을 입력하거나, 기존 카테고리명을 입력하세요:');
+    if(!catName||!catName.trim()) return;
+    const label = prompt('항목 이름:');
+    if(!label||!label.trim()) return;
+    // 기존 카테고리 찾기
+    let cat = tpl.find(c=>c.cat===catName.trim());
+    if(!cat){
+      cat = {cat:catName.trim(), desc:'', items:[]};
+      tpl.push(cat);
+    }
+    cat.items.push({id:'c_'+Date.now(), label:label.trim(), on:true, custom:true});
+    _csSaveTemplate(itemId, tpl);
+    renderToolsCS(node, container);
+  };
+  addWrap.appendChild(addBtn);
+  right.appendChild(addWrap);
+
+  cs.appendChild(right);
+  container.appendChild(cs);
+}
+
+// 활성화된 특성 필드만 좌측에 렌더
+function _csRenderActiveFields(leftEl, node, d, tpl){
+  // 기존 특성 필드 제거 (cs-trait-field 클래스)
+  leftEl.querySelectorAll('.cs-trait-section').forEach(el=>el.remove());
+
+  tpl.forEach(catObj=>{
+    const activeItems = catObj.items.filter(it=>it.on);
+    if(!activeItems.length) return;
+
+    const section = document.createElement('div');
+    section.className = 'cs-trait-section';
+
+    const secTitle = document.createElement('div');
+    secTitle.className = 'writing-section-title';
+    secTitle.textContent = catObj.cat;
+    section.appendChild(secTitle);
+
+    activeItems.forEach(item=>{
+      const field = document.createElement('div');
+      field.className = 'cs-trait-field';
+      const lbl = document.createElement('label');
+      lbl.textContent = item.label;
+      if(item.desc){ lbl.title=item.desc; }
+      const ta = document.createElement('textarea');
+      ta.className='cs-field-input'; ta.rows=3;
+      ta.placeholder=item.label+' 내용 입력...';
+      ta.value=d['f_'+item.id]||'';
+      ta.oninput=()=>_writingAutoSave(node.id,{['f_'+item.id]:ta.value});
+      field.append(lbl,ta);
+      section.appendChild(field);
+    });
+    leftEl.appendChild(section);
+  });
+}
+
+// 우측 특성 패널 렌더
+function _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d){
+  catsWrap.innerHTML='';
+  tpl.forEach((catObj, ci)=>{
+    const catDiv = document.createElement('div');
+    const catTitle = document.createElement('div');
+    catTitle.className = 'cs-cat-title';
+    catTitle.textContent = catObj.cat + (catObj.desc?' — '+catObj.desc:'');
+    catDiv.appendChild(catTitle);
+
+    catObj.items.forEach((item, ii)=>{
+      const row = document.createElement('div');
+      row.className = 'cs-trait-item';
+      const chk = document.createElement('input');
+      chk.type='checkbox'; chk.checked=item.on;
+      chk.id='cs-chk-'+node.id+'-'+item.id;
+      chk.onchange=()=>{
+        tpl[ci].items[ii].on=chk.checked;
+        _csSaveTemplate(itemId,tpl);
+        const left=document.getElementById('cs-left-'+node.id);
+        if(left) _csRenderActiveFields(left,node,d,tpl);
+      };
+      const lbl=document.createElement('label');
+      lbl.htmlFor=chk.id; lbl.textContent=item.label;
+
+      row.append(chk, lbl);
+
+      if(item.custom){
+        const delBtn=document.createElement('button');
+        delBtn.className='cs-trait-del'; delBtn.textContent='✕'; delBtn.title='삭제';
+        delBtn.onclick=e=>{
+          e.stopPropagation();
+          if(!confirm(`"${item.label}" 항목을 삭제하시겠습니까?`)) return;
+          tpl[ci].items.splice(ii,1);
+          _csSaveTemplate(itemId,tpl);
+          renderToolsCS(node,container);
+        };
+        row.appendChild(delBtn);
+      }
+      catDiv.appendChild(row);
+    });
+    catsWrap.appendChild(catDiv);
+  });
+}
 function renderToolsRM(node,container){
   const d=node.data; if(!d.chars)d.chars=[]; if(!d.rels)d.rels=[];
   _rmNode=node; _rmD=d;
@@ -3884,38 +4247,38 @@ function renderToolsRM(node,container){
 
 function _rmRenderSide(sideEl,node,d,cvWrap,svg){
   sideEl.innerHTML='';
-  const csNode=S.toolNodes.find(n=>n.workId===node.workId&&n.type==='CS');
-  const chars=csNode?.data?.chars||[];
-  if(!chars.length){
-    sideEl.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:8px;line-height:1.6">캐릭터 시트에 캐릭터를 먼저 추가하세요</div>';
+  // 같은 workId의 CS 시트 노드 전체 탐색 (각 CS 노드 = 캐릭터 1명)
+  const csNodes=(S.toolNodes||[]).filter(n=>n.workId===node.workId&&n.type==='CS');
+  if(!csNodes.length){
+    sideEl.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:8px;line-height:1.6">캐릭터 시트를<br>먼저 추가하세요</div>';
     return;
   }
-  chars.forEach(cs=>{
-    const already=d.chars.find(c=>c.csId===cs.id);
+  csNodes.forEach(csNode=>{
+    const already=d.chars.find(c=>c.csId===csNode.id);
     const row=document.createElement('div'); row.className='rm-side-item'+(already?' added':'');
     const ico=document.createElement('span'); ico.style.cssText='font-size:16px;flex-shrink:0';
-    if(cs.image){const img=document.createElement('img');img.src=cs.image;img.style.cssText='width:22px;height:22px;border-radius:50%;object-fit:cover';ico.appendChild(img);}
+    if(csNode.data?.image){const img=document.createElement('img');img.src=csNode.data.image;img.style.cssText='width:22px;height:22px;border-radius:50%;object-fit:cover';ico.appendChild(img);}
     else ico.textContent='👤';
-    const name=document.createElement('span'); name.style.cssText='flex:1;font-size:11px;color:var(--tx2)'; name.textContent=cs.name||'?';
+    const name=document.createElement('span'); name.style.cssText='flex:1;font-size:11px;color:var(--tx2)'; name.textContent=csNode.data?.name||csNode.name||'?';
     const btn=document.createElement('button'); btn.className='rm-side-add-btn'+(already?' remove':''); btn.textContent=already?'제거':'추가';
     btn.onclick=()=>{
       if(already){
-        d.chars=d.chars.filter(c=>c.csId!==cs.id);
+        d.chars=d.chars.filter(c=>c.csId!==csNode.id);
         d.rels=d.rels.filter(r=>r.from!==already.id&&r.to!==already.id);
       } else {
-        d.chars.push({id:uid(),csId:cs.id,x:60+Math.random()*300,y:40+Math.random()*200});
+        d.chars.push({id:uid(),csId:csNode.id,x:60+Math.random()*300,y:40+Math.random()*200});
       }
-      _toolsSave(node);
-      toolsOpenSheetNode(node);
+      _toolsSave(node); toolsOpenSheetNode(node);
     };
     row.append(ico,name,btn); sideEl.appendChild(row);
   });
 }
 
 function _rmRenderCard(ch,cvWrap,node,d,svg){
-  const csNode=S.toolNodes.find(n=>n.workId===node.workId&&n.type==='CS');
-  const csChar=csNode?.data?.chars?.find(c=>c.id===ch.csId);
-  if(!csChar) return;
+  // 각 CS 노드 = 캐릭터 1명. csId로 해당 CS 노드를 직접 찾음
+  const csNode=(S.toolNodes||[]).find(n=>n.id===ch.csId);
+  if(!csNode) return;
+  const csChar=csNode.data||{};
 
   const card=document.createElement('div'); card.className='rm-char-card'; card.id='rm-card-'+ch.id;
   card.style.left=ch.x+'px'; card.style.top=ch.y+'px';
@@ -3923,15 +4286,15 @@ function _rmRenderCard(ch,cvWrap,node,d,svg){
   const imgDiv=document.createElement('div'); imgDiv.className='rm-char-img';
   if(csChar.image){const img=document.createElement('img');img.src=csChar.image;imgDiv.appendChild(img);}
   else imgDiv.textContent='👤';
-  const nameEl=document.createElement('div'); nameEl.className='rm-char-name'; nameEl.textContent=csChar.name||csChar.id;
-  const summEl=document.createElement('div'); summEl.className='rm-char-summary'; summEl.textContent=csChar.role||'';
+  const nameEl=document.createElement('div'); nameEl.className='rm-char-name'; nameEl.textContent=csChar.name||csNode.name||'?';
+  const summEl=document.createElement('div'); summEl.className='rm-char-summary'; summEl.textContent=csChar.summary||csChar.f_role||'';
   card.append(imgDiv,nameEl,summEl);
 
   // 연결 포인트 4방향
-  [['top',50,0],['right',100,50],['bottom',50,100],['left',0,50]].forEach(([dir,lp,tp])=>{
+  [['top',50,0],['right',100,50],['bottom',50,100],['left',0,50]].forEach(([pos,lp,tp])=>{
     const pt=document.createElement('div'); pt.className='rm-connect-pt';
     pt.style.cssText=`left:${lp}%;top:${tp}%;transform:translate(-50%,-50%)`;
-    pt.addEventListener('mousedown',e=>{
+    pt.addEventListener('pointerdown',e=>{
       e.stopPropagation(); e.preventDefault();
       const rect=cvWrap.getBoundingClientRect(); const cr=card.getBoundingClientRect();
       _rmConnecting={fromId:ch.id, sx:cr.left-rect.left+cr.width/2, sy:cr.top-rect.top+cr.height/2};
@@ -3939,34 +4302,43 @@ function _rmRenderCard(ch,cvWrap,node,d,svg){
     card.appendChild(pt);
   });
 
-  // 드래그 이동
-  let _dx=0,_dy=0,_dragging=false;
-  card.addEventListener('mousedown',e=>{
+  // 드래그 이동 — pointerCapture로 이벤트 누적 방지
+  let _dragOffX=0,_dragOffY=0;
+  card.addEventListener('pointerdown',e=>{
     if(e.target.classList.contains('rm-connect-pt')) return;
-    _dragging=true; _dx=e.clientX-card.offsetLeft; _dy=e.clientY-card.offsetTop; card.style.zIndex='10';
+    e.preventDefault();
+    _dragOffX=e.clientX-ch.x; _dragOffY=e.clientY-ch.y;
+    card.style.zIndex='10';
+    card.setPointerCapture(e.pointerId);
   });
-  document.addEventListener('mousemove',e=>{
-    if(!_dragging) return;
-    ch.x=e.clientX-_dx; ch.y=e.clientY-_dy;
+  card.addEventListener('pointermove',e=>{
+    if(!card.hasPointerCapture(e.pointerId)) return;
+    if(e.target.classList.contains('rm-connect-pt')) return;
+    ch.x=e.clientX-_dragOffX; ch.y=e.clientY-_dragOffY;
     card.style.left=ch.x+'px'; card.style.top=ch.y+'px';
     _rmDrawAllLines(svg,d,cvWrap);
   });
-  document.addEventListener('mouseup',e=>{
-    if(!_dragging) return;
-    _dragging=false; card.style.zIndex=''; _toolsSave(node);
+  card.addEventListener('pointerup',e=>{
+    if(!card.hasPointerCapture(e.pointerId)) return;
+    card.style.zIndex=''; _toolsSave(node);
     if(_rmConnecting){
-      const targetCard=e.target.closest('.rm-char-card');
-      if(targetCard&&targetCard!==card){
-        const toId=targetCard.id.replace('rm-card-','');
-        _rmOpenRelPopup(e,_rmConnecting.fromId,toId,node,d,cvWrap,svg);
-      } else _rmCancelConnect();
+      const rect=cvWrap.getBoundingClientRect();
+      const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      const target=d.chars.find(c=>{
+        if(c.id===_rmConnecting.fromId) return false;
+        const el=document.getElementById('rm-card-'+c.id);
+        if(!el) return false;
+        const er=el.getBoundingClientRect(), wr=cvWrap.getBoundingClientRect();
+        return mx>=er.left-wr.left&&mx<=er.right-wr.left&&my>=er.top-wr.top&&my<=er.bottom-wr.top;
+      });
+      if(target) _rmOpenRelPopup(e,_rmConnecting.fromId,target.id,node,d,cvWrap,svg);
+      else _rmCancelConnect();
     }
   });
 
-  // 우클릭 → 이 캐릭터 관계선 보기 / 카드 제거
+  // 우클릭 → 관계선 보기 / 카드 제거
   card.addEventListener('contextmenu',e=>{
     e.preventDefault();
-    // 이 캐릭터의 관계선 목록
     const myRels=d.rels.filter(r=>r.from===ch.id||r.to===ch.id);
     const menu=[
       {l:'🔗 이 캐릭터의 관계선 보기', a:()=>_rmShowRelList(ch,csChar,myRels,d,svg,cvWrap,node)},
@@ -3998,17 +4370,16 @@ function _rmShowRelList(ch,csChar,rels,d,svg,cvWrap,node){
     const empty=document.createElement('div'); empty.style.cssText='font-size:11px;color:var(--tx3);padding:8px 0'; empty.textContent='관계선이 없습니다.'; pop.appendChild(empty);
   } else {
     rels.forEach(rel=>{
-      const csNode=S.toolNodes.find(n=>n.workId===node.workId&&n.type==='CS');
-      const chars=csNode?.data?.chars||[];
       const otherId=rel.from===ch.id?rel.to:rel.from;
-      const otherChar=d.chars.find(c=>c.id===otherId);
-      const otherCs=chars.find(c=>c.id===otherChar?.csId);
-      const otherName=otherCs?.name||'?';
+      const otherPos=d.chars.find(c=>c.id===otherId);
+      // 각 CS 노드 = 캐릭터 1명 → csId로 직접 조회
+      const otherCsNode=otherPos?(S.toolNodes||[]).find(n=>n.id===otherPos.csId):null;
+      const otherName=otherCsNode?.data?.name||otherCsNode?.name||'?';
       const dir=rel.dir||'none';
-      const dirLabel= dir==='one'? (rel.from===ch.id?`→ ${otherName}`:`${otherName} →`) : dir==='both'? `↔ ${otherName}` : `— ${otherName}`;
+      const dirLabel=dir==='one'?(rel.from===ch.id?`→ ${otherName}`:`${otherName} →`):dir==='both'?`↔ ${otherName}`:`— ${otherName}`;
       const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bdr2)';
       const dot=document.createElement('span'); dot.style.cssText=`width:10px;height:10px;border-radius:50%;background:${rel.color||'#388bfd'};flex-shrink:0`;
-      const lbl=document.createElement('span'); lbl.style.cssText='flex:1;font-size:11px;color:var(--tx2)'; lbl.textContent=(rel.label?`"${rel.label}" `:'')+ dirLabel;
+      const lbl=document.createElement('span'); lbl.style.cssText='flex:1;font-size:11px;color:var(--tx2)'; lbl.textContent=(rel.label?`"${rel.label}" `:'')+dirLabel;
       const editBtn=document.createElement('button'); editBtn.className='wt-btn'; editBtn.style.cssText='font-size:10px;padding:2px 7px'; editBtn.textContent='편집';
       editBtn.onclick=()=>{pop.remove(); _rmEditRelPopup({clientX:window.innerWidth/2,clientY:window.innerHeight/2},rel,d,svg,cvWrap,node);};
       row.append(dot,lbl,editBtn); pop.appendChild(row);
@@ -4331,70 +4702,240 @@ function _rmEditRelPopup(e,rel,d,svg,cvWrap,node){
 // ────────────────────────────────────
 //  5. 용어사전 (GS)
 // ────────────────────────────────────
-function renderToolsGS(node,container){
-  const d=node.data;if(!d.tabs)d.tabs=[{id:uid(),name:'기본',rows:[]}];
-  const save=()=>_toolsSave(node);
-
-  const tb=document.createElement('div');tb.className='writing-toolbar';
-  tb.innerHTML='<span class="writing-toolbar-title">📚 용어사전</span>';
-  const addTabBtn=document.createElement('button');addTabBtn.className='wt-btn';addTabBtn.textContent='+ 탭 추가';
-  addTabBtn.onclick=()=>{d.tabs.push({id:uid(),name:'새 탭',rows:[]});save();toolsOpenSheetNode(node);};
-  tb.appendChild(addTabBtn);container.appendChild(tb);
-
-  // 탭 헤더
-  const tabHdr=document.createElement('div');tabHdr.style.cssText='display:flex;border-bottom:1px solid var(--bdr);padding:0 14px;background:var(--surf2);flex-shrink:0;overflow-x:auto;flex-wrap:nowrap';
-  let activeTabId=d._activeTab||d.tabs[0]?.id;
-
-  const body=document.createElement('div');body.style.cssText='flex:1;overflow:hidden;display:flex;flex-direction:column';
-
-  const renderTab=(tabId)=>{
-    d._activeTab=tabId;activeTabId=tabId;
-    tabHdr.querySelectorAll('.gs-tab-btn').forEach(b=>b.classList.toggle('on',b.dataset.tabId===tabId));
-    body.innerHTML='';
-    const tab=d.tabs.find(t=>t.id===tabId);if(!tab)return;
-    if(!tab.rows)tab.rows=[];
-
-    const tableWrap=document.createElement('div');tableWrap.style.cssText='flex:1;overflow:auto;padding:10px';
-    const table=document.createElement('table');table.className='gs-table';
-    const thead=document.createElement('thead');thead.innerHTML='<tr><th style="width:200px">용어</th><th>설명</th><th style="width:32px"></th></tr>';
-    table.appendChild(thead);
-    const tbody=document.createElement('tbody');
-    tab.rows.forEach((row,ri)=>tbody.appendChild(_gsCreateRow(row,ri,tab,node,tableWrap,renderTab,tabId)));
-    table.appendChild(tbody);
-    const addRow=document.createElement('div');addRow.className='gs-add-row';
-    addRow.innerHTML='<span>＋</span> 행 추가';
-    addRow.onclick=()=>{tab.rows.push({id:uid(),word:'',desc:''});save();renderTab(tabId);};
-    tableWrap.append(table,addRow);body.appendChild(tableWrap);
-  };
-
-  d.tabs.forEach(tab=>{
-    const btn=document.createElement('button');btn.className='gs-tab-btn'+(tab.id===activeTabId?' on':'');btn.dataset.tabId=tab.id;
-    btn.style.cssText='background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;cursor:pointer;color:var(--tx3);font-family:inherit;white-space:nowrap';
-    if(tab.id===activeTabId){btn.style.borderBottomColor='var(--ac)';btn.style.color='var(--ac)';}
-    btn.textContent=tab.name;
-    btn.onclick=()=>renderTab(tab.id);
-    btn.addEventListener('dblclick',()=>{const n=prompt('탭 이름:',tab.name);if(n)tab.name=n;save();toolsOpenSheetNode(node);});
-    tabHdr.appendChild(btn);
-  });
-  container.append(tabHdr,body);
-  renderTab(activeTabId);
+function _gsInit(node){
+  if(!node.data) node.data={};
+  if(!node.data.tabs || !node.data.tabs.length){
+    node.data.tabs = [{id:'tab'+Date.now(), name:'기본', rows:[]}];
+  }
+  if(!node.data.activeTab) node.data.activeTab = node.data.tabs[0].id;
+  return node.data;
 }
 
-function _gsCreateRow(row,ri,tab,node,tableWrap,renderTab,tabId){
-  const tr=document.createElement('tr');
-  const mkTd=(key,isDesc)=>{
-    const td=document.createElement('td');
-    const ta=document.createElement('textarea');ta.className='gs-cell';ta.value=row[key]||'';ta.placeholder=isDesc?'설명...':'용어...';
-    const autoH=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';};
-    ta.addEventListener('input',()=>{row[key]=ta.value;_toolsSave(node);autoH();});
-    ta.addEventListener('focus',autoH);setTimeout(autoH,0);
-    ta.addEventListener('keydown',e=>{if(e.key==='Tab'&&!e.shiftKey&&isDesc){e.preventDefault();const rows=[...tr.parentElement.children];const ni=rows.indexOf(tr)+1;if(ni<rows.length)rows[ni].querySelector('.gs-cell')?.focus();else tableWrap.querySelector('.gs-add-row')?.click();}e.stopPropagation();});
-    td.appendChild(ta);return td;
+function renderToolsGS(node, container){
+  container.innerHTML = '';
+  const d = _gsInit(node);
+
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WGS');
+  const tbTitle = document.createElement('span');
+  tbTitle.className = 'writing-toolbar-title';
+  tbTitle.textContent = '📚 용어 사전';
+  const hint = document.createElement('span');
+  hint.style.cssText = 'font-size:10px;color:var(--tx3)';
+  hint.textContent = '탭 더블클릭으로 이름 변경 • 행 우클릭으로 삭제';
+  tb.append(tbTitle, hint);
+  container.appendChild(tb);
+
+  // 본문
+  const wrap = document.createElement('div');
+  wrap.className = 'gs-container';
+
+  // 탭 바
+  const tabBar = document.createElement('div');
+  tabBar.className = 'gs-tab-bar';
+  tabBar.id = 'gs-tabbar-'+node.id;
+  _gsRenderTabs(tabBar, node, d, wrap);
+
+  // 탭 추가 버튼
+  const addTabBtn = document.createElement('button');
+  addTabBtn.className = 'gs-tab-add';
+  addTabBtn.textContent = '＋';
+  addTabBtn.title = '새 탭 추가';
+  addTabBtn.onclick = ()=>{
+    const name = '탭'+(d.tabs.length+1);
+    const newTab = {id:'tab'+Date.now(), name, rows:[]};
+    d.tabs.push(newTab);
+    d.activeTab = newTab.id;
+    _saveWritingData(node.id, {tabs:[...d.tabs], activeTab:d.activeTab});
+    renderToolsGS(node, container);
   };
-  const delTd=document.createElement('td');delTd.style.cssText='text-align:center;vertical-align:middle;padding:0';
-  const delBtn=document.createElement('button');delBtn.className='gs-row-del';delBtn.textContent='✕';
-  delBtn.onclick=()=>{if(!confirm('삭제하시겠습니까?'))return;tab.rows.splice(ri,1);_toolsSave(node);renderTab(tabId);};
-  delTd.appendChild(delBtn);tr.append(mkTd('word',false),mkTd('desc',true),delTd);
+  tabBar.appendChild(addTabBtn);
+  wrap.appendChild(tabBar);
+
+  // 본문 테이블 영역
+  const body = document.createElement('div');
+  body.className = 'gs-body';
+  body.id = 'gs-body-'+node.id;
+  _gsRenderTable(body, node, d);
+  wrap.appendChild(body);
+
+  container.appendChild(wrap);
+}
+
+function _gsRenderTabs(tabBar, node, d, wrap){
+  // 기존 탭 버튼들만 제거 (addTabBtn 제외)
+  Array.from(tabBar.children).forEach(el=>{
+    if(!el.classList.contains('gs-tab-add')) el.remove();
+  });
+  const addBtn = tabBar.querySelector('.gs-tab-add');
+
+  d.tabs.forEach((tab, ti)=>{
+    const btn = document.createElement('button');
+    btn.className = 'gs-tab-btn' + (tab.id===d.activeTab?' on':'');
+    btn.textContent = tab.name;
+    btn.title = tab.name;
+
+    // 클릭 → 탭 전환
+    btn.onclick = ()=>{
+      d.activeTab = tab.id;
+      _saveWritingData(node.id, {activeTab:tab.id});
+      tabBar.querySelectorAll('.gs-tab-btn').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      const body = document.getElementById('gs-body-'+node.id);
+      if(body) _gsRenderTable(body, node, d);
+    };
+
+    // 더블클릭 → 이름 변경
+    btn.addEventListener('dblclick', e=>{
+      e.stopPropagation();
+      const inp = document.createElement('input');
+      inp.className = 'gs-tab-rename';
+      inp.value = tab.name;
+      inp.style.width = Math.max(60, tab.name.length*9)+'px';
+      btn.replaceWith(inp);
+      inp.focus(); inp.select();
+      const commit = ()=>{
+        const v = inp.value.trim() || tab.name;
+        tab.name = v;
+        _saveWritingData(node.id, {tabs:[...d.tabs]});
+        inp.replaceWith(btn);
+        btn.textContent = v;
+      };
+      inp.addEventListener('blur', commit, {once:true});
+      inp.addEventListener('keydown', e2=>{
+        if(e2.key==='Enter'){e2.preventDefault(); inp.removeEventListener('blur',commit); commit();}
+        if(e2.key==='Escape'){inp.replaceWith(btn);}
+        e2.stopPropagation();
+      });
+    });
+
+    // 우클릭 → 탭 삭제
+    btn.addEventListener('contextmenu', e=>{
+      e.preventDefault();
+      if(d.tabs.length<=1){toast('마지막 탭은 삭제할 수 없습니다.',true);return;}
+      showCtx(e,[
+        {l:'✏️ 이름 변경', a:()=>btn.dispatchEvent(new MouseEvent('dblclick',{bubbles:true}))},
+        'sep',
+        {l:'🗑 탭 삭제', d:true, a:()=>{
+          if(!confirm(`"${tab.name}" 탭을 삭제하시겠습니까? 내용도 모두 삭제됩니다.`)) return;
+          d.tabs.splice(ti,1);
+          if(d.activeTab===tab.id) d.activeTab=d.tabs[0].id;
+          _saveWritingData(node.id,{tabs:[...d.tabs],activeTab:d.activeTab});
+          const cont=document.getElementById('pub-writing-content');
+          if(cont){cont.innerHTML='';renderToolsGS(node,cont);}
+        }},
+      ]);
+    });
+
+    tabBar.insertBefore(btn, addBtn);
+  });
+}
+
+function _gsRenderTable(body, node, d){
+  body.innerHTML = '';
+  const tab = d.tabs.find(t=>t.id===d.activeTab);
+  if(!tab) return;
+  if(!tab.rows) tab.rows = [];
+
+  const tableWrap = document.createElement('div');
+  tableWrap.style.cssText='border:1px solid var(--bdr);border-radius:8px;overflow:hidden';
+
+  const table = document.createElement('table');
+  table.className = 'gs-table';
+
+  // 헤더
+  const thead = document.createElement('thead');
+  thead.innerHTML = `<tr>
+    <th style="width:28%">단어 / 용어</th>
+    <th>설명</th>
+    <th style="width:28px"></th>
+  </tr>`;
+  table.appendChild(thead);
+
+  // 바디
+  const tbody = document.createElement('tbody');
+  tab.rows.forEach((row, ri)=>{
+    tbody.appendChild(_gsCreateRow(row, ri, node, d, tab, body));
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+
+  // 행 추가 버튼
+  const addRow = document.createElement('div');
+  addRow.className = 'gs-add-row';
+  addRow.innerHTML = '<span style="font-size:14px">＋</span> 행 추가';
+  addRow.onclick = ()=>{
+    const newRow = {id:'row'+Date.now(), word:'', desc:''};
+    tab.rows.push(newRow);
+    _saveWritingData(node.id, {tabs:[...d.tabs]});
+    const tr = _gsCreateRow(newRow, tab.rows.length-1, node, d, tab, body);
+    tbody.appendChild(tr);
+    tr.querySelector('.gs-cell')?.focus();
+  };
+  tableWrap.appendChild(addRow);
+  body.appendChild(tableWrap);
+}
+
+function _gsCreateRow(row, ri, node, d, tab, body){
+  const tr = document.createElement('tr');
+  tr.dataset.id = row.id;
+
+  const mkTd = (key, isDesc)=>{
+    const td = document.createElement('td');
+    const ta = document.createElement('textarea');
+    ta.className = 'gs-cell';
+    ta.rows = 1;
+    ta.value = row[key] || '';
+    ta.placeholder = isDesc ? '단어 설명...' : '용어 입력...';
+    // 자동 높이
+    const autoH = ()=>{ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; };
+    ta.addEventListener('input', ()=>{
+      row[key] = ta.value;
+      _saveWritingData(node.id, {tabs:[...d.tabs]});
+      autoH();
+    });
+    ta.addEventListener('focus', autoH);
+    setTimeout(autoH, 0);
+    // Tab으로 다음 셀로 이동
+    ta.addEventListener('keydown', e=>{
+      if(e.key==='Tab' && !e.shiftKey && isDesc){
+        e.preventDefault();
+        // 다음 행 word 셀로
+        const rows=[...tr.parentElement.children];
+        const ni=rows.indexOf(tr)+1;
+        if(ni<rows.length) rows[ni].querySelector('.gs-cell')?.focus();
+        else body.querySelector('.gs-add-row')?.click();
+      }
+      e.stopPropagation();
+    });
+    td.appendChild(ta);
+    return td;
+  };
+
+  tr.append(mkTd('word',false), mkTd('desc',true));
+
+  // 삭제 버튼
+  const delTd = document.createElement('td');
+  delTd.style.cssText='text-align:center;vertical-align:middle;width:28px;padding:0';
+  const delBtn = document.createElement('button');
+  delBtn.className = 'gs-row-del';
+  delBtn.textContent = '✕';
+  delBtn.title = '행 삭제';
+  delBtn.onclick = ()=>{
+    if(!confirm('이 행을 삭제하시겠습니까?')) return;
+    tab.rows.splice(ri,1);
+    _saveWritingData(node.id,{tabs:[...d.tabs]});
+    tr.remove();
+  };
+  // 우클릭도 삭제
+  tr.addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    showCtx(e,[{l:'🗑 행 삭제',d:true,a:()=>delBtn.click()}]);
+  });
+  delTd.appendChild(delBtn);
+  tr.appendChild(delTd);
   return tr;
 }
 
@@ -4434,77 +4975,298 @@ function _mbCreatePin(pin,d,node,board){
 // ────────────────────────────────────
 //  7. 타임라인 (TL)
 // ────────────────────────────────────
-function renderToolsTL(node,container){
-  const d=node.data;if(!d.items)d.items=[];
-  const save=()=>_toolsSave(node);
+let _tlDragId = null;
+let _tlDragOver = null;
+let _tlDragPos = null; // 'top' | 'bottom'
 
-  const tb=document.createElement('div');tb.className='writing-toolbar';
-  tb.innerHTML='<span class="writing-toolbar-title">📅 타임라인</span>';
-  const addBtn=document.createElement('button');addBtn.className='wt-btn';addBtn.textContent='+ 이벤트 추가';
-  addBtn.onclick=()=>{d.items.push({id:uid(),date:'',title:'새 이벤트',desc:'',color:RM_REL_COLORS[d.items.length%RM_REL_COLORS.length]});save();toolsOpenSheetNode(node);};
-  tb.appendChild(addBtn);container.appendChild(tb);
+function renderToolsTL(node, container){
+  container.innerHTML = '';
+  const d = node.data || {};
+  if(!d.events) d.events = [];
 
-  const tl=document.createElement('div');tl.className='tl-container';
-  if(!d.items.length){tl.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3);font-size:12px">+ 이벤트 추가 버튼으로 타임라인을 구성하세요</div>';}
-  d.items.forEach((item,ii)=>{
-    const row=document.createElement('div');row.className='tl-item';
-    const dateCol=document.createElement('div');dateCol.className='tl-date-col';
-    const dateInp=document.createElement('input');dateInp.type='text';dateInp.className='tl-date-inp';dateInp.value=item.date||'';dateInp.placeholder='날짜/시간';
-    dateInp.oninput=()=>{item.date=dateInp.value;save();};dateInp.addEventListener('keydown',e=>e.stopPropagation());
-    dateCol.appendChild(dateInp);
-    const dot=document.createElement('div');dot.className='tl-dot';dot.style.background=item.color||'var(--ac)';
-    const content=document.createElement('div');content.className='tl-content';
-    const titleInp=document.createElement('input');titleInp.type='text';titleInp.className='tl-title-inp';titleInp.value=item.title||'';titleInp.placeholder='이벤트 제목';
-    titleInp.oninput=()=>{item.title=titleInp.value;save();};titleInp.addEventListener('keydown',e=>e.stopPropagation());
-    const descInp=document.createElement('textarea');descInp.className='tl-desc-inp';descInp.value=item.desc||'';descInp.placeholder='이벤트 설명...';descInp.rows=2;
-    descInp.oninput=()=>{item.desc=descInp.value;save();};descInp.addEventListener('keydown',e=>e.stopPropagation());
-    const delBtn=document.createElement('button');delBtn.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:11px;padding:2px 4px;margin-top:4px;align-self:flex-end';delBtn.textContent='삭제';
-    delBtn.onclick=()=>{d.items.splice(ii,1);save();toolsOpenSheetNode(node);};
-    content.append(titleInp,descInp,delBtn);row.append(dateCol,dot,content);tl.appendChild(row);
-  });
-  container.appendChild(tl);
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  const tbTitle = document.createElement('span');
+  tbTitle.className = 'writing-toolbar-title';
+  tb.setAttribute('data-type','WTL');
+  tbTitle.textContent = '⏱ 타임라인';
+  const addBtn = document.createElement('button');
+  addBtn.className = 'wt-btn';
+  addBtn.textContent = '＋ 이벤트 추가';
+  addBtn.onclick = ()=>_tlAddEvent(node, container);
+  const hint = document.createElement('span');
+  hint.style.cssText = 'font-size:10px;color:var(--tx3)';
+  hint.textContent = '드래그로 순서 변경 • 카드 클릭으로 편집';
+  tb.append(tbTitle, addBtn, hint);
+  container.appendChild(tb);
+
+  // 본문
+  const wrap = document.createElement('div');
+  wrap.className = 'tl-container';
+  const body = document.createElement('div');
+  body.className = 'tl-body';
+  const list = document.createElement('div');
+  list.className = 'tl-list';
+  list.id = 'tl-list-'+node.id;
+
+  _tlRenderList(list, node, container, d);
+  body.appendChild(list);
+  wrap.appendChild(body);
+  container.appendChild(wrap);
 }
 
+function _tlRenderList(list, node, container, d){
+  list.innerHTML = '';
+  (d.events||[]).forEach((ev, idx)=>{
+    list.appendChild(_tlCreateItem(ev, idx, node, container, d));
+  });
+
+  // 하단 추가 버튼
+  const addBtn = document.createElement('button');
+  addBtn.className = 'tl-add-btn';
+  addBtn.innerHTML = '<span style="font-size:16px">＋</span> 이벤트 추가';
+  addBtn.onclick = ()=>_tlAddEvent(node, container);
+  list.appendChild(addBtn);
+}
+
+function _tlCreateItem(ev, idx, node, container, d){
+  const item = document.createElement('div');
+  item.className = 'tl-item';
+  item.dataset.id = ev.id;
+  item.draggable = true;
+
+  // ── 카드 (보기 모드) ──
+  const card = document.createElement('div');
+  card.className = 'tl-card';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'tl-card-hdr';
+
+  // 드래그 핸들
+  const handle = document.createElement('span');
+  handle.className = 'tl-drag-handle';
+  handle.textContent = '⠿';
+  handle.title = '드래그하여 순서 변경';
+
+  const title = document.createElement('span');
+  title.className = 'tl-card-title';
+  title.textContent = ev.title || '(제목 없음)';
+
+  const badge = document.createElement('span');
+  badge.className = 'tl-chapter-badge';
+  badge.textContent = ev.chapter ? ev.chapter : '';
+  badge.style.display = ev.chapter ? '' : 'none';
+  // 회차 라벨을 타임라인 왼쪽에 별도 표시
+  const chapterLabel = document.createElement('div');
+  chapterLabel.className = 'tl-chapter-label';
+  chapterLabel.textContent = ev.chapter ? ev.chapter : '';
+  chapterLabel.style.display = ev.chapter ? '' : 'none';
+  item.appendChild(chapterLabel);
+
+  hdr.append(handle, title, badge);
+
+  const body = document.createElement('div');
+  body.className = 'tl-card-body';
+  body.textContent = ev.content || '';
+  body.style.display = ev.content ? '' : 'none';
+
+  card.append(hdr, body);
+
+  // ── 편집 폼 (숨겨진 상태) ──
+  const editForm = document.createElement('div');
+  editForm.className = 'tl-card-edit';
+
+  const titleInp = document.createElement('input');
+  titleInp.className = 'tl-edit-input';
+  titleInp.placeholder = '이벤트 제목';
+  titleInp.value = ev.title || '';
+
+  const chapterInp = document.createElement('input');
+  chapterInp.className = 'tl-edit-input';
+  chapterInp.placeholder = '회차/챕터 (선택, 숫자만)';
+  chapterInp.value = ev.chapter || '';
+  chapterInp.type = 'text';
+
+  const contentTa = document.createElement('textarea');
+  contentTa.className = 'tl-edit-input';
+  contentTa.rows = 4;
+  contentTa.placeholder = '이벤트 내용, 사건 설명, 주요 대화 등';
+  contentTa.value = ev.content || '';
+
+  const actions = document.createElement('div');
+  actions.className = 'tl-card-actions';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'wt-btn';
+  saveBtn.style.background = 'var(--ac)'; saveBtn.style.color = '#fff';
+  saveBtn.textContent = '저장';
+  saveBtn.onclick = e=>{
+    e.stopPropagation();
+    ev.title   = titleInp.value.trim() || '(제목 없음)';
+    ev.chapter = chapterInp.value.trim();
+    ev.content = contentTa.value;
+    _saveWritingData(node.id, {events:[...d.events]});
+    const list = document.getElementById('tl-list-'+node.id);
+    if(list) _tlRenderList(list, node, container, d);
+  };
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'wt-btn';
+  delBtn.style.color = 'var(--rd)';
+  delBtn.textContent = '삭제';
+  delBtn.onclick = e=>{
+    e.stopPropagation();
+    if(!confirm('이 이벤트를 삭제하시겠습니까?')) return;
+    d.events.splice(idx, 1);
+    _saveWritingData(node.id, {events:[...d.events]});
+    const list = document.getElementById('tl-list-'+node.id);
+    if(list) _tlRenderList(list, node, container, d);
+  };
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'wt-btn';
+  cancelBtn.textContent = '취소';
+  cancelBtn.onclick = e=>{
+    e.stopPropagation();
+    editForm.classList.remove('open');
+    card.style.display = '';
+  };
+
+  actions.append(delBtn, cancelBtn, saveBtn);
+  editForm.append(titleInp, chapterInp, contentTa, actions);
+  item.append(card, editForm);
+
+  // 카드 우클릭 메뉴
+  card.addEventListener('contextmenu', e=>{
+    e.preventDefault(); e.stopPropagation();
+    showCtx(e,[
+      {l:'✏️ 수정', a:()=>{ document.querySelectorAll('.tl-card-edit.open').forEach(f=>{f.classList.remove('open');f.previousSibling.style.display='';}); editForm.classList.add('open'); card.style.display='none'; titleInp.focus(); }},
+      'sep',
+      {l:'🗑 삭제', d:true, a:()=>{ if(!confirm('이 이벤트를 삭제하시겠습니까?')) return; d.events.splice(idx,1); _saveWritingData(node.id,{events:[...d.events]}); const list=document.getElementById('tl-list-'+node.id); if(list)_tlRenderList(list,node,container,d); }},
+    ]);
+  });
+  // 카드 클릭 → 편집 폼 열기
+  card.onclick = ()=>{
+    const isOpen = editForm.classList.contains('open');
+    // 다른 열린 폼 닫기
+    document.querySelectorAll('.tl-card-edit.open').forEach(f=>{f.classList.remove('open'); f.previousSibling.style.display='';});
+    if(!isOpen){
+      editForm.classList.add('open');
+      card.style.display = 'none';
+      titleInp.focus();
+    }
+  };
+
+  // ── 드래그 앤 드롭 ──
+  item.addEventListener('dragstart', e=>{
+    _tlDragId = ev.id;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(()=>item.classList.add('dragging'), 0);
+  });
+  item.addEventListener('dragend', ()=>{
+    _tlDragId = null; _tlDragOver = null; _tlDragPos = null;
+    item.classList.remove('dragging');
+    document.querySelectorAll('.tl-item').forEach(el=>{
+      el.classList.remove('drag-over-top','drag-over-bottom');
+    });
+  });
+  item.addEventListener('dragover', e=>{
+    e.preventDefault();
+    if(!_tlDragId || _tlDragId===ev.id) return;
+    const rect = item.getBoundingClientRect();
+    const mid = rect.top + rect.height/2;
+    _tlDragOver = ev.id;
+    _tlDragPos = e.clientY < mid ? 'top' : 'bottom';
+    document.querySelectorAll('.tl-item').forEach(el=>{
+      el.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    item.classList.add(_tlDragPos==='top' ? 'drag-over-top' : 'drag-over-bottom');
+  });
+  item.addEventListener('drop', e=>{
+    e.preventDefault();
+    if(!_tlDragId || !_tlDragOver || _tlDragId===_tlDragOver) return;
+    const srcIdx = d.events.findIndex(ev=>ev.id===_tlDragId);
+    const tgtIdx = d.events.findIndex(ev=>ev.id===_tlDragOver);
+    if(srcIdx<0||tgtIdx<0) return;
+    const [moved] = d.events.splice(srcIdx, 1);
+    const newTgt = d.events.findIndex(ev=>ev.id===_tlDragOver);
+    const ins = _tlDragPos==='top' ? newTgt : newTgt+1;
+    d.events.splice(ins, 0, moved);
+    _saveWritingData(node.id, {events:[...d.events]});
+    const list = document.getElementById('tl-list-'+node.id);
+    if(list) _tlRenderList(list, node, container, d);
+  });
+
+  return item;
+}
+
+function _tlAddEvent(node, container){
+  const d = node.data || {};
+  if(!d.events) d.events = [];
+  const ev = {id:'ev'+Date.now(), title:'새 이벤트', chapter:'', content:''};
+  d.events.push(ev);
+  _saveWritingData(node.id, {events:[...d.events]});
+  const list = document.getElementById('tl-list-'+node.id);
+  if(list){
+    _tlRenderList(list, node, container, d);
+    // 마지막 카드 자동 편집 모드
+    const items = list.querySelectorAll('.tl-item');
+    const last = items[items.length-2]; // 마지막 tl-item (add 버튼 제외)
+    if(last) last.querySelector('.tl-card')?.click();
+  }
+}
 // ────────────────────────────────────
 //  8. 트리트먼트 (TRT)
 // ────────────────────────────────────
-function renderToolsTRT(node,container){
-  const d=node.data;if(!d.acts)d.acts=[{id:uid(),title:'1막',scenes:[]}];
-  const save=()=>_toolsSave(node);
+function renderToolsTRT(node, container){
+  container.innerHTML = '';
+  const d = node.data || {};
 
-  const tb=document.createElement('div');tb.className='writing-toolbar';
-  tb.innerHTML='<span class="writing-toolbar-title">📋 트리트먼트</span><span style="font-size:10px;color:var(--tx3)">막/장면 단위로 스토리를 구성하세요</span>';
-  const addActBtn=document.createElement('button');addActBtn.className='wt-btn';addActBtn.textContent='+ 막 추가';
-  addActBtn.onclick=()=>{d.acts.push({id:uid(),title:(d.acts.length+1)+'막',scenes:[]});save();toolsOpenSheetNode(node);};
-  tb.appendChild(addActBtn);container.appendChild(tb);
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WTR');
+  tb.innerHTML = `<span class="writing-toolbar-title">📋 트리트먼트</span>`;
+  container.appendChild(tb);
 
-  const trt=document.createElement('div');trt.className='trt-container';
-  d.acts.forEach((act,ai)=>{
-    const actEl=document.createElement('div');actEl.className='trt-act';
-    const hdr=document.createElement('div');hdr.className='trt-act-hdr';
-    const num=document.createElement('span');num.className='trt-act-num';num.textContent='막 '+(ai+1);
-    const titleInp=document.createElement('input');titleInp.className='trt-act-title';titleInp.value=act.title||'';titleInp.placeholder='막 제목';
-    titleInp.oninput=()=>{act.title=titleInp.value;save();};titleInp.addEventListener('keydown',e=>e.stopPropagation());
-    const delActBtn=document.createElement('button');delActBtn.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:11px;margin-left:auto';delActBtn.textContent='막 삭제';
-    delActBtn.onclick=()=>{if(!confirm('이 막을 삭제하시겠습니까?'))return;d.acts.splice(ai,1);save();toolsOpenSheetNode(node);};
-    hdr.append(num,titleInp,delActBtn);actEl.appendChild(hdr);
+  const body = document.createElement('div');
+  body.className = 'writing-body';
 
-    if(!act.scenes)act.scenes=[];
-    act.scenes.forEach((scene,si)=>{
-      const sceneEl=document.createElement('div');sceneEl.className='trt-scene';
-      const snum=document.createElement('span');snum.className='trt-scene-num';snum.textContent='씬 '+(si+1);
-      const inp=document.createElement('textarea');inp.className='trt-scene-inp';inp.value=scene.text||'';inp.placeholder='씬 내용...';inp.rows=2;
-      inp.oninput=()=>{scene.text=inp.value;save();};inp.addEventListener('keydown',e=>e.stopPropagation());
-      const del=document.createElement('button');del.className='trt-scene-del';del.textContent='✕';
-      del.onclick=()=>{act.scenes.splice(si,1);save();toolsOpenSheetNode(node);};
-      sceneEl.append(snum,inp,del);actEl.appendChild(sceneEl);
-    });
-
-    const addScene=document.createElement('div');addScene.className='trt-add-scene';addScene.innerHTML='<span style="font-size:14px">＋</span> 씬 추가';
-    addScene.onclick=()=>{act.scenes.push({id:uid(),text:''});save();toolsOpenSheetNode(node);};
-    actEl.appendChild(addScene);trt.appendChild(actEl);
+  // 제목 + 분류 + 연결 회차
+  const fTitle = _wField('제목', 'text', d.title, v=>_writingAutoSave(node.id,{title:v}), {placeholder:'이 트리트먼트의 제목 (예: 3화 야외 데이트 씬 구성안)'});
+  const fType = _wField('분류', 'select', d.type||'episode', v=>_writingAutoSave(node.id,{type:v}), {
+    options:[['episode','에피소드'],['scene','씬'],['narrative','서사 흐름'],['character','캐릭터 중심'],['worldbuild','세계관 설정'],['etc','기타']]
   });
-  container.appendChild(trt);
+  const fChapter = _wField('연결 회차/챕터', 'text', d.chapter, v=>_writingAutoSave(node.id,{chapter:v}), {placeholder:'예: 3화, 2장 등 (선택)'});
+  const fMood = _wField('분위기/톤', 'text', d.mood, v=>_writingAutoSave(node.id,{mood:v}), {placeholder:'예: 달달, 긴장, 유머, 감동 (선택)'});
+  body.appendChild(_wRow(fTitle, fType));
+  body.appendChild(_wRow(fChapter, fMood));
+
+  // 구분선
+  body.appendChild(_wSection('내용'));
+
+  // 핵심 내용
+  const wcId = 'wtr-wc-'+node.id;
+  const fCore = _wField('핵심 내용', 'textarea', d.core, v=>_writingAutoSave(node.id,{core:v}), {
+    rows:8, placeholder:'씬 구성, 주요 사건, 대화 흐름, 묘사 포인트 등 자유롭게 메모\n예) 분위기 환기 구간 추가 필요. 야외 데이트 씬 추가. 1500자 가량. 농담, 가벼운 스킨십 추가.',
+    wc: wcId
+  });
+  body.appendChild(fCore.wrap);
+
+  // 연결 장치
+  const fLink = _wField('연결 장치', 'textarea', d.link, v=>_writingAutoSave(node.id,{link:v}), {
+    rows:3, placeholder:'이전/이후 씬과의 연결, 복선 설치, 사건 트리거 등\n예) ㅇㅇ 사건으로 연결 장치로 사용할 것.'
+  });
+  body.appendChild(fLink.wrap);
+
+  // 메모/미결
+  const fMemo = _wField('메모 / 미결 사항', 'textarea', d.memo, v=>_writingAutoSave(node.id,{memo:v}), {
+    rows:3, placeholder:'확인 필요 사항, 수정 예정 내용, 담당자 전달 사항 등'
+  });
+  body.appendChild(fMemo.wrap);
+
+  container.appendChild(body);
 }
 
 // ────────────────────────────────────
@@ -4513,33 +5275,187 @@ function renderToolsTRT(node,container){
 const IM_TAGS=['플롯','캐릭터','대사','세계관','장면','기타'];
 const IM_TAG_COLORS={'플롯':'#388bfd','캐릭터':'#3fb950','대사':'#d29922','세계관':'#bc8cff','장면':'#ffa657','기타':'#7d8590'};
 
-function renderToolsIM(node,container){
-  const d=node.data;if(!d.cards)d.cards=[];
-  const save=()=>_toolsSave(node);
+function _imGetTemplate(itemId){
+  // 항목 노드에 imTemplate 저장 (작품 단위 공유)
+  const item = (S.toolNodes||[]).find(n=>n.id===itemId);
+  if(!item) return JSON.parse(JSON.stringify(IM_DEFAULT_FIELDS));
+  if(!item.imTemplate) item.imTemplate = JSON.parse(JSON.stringify(IM_DEFAULT_FIELDS));
+  return item.imTemplate;
+}
 
-  const idea=document.createElement('div');idea.className='idea-container';
-  const toolbar=document.createElement('div');toolbar.className='idea-toolbar';
-  toolbar.innerHTML='<span style="font-size:13px;font-weight:700;color:var(--tx)">💡 아이디어 메모</span>';
-  IM_TAGS.forEach(tag=>{
-    const btn=document.createElement('button');btn.className='wt-btn';btn.textContent='+ '+tag;
-    btn.onclick=()=>{d.cards.push({id:uid(),tag,text:'',color:IM_TAG_COLORS[tag]||'var(--ac)',createdAt:new Date().toISOString()});save();toolsOpenSheetNode(node);};
-    toolbar.appendChild(btn);
-  });
-  idea.appendChild(toolbar);
+function _imSaveTemplate(itemId, tpl){
+  const item = (S.toolNodes||[]).find(n=>n.id===itemId);
+  if(!item) return;
+  item.imTemplate = tpl;
+  dsave();
+}
 
-  const grid=document.createElement('div');grid.className='idea-grid';
-  if(!d.cards.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-size:12px">위 버튼으로 아이디어를 추가하세요</div>';}
-  d.cards.forEach((card,ci)=>{
-    const cardEl=document.createElement('div');cardEl.className='idea-card';
-    const tagEl=document.createElement('div');tagEl.className='idea-card-tag';tagEl.style.background=card.color||'var(--ac)';tagEl.textContent=card.tag||'기타';
-    const content=document.createElement('div');content.className='idea-card-content';content.contentEditable='true';content.textContent=card.text||'';
-    content.addEventListener('input',()=>{card.text=content.textContent;save();});
-    content.addEventListener('keydown',e=>e.stopPropagation());
-    const del=document.createElement('button');del.className='idea-card-del';del.textContent='✕';
-    del.onclick=()=>{d.cards.splice(ci,1);save();toolsOpenSheetNode(node);};
-    cardEl.append(tagEl,content,del);grid.appendChild(cardEl);
+function _imGetItemId(node){
+  // 이 노드의 부모 항목(I타입) ID 반환
+  return node.p;
+}
+
+// ── 아이디어 메모 (WIM) ──
+function renderToolsIM(node, container){
+  container.innerHTML = '';
+  const d = node.data || {};
+  const itemId = _imGetItemId(node);
+  const tpl = _imGetTemplate(itemId);
+
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  const tbTitle = document.createElement('span');
+  tbTitle.className = 'writing-toolbar-title';
+  tb.setAttribute('data-type','WIM');
+  tbTitle.textContent = '💡 아이디어 메모';
+  const addBtn = document.createElement('button');
+  addBtn.className = 'wt-btn';
+  addBtn.textContent = '＋ 항목 추가';
+  addBtn.onclick = ()=>_imAddField(node, container, itemId, tpl);
+  tb.append(tbTitle, addBtn);
+  container.appendChild(tb);
+
+  const body = document.createElement('div');
+  body.className = 'writing-body';
+  body.id = 'im-body-'+node.id;
+
+  _imRenderFields(node, body, itemId, tpl, d);
+  container.appendChild(body);
+}
+
+function _imRenderFields(node, body, itemId, tpl, d){
+  body.innerHTML = '';
+  let _imDragIdx=null, _imDragOver=null, _imDragPos=null;
+
+  tpl.forEach((field, idx)=>{
+    const isTitle = field.id==='title';
+    const wrap = document.createElement('div');
+    wrap.className = 'im-field-wrap writing-field';
+    wrap.dataset.idx = idx;
+    if(!isTitle) wrap.draggable = true;
+
+    // 라벨 행
+    const labelRow = document.createElement('div');
+    labelRow.className = 'im-label-row';
+
+    // 드래그 핸들 (제목 제외)
+    if(!isTitle){
+      const handle = document.createElement('span');
+      handle.className = 'im-drag-handle'; handle.textContent='⠿';
+      handle.title='드래그하여 순서 변경';
+      labelRow.appendChild(handle);
+    }
+
+    // 라벨 (인라인 편집)
+    const lbl = document.createElement('span');
+    lbl.className = 'im-label';
+    lbl.textContent = field.label;
+    lbl.title = '더블클릭 또는 클릭하여 이름 수정';
+
+    const startEdit = ()=>{
+      if(isTitle) return;
+      lbl.contentEditable='true'; lbl.classList.add('editing');
+      lbl.focus();
+      const range=document.createRange(); range.selectNodeContents(lbl);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+    };
+    lbl.addEventListener('dblclick', e=>{ e.stopPropagation(); startEdit(); });
+    lbl.addEventListener('blur', ()=>{
+      const v=lbl.textContent.trim();
+      if(v){ tpl[idx].label=v; _imSaveTemplate(itemId,tpl); }
+      else lbl.textContent=field.label;
+      lbl.contentEditable='false'; lbl.classList.remove('editing');
+    });
+    lbl.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); lbl.blur(); }
+      if(e.key==='Escape'){ lbl.textContent=field.label; lbl.blur(); }
+    });
+    // 우클릭 메뉴
+    if(!isTitle){
+      lbl.addEventListener('contextmenu', e=>{
+        e.preventDefault(); e.stopPropagation();
+        showCtx(e,[
+          {l:'✏️ 이름 변경', a:()=>startEdit()},
+          {l:'🗑 항목 삭제', d:true, a:()=>{
+            if(!confirm(`"${field.label}" 항목을 삭제하시겠습니까?`)) return;
+            tpl.splice(idx,1); _imSaveTemplate(itemId,tpl);
+            renderToolsIM(node, body.parentElement);
+          }},
+        ]);
+      });
+    }
+    labelRow.appendChild(lbl);
+
+    // 삭제 버튼 (제목 제외)
+    if(!isTitle){
+      const delBtn=document.createElement('button');
+      delBtn.className='im-del-btn'; delBtn.textContent='✕'; delBtn.title='항목 삭제';
+      delBtn.onclick=e=>{
+        e.stopPropagation();
+        if(!confirm(`"${field.label}" 항목을 삭제하시겠습니까?`)) return;
+        tpl.splice(idx,1); _imSaveTemplate(itemId,tpl);
+        renderToolsIM(node, body.parentElement);
+      };
+      labelRow.appendChild(delBtn);
+    }
+    wrap.appendChild(labelRow);
+
+    // 입력 필드
+    const isShort = isTitle;
+    const ta = document.createElement(isShort?'input':'textarea');
+    if(!isShort){ ta.rows=4; }
+    else { ta.type='text'; }
+    ta.className='cs-field-input';
+    ta.value=d[field.id]||'';
+    ta.placeholder=isTitle?'아이디어 제목':'';
+    ta.addEventListener('input',()=>{ d[field.id]=ta.value; _writingAutoSave(node.id,{[field.id]:ta.value}); });
+    wrap.appendChild(ta);
+
+    // 드래그 이벤트 (제목 제외)
+    if(!isTitle){
+      wrap.addEventListener('dragstart', e=>{
+        _imDragIdx=idx; e.dataTransfer.effectAllowed='move';
+        setTimeout(()=>wrap.classList.add('dragging'),0);
+      });
+      wrap.addEventListener('dragend', ()=>{
+        _imDragIdx=null; _imDragOver=null; _imDragPos=null;
+        body.querySelectorAll('.im-field-wrap').forEach(el=>el.classList.remove('dragging','drag-over-top','drag-over-bottom'));
+      });
+      wrap.addEventListener('dragover', e=>{
+        e.preventDefault();
+        if(_imDragIdx===null||_imDragIdx===idx) return;
+        const rect=wrap.getBoundingClientRect(), mid=rect.top+rect.height/2;
+        _imDragOver=idx; _imDragPos=e.clientY<mid?'top':'bottom';
+        body.querySelectorAll('.im-field-wrap').forEach(el=>el.classList.remove('drag-over-top','drag-over-bottom'));
+        wrap.classList.add(_imDragPos==='top'?'drag-over-top':'drag-over-bottom');
+      });
+      wrap.addEventListener('drop', e=>{
+        e.preventDefault();
+        if(_imDragIdx===null||_imDragOver===null||_imDragIdx===_imDragOver) return;
+        const moved=tpl.splice(_imDragIdx,1)[0];
+        const newTgt=_imDragPos==='top'?_imDragOver:_imDragOver+1;
+        const ins=_imDragIdx<_imDragOver?newTgt-1:newTgt;
+        tpl.splice(Math.max(1,ins),0,moved); // 인덱스0(title) 앞으로 못 가게
+        _imSaveTemplate(itemId,tpl);
+        renderToolsIM(node,body.parentElement);
+      });
+    }
+    body.appendChild(wrap);
   });
-  idea.appendChild(grid);container.appendChild(idea);
+}
+
+function _imAddField(node, container, itemId, tpl){
+  const newId = 'custom_'+Date.now();
+  tpl.push({id:newId, label:'새 항목', fixed:false});
+  _imSaveTemplate(itemId, tpl);
+  renderToolsIM(node, container);
+  // 새로 추가된 항목 라벨 자동 편집 모드
+  setTimeout(()=>{
+    const labels=[...container.querySelectorAll('.im-label')];
+    const last=labels[labels.length-1];
+    if(last) last.dispatchEvent(new MouseEvent('dblclick',{bubbles:true}));
+  },50);
 }
 
 // ── 작품 추가/삭제 시 작품도구 트리도 갱신 ──
