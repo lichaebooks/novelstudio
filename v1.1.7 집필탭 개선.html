@@ -1999,6 +1999,8 @@ async function load(){
     S.archives    = data.archives     || [];
     S.profile     = data.profile      || {};
     S.writingNodes= data.writingNodes || [];
+    S._lastWritingWork = data.lastWritingWork || null;
+    S._lastWritingCh   = data.lastWritingCh   || null;
     S.toolNodes   = data.toolNodes    || [];
     // ── 데이터 마이그레이션: 구버전 toolNodes (id 필드 없음) 처리 ──
     S.toolNodes.forEach((n,i)=>{
@@ -2879,7 +2881,7 @@ function loadEditorDefaults(){
 //  SETTINGS — BACKUP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function exportData(){
-  const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,v:1,date:new Date().toISOString()};
+  const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,lastWritingWork:S._lastWritingWork,lastWritingCh:S._lastWritingCh,v:1,date:new Date().toISOString()};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
   a.download='집필스튜디오_백업_'+new Date().toLocaleDateString('ko-KR').replace(/\.\s*/g,'-').replace(/-$/,'')+'.json';
   a.click();toast('백업 파일이 다운로드되었습니다.');
@@ -3598,20 +3600,13 @@ function writingNavChapter(dir){
 }
 function writingOpenChapter(workId,chId){
   _writingSelWork=workId;_writingSelCh=chId;
-  // 마지막 화면 저장
   S._lastWritingWork=workId; S._lastWritingCh=chId;
   const w=wNodes().find(n=>n.id===workId);
   const ch=wNodes().find(n=>n.id===chId);if(!ch)return;
   const chs=wChapters(workId);
   const ci=chs.findIndex(c=>c.id===chId);
 
-  // 트리 갱신 + 트래커 빌드
-  writingRenderTree();
-  writingUpdateProgress(workId);
-  const trkWrap=document.getElementById('writing-tracker-wrap');
-  if(trkWrap) writingBuildTracker(trkWrap, workId);
-
-  // UI 전환
+  // ① 에디터 가장 먼저 표시 (오류에 영향 없도록)
   document.getElementById('writing-empty-state').style.display='none';
   document.getElementById('writing-editor-wrap').style.display='flex';
 
@@ -3649,6 +3644,13 @@ function writingOpenChapter(workId,chId){
 
   // 맞춤법 패널 숨김
   const spellPanel=document.getElementById('writing-spell-panel');if(spellPanel)spellPanel.style.display='none';
+
+  // ⑦ 트리 갱신 + 트래커 (마지막에, 오류가 나도 에디터에 영향 없음)
+  writingRenderTree();
+  try{
+    const trkWrap=document.getElementById('writing-tracker-wrap');
+    if(trkWrap) writingBuildTracker(trkWrap, workId);
+  }catch(e){console.warn('tracker build error',e);}
 }
 
 // ── 작품/회차 추가/삭제 ──
