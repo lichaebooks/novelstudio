@@ -115,19 +115,19 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 /* ── HEADER ── */
 .hdr{height:46px;background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 8px;gap:4px;flex-shrink:0;z-index:100;min-width:0}
 .hlogo{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;cursor:default;user-select:none}
-.tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:2px;flex:1;min-width:0;overflow:hidden}
 .tbtn{background:none;border:none;padding:5px 9px;border-radius:var(--r);color:var(--tx3);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap;flex-shrink:0}
 .tbtn:hover{background:var(--surf2);color:var(--tx)}
 .tbtn.on{background:var(--surf2);color:var(--ac);font-weight:600}
-/* overflow menu */
-.tab-overflow-btn{background:none;border:1px solid var(--bdr);border-radius:var(--r);padding:4px 8px;color:var(--tx3);font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap;display:none}
+/* compact menu button (창 좁을 때) */
+.tab-overflow-btn{background:none;border:1px solid var(--bdr);border-radius:var(--r);padding:4px 10px;color:var(--tx2);font-size:12px;cursor:pointer;flex-shrink:0;white-space:nowrap;display:none;font-family:inherit;transition:all .15s}
 .tab-overflow-btn:hover{background:var(--surf2);color:var(--tx)}
-.tab-overflow-menu{position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:9999;min-width:160px;display:none;padding:4px}
+.tab-overflow-btn.menu-active{color:var(--ac);border-color:var(--ac);font-weight:600}
+.tab-overflow-menu{position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:9999;min-width:180px;display:none;padding:4px}
 .tab-overflow-menu.open{display:block}
-.tab-overflow-item{padding:7px 12px;border-radius:5px;font-size:12px;color:var(--tx2);cursor:pointer}
+.tab-overflow-item{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:7px;font-size:13px;color:var(--tx2);cursor:pointer;transition:background .1s}
 .tab-overflow-item:hover{background:var(--surf2);color:var(--tx)}
-.tab-overflow-item.on{color:var(--ac);font-weight:600}
+.tab-overflow-item.on{color:var(--ac);font-weight:700;background:var(--surf2)}
 /* header right */
 .hright{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .hbtn-label{margin-left:3px}
@@ -1382,7 +1382,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
     <button class="tbtn"    id="tb-analysis" onclick="switchTab('analysis')">🤖 작품분석</button>
     <button class="tbtn"    id="tb-settings" onclick="switchTab('settings')">⚙️ 설정</button>
   </div>
-  <button class="tab-overflow-btn" id="overflow-btn" onclick="toggleOverflowMenu(event)">··· ▾</button>
+  <button class="tab-overflow-btn" id="overflow-btn" onclick="toggleOverflowMenu(event)">📋 메뉴 ▾</button>
   <div class="tab-overflow-menu" id="overflow-menu"></div>
   <div class="hright">
     <div class="saveind" id="saveind" title="저장됨"></div>
@@ -2022,7 +2022,7 @@ async function enterApp(){
   await load();
   loadTheme();
   startClock();
-  initOverflowTabs(); initTabDragScroll();
+  initResponsiveTabs();
   renderHome();
   renderSettings();
   renderSched();
@@ -2076,10 +2076,7 @@ function switchTab(t){
   const btn=document.getElementById('tb-'+t);
   if(btn) btn.classList.add('on');
   document.getElementById('overflow-menu').classList.remove('open');
-  // update overflow menu active state
-  document.querySelectorAll('.tab-overflow-item').forEach(el=>{
-    el.classList.toggle('on', el.dataset.tab===t);
-  });
+  _updateMenuActiveState();
   if(t==='settings'){renderSettings();}
   if(t==='home'){renderHome();}
   if(t==='schedule'){renderSched();}
@@ -2088,75 +2085,93 @@ function switchTab(t){
 }
 
 
-// 탭 가로 드래그 스크롤
-function initTabDragScroll(){
-  const tabs = document.getElementById('tabs-container');
-  if(!tabs) return;
-  let isDown=false, startX=0, scrollLeft=0;
-  tabs.addEventListener('mousedown', e=>{
-    if(e.target.classList.contains('tbtn')) return;
-    isDown=true; startX=e.pageX-tabs.getBoundingClientRect().left;
-    scrollLeft=tabs.scrollLeft; tabs.style.cursor='grabbing';
-  });
-  document.addEventListener('mouseup', ()=>{ isDown=false; tabs.style.cursor=''; });
-  tabs.addEventListener('mousemove', e=>{
-    if(!isDown) return; e.preventDefault();
-    const x=e.pageX-tabs.getBoundingClientRect().left;
-    tabs.scrollLeft=scrollLeft-(x-startX);
-  });
-  tabs.addEventListener('mouseleave', ()=>{ isDown=false; tabs.style.cursor=''; });
-}
-function initOverflowTabs(){
-  const container=document.getElementById('tabs-container');
-  const overflowBtn=document.getElementById('overflow-btn');
-  const overflowMenu=document.getElementById('overflow-menu');
-  if(!container||!overflowBtn||!overflowMenu)return;
+// ── 반응형 탭: 홈·설정은 항상 노출, 나머지는 창 좁아지면 메뉴로 전환 ──
+// 새 탭을 TAB_ORDER에 추가하기만 하면 자동 적용됨
+const TABS_PINNED = ['home', 'settings']; // 항상 노출 고정 탭
 
-  // overflow 메뉴 항목 빌드
-  overflowMenu.innerHTML='';
-  TAB_ORDER.forEach(t=>{
-    const btn=document.getElementById('tb-'+t);
-    if(!btn)return;
-    const item=document.createElement('div');
-    item.className='tab-overflow-item';
-    item.dataset.tab=t;
-    item.textContent=btn.textContent;
-    item.onclick=()=>{switchTab(t);overflowMenu.classList.remove('open');};
-    overflowMenu.appendChild(item);
-  });
-
-  // ResizeObserver — 컨테이너 크기 변할 때마다 재계산
+function initResponsiveTabs(){
+  _buildMenuItems();
+  // 헤더 리사이즈 감지
+  const hdr = document.querySelector('.hdr');
   if(window.ResizeObserver){
-    const ro=new ResizeObserver(entries=>{
-      // rAF로 감싸서 레이아웃 완료 후 실행
-      requestAnimationFrame(()=>checkTabOverflow());
-    });
-    ro.observe(container);
+    new ResizeObserver(()=>requestAnimationFrame(_applyTabMode)).observe(hdr);
   } else {
-    window.addEventListener('resize',()=>checkTabOverflow());
+    window.addEventListener('resize', _applyTabMode);
   }
-  // 초기 실행은 폰트/레이아웃 완전히 잡힌 뒤
-  requestAnimationFrame(()=>requestAnimationFrame(()=>checkTabOverflow()));
+  requestAnimationFrame(()=>requestAnimationFrame(_applyTabMode));
 }
 
-function checkTabOverflow(){
-  const overflowBtn=document.getElementById('overflow-btn');
-  if(overflowBtn) overflowBtn.style.display='none';
-  document.querySelectorAll('.tbtn').forEach(b=>b.style.display='');
-  const active=document.querySelector('.tbtn.on');
-  if(active) active.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
+function _buildMenuItems(){
+  const menu = document.getElementById('overflow-menu');
+  if(!menu) return;
+  menu.innerHTML = '';
+  // 고정 탭 제외한 나머지를 메뉴에 추가 (TAB_ORDER 순서 그대로)
+  TAB_ORDER.filter(t => !TABS_PINNED.includes(t)).forEach(t => {
+    const srcBtn = document.getElementById('tb-'+t);
+    if(!srcBtn) return;
+    const item = document.createElement('div');
+    item.className = 'tab-overflow-item';
+    item.dataset.tab = t;
+    item.textContent = srcBtn.textContent;
+    item.onclick = () => { switchTab(t); document.getElementById('overflow-menu').classList.remove('open'); };
+    menu.appendChild(item);
+  });
+}
+
+function _applyTabMode(){
+  const hdr = document.querySelector('.hdr');
+  const overflowBtn = document.getElementById('overflow-btn');
+  if(!hdr || !overflowBtn) return;
+  const isCompact = hdr.offsetWidth < 720;
+
+  TAB_ORDER.forEach(t => {
+    const btn = document.getElementById('tb-'+t);
+    if(!btn) return;
+    if(isCompact){
+      // 고정 탭만 보이고, 나머지 숨김
+      btn.style.display = TABS_PINNED.includes(t) ? '' : 'none';
+    } else {
+      // 전체 노출
+      btn.style.display = '';
+    }
+  });
+
+  overflowBtn.style.display = isCompact ? '' : 'none';
+  _updateMenuActiveState();
+}
+
+function _updateMenuActiveState(){
+  const cur = S.curTab || 'home';
+  const overflowBtn = document.getElementById('overflow-btn');
+  const isInMenu = !TABS_PINNED.includes(cur);
+  if(overflowBtn){
+    overflowBtn.classList.toggle('menu-active', isInMenu);
+  }
+  document.querySelectorAll('.tab-overflow-item').forEach(el => {
+    el.classList.toggle('on', el.dataset.tab === cur);
+  });
 }
 
 function toggleOverflowMenu(e){
   e.stopPropagation();
-  const menu=document.getElementById('overflow-menu');
+  const menu = document.getElementById('overflow-menu');
   menu.classList.toggle('open');
   if(menu.classList.contains('open')){
-    const btn=document.getElementById('overflow-btn');
-    const r=btn.getBoundingClientRect();
-    menu.style.right=(window.innerWidth-r.right)+'px';
-    menu.style.top=r.bottom+'px';
-    setTimeout(()=>document.addEventListener('click',function h(){menu.classList.remove('open');document.removeEventListener('click',h);},true),50);
+    const btn = document.getElementById('overflow-btn');
+    const r = btn.getBoundingClientRect();
+    menu.style.left = r.left + 'px';
+    menu.style.top = r.bottom + 4 + 'px';
+    // 화면 오른쪽 넘침 방지
+    requestAnimationFrame(()=>{
+      if(menu.getBoundingClientRect().right > window.innerWidth){
+        menu.style.left = '';
+        menu.style.right = (window.innerWidth - r.right) + 'px';
+      }
+    });
+    setTimeout(()=>document.addEventListener('click', function h(){
+      menu.classList.remove('open');
+      document.removeEventListener('click', h);
+    }, true), 50);
   }
 }
 
