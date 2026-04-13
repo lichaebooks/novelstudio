@@ -389,6 +389,45 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .writing-stat-card.warn .writing-stat-val{color:var(--yw)}
 .writing-stat-card.danger .writing-stat-val{color:var(--rd)}
 
+/* ── 집필 탭 트래커 (사이드바 컴팩트형) ── */
+.wt-trk-wrap{border-top:2px solid var(--bdr);background:var(--surf2);display:flex;flex-direction:column;flex-shrink:0}
+.wt-trk-hdr{padding:7px 10px;font-size:10px;font-weight:800;color:var(--tx3);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.wt-trk-hdr:hover{background:var(--surf3)}
+.wt-trk-hdr-toggle{font-size:9px;color:var(--tx3);transition:transform .15s}
+.wt-trk-hdr-toggle.open{transform:rotate(90deg)}
+.wt-trk-body{display:none;flex-direction:column;gap:6px;padding:8px 10px;max-height:320px;overflow-y:auto}
+.wt-trk-body.open{display:flex}
+.wt-trk-goal-row{display:flex;align-items:center;gap:5px}
+.wt-trk-goal-lbl{font-size:9px;color:var(--tx3);flex-shrink:0;white-space:nowrap}
+.wt-trk-goal-inp{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:3px 6px;font-size:11px;font-weight:700;color:var(--tx);text-align:right;outline:none;min-width:0;width:100%}
+.wt-trk-goal-inp:focus{border-color:#00b894}
+.wt-trk-bar-wrap{position:relative;height:12px;background:var(--surf);border-radius:6px;overflow:hidden}
+.wt-trk-bar-fill{height:100%;background:linear-gradient(90deg,#00b894,#00cec9);border-radius:6px;transition:width .4s}
+.wt-trk-bar-pct{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:800;color:var(--tx)}
+.wt-trk-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.wt-trk-stat{background:var(--surf);border-radius:5px;padding:4px 6px;text-align:center}
+.wt-trk-stat-val{font-size:11px;font-weight:800;color:#00b894}
+.wt-trk-stat-lbl{font-size:8px;color:var(--tx3);margin-top:1px}
+.wt-trk-stat.warn .wt-trk-stat-val{color:var(--yw)}
+.wt-trk-stat.danger .wt-trk-stat-val{color:var(--rd)}
+.wt-trk-today-btn{padding:5px 8px;border-radius:6px;border:1px solid #00b894;background:transparent;color:#00b894;font-size:10px;font-weight:700;cursor:pointer;text-align:center;width:100%}
+.wt-trk-today-btn:hover{background:#00b894;color:#fff}
+/* 로그 섹션 */
+.wt-trk-log-toggle{font-size:10px;color:var(--tx3);cursor:pointer;display:flex;align-items:center;gap:4px;padding:2px 0;border-top:1px solid var(--bdr);margin-top:2px}
+.wt-trk-log-toggle:hover{color:var(--ac)}
+.wt-trk-log-section{display:none;flex-direction:column;gap:3px;margin-top:4px}
+.wt-trk-log-section.open{display:flex}
+.wt-trk-log-row{display:grid;grid-template-columns:68px 48px 1fr 18px;gap:3px;align-items:center}
+.wt-trk-log-inp{background:var(--surf);border:1px solid var(--bdr);border-radius:4px;padding:2px 4px;font-size:9px;color:var(--tx);outline:none;font-family:inherit;width:100%}
+.wt-trk-log-inp:focus{border-color:#00b894}
+.wt-trk-log-bar-bg{height:4px;background:var(--surf3);border-radius:2px;grid-column:1/-1;margin-top:-1px}
+.wt-trk-log-bar-fg{height:4px;background:#00b894;border-radius:2px;transition:width .3s}
+.wt-trk-del{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:9px;padding:1px;opacity:0}
+.wt-trk-log-row:hover .wt-trk-del{opacity:1}
+.wt-trk-del:hover{color:var(--rd)}
+.wt-trk-add-btn{font-size:10px;color:var(--tx3);cursor:pointer;padding:3px 0;display:flex;align-items:center;gap:4px}
+.wt-trk-add-btn:hover{color:#00b894}
+
 /* 맞춤법 */
 .spell-error{background:rgba(248,81,73,.15);border-bottom:2px solid var(--rd);cursor:pointer}
 .spell-item{padding:5px 8px;border-radius:5px;border:1px solid var(--bdr);margin-bottom:4px;font-size:11px}
@@ -1418,7 +1457,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 
   <!-- ── WRITING ── -->
   <div class="panel" id="pwriting" style="flex-direction:row">
-    <!-- 좌측: 작품 트리 사이드바 -->
+    <!-- 좌측: 작품 트리 사이드바 + 트래커 -->
     <div class="sidebar" id="writing-sidebar">
       <div class="sbhdr">
         <span class="sblabel">집필</span>
@@ -1428,28 +1467,9 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
           <button class="icobtn" onclick="writingOpenTrash()" title="휴지통" id="writing-trash-btn">🗑</button>
         </div>
       </div>
-      <div class="treewrap" id="writing-tree"></div>
-    </div>
-
-    <!-- 가운데: 회차 목록 (작품 선택 시) -->
-    <div id="writing-chlist-panel" style="width:200px;flex-shrink:0;border-right:1px solid var(--bdr);display:none;flex-direction:column;overflow:hidden;background:var(--surf2)">
-      <div style="padding:8px 10px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-        <span style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.7px" id="writing-chlist-title">회차 목록</span>
-        <span style="font-size:10px;color:var(--tx3)" id="writing-total-wc"></span>
-      </div>
-      <div style="flex:1;overflow-y:auto;padding:4px 0" id="writing-chlist"></div>
-      <div style="border-top:1px solid var(--bdr);padding:8px 10px;flex-shrink:0">
-        <div style="font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:6px">📊 집필 진행</div>
-        <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-          <span style="font-size:9px;color:var(--tx3);flex-shrink:0">목표</span>
-          <input type="number" id="writing-goal-inp" placeholder="목표 자수" style="flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:3px 6px;font-size:11px;font-weight:700;color:var(--tx);text-align:right;outline:none;min-width:0" oninput="writingUpdateGoal(this.value)"/>
-        </div>
-        <div style="height:10px;background:var(--surf);border-radius:5px;overflow:hidden;margin-bottom:4px">
-          <div id="writing-prog-bar" style="height:100%;background:linear-gradient(90deg,#00b894,#00cec9);border-radius:5px;width:0%;transition:width .4s"></div>
-        </div>
-        <div id="writing-prog-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px"></div>
-        <button class="wed-trk-today-btn" style="width:100%" onclick="writingLogToday()">📝 오늘 기록하기</button>
-      </div>
+      <div class="treewrap" id="writing-tree" style="flex:1;overflow-y:auto;min-height:0"></div>
+      <!-- 트래커 (작품 선택 시 표시) -->
+      <div id="writing-tracker-wrap" style="display:flex;flex-direction:column;flex-shrink:0"></div>
     </div>
 
     <!-- 우측: 에디터 영역 -->
@@ -1500,10 +1520,16 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
             <div id="writing-tb1" class="mbtb"></div>
             <div id="writing-ce1" class="mbedit" style="font-family:'맑은 고딕',Georgia,serif;font-size:14pt;line-height:2.0;padding:32px 48px;max-width:800px;margin:0 auto;width:100%" spellcheck="true"></div>
           </div>
-          <!-- 에디터 2 (분할보기) -->
+          <!-- 에디터 2 (분할보기 — 다른 문서 가져오기) -->
           <div style="flex:1;display:none;flex-direction:column;overflow:hidden;min-width:0;border-left:1px solid var(--bdr)" id="writing-pane2">
-            <div style="padding:6px 12px;background:var(--surf2);border-bottom:1px solid var(--bdr);font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:6px">분할 보기 <span style="font-size:10px;opacity:.6">(실시간 동기화)</span></div>
-            <div id="writing-ce2" class="mbedit" style="font-family:'맑은 고딕',Georgia,serif;font-size:14pt;line-height:2.0;padding:32px 48px;max-width:800px;margin:0 auto;width:100%" contenteditable="true" spellcheck="true"></div>
+            <div style="padding:5px 10px;background:var(--surf2);border-bottom:1px solid var(--bdr);font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:6px;flex-shrink:0">
+              <span id="writing-pane2-title" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">— 문서를 선택하세요 —</span>
+              <button class="splitbtn" id="writing-xpanel-btn" onclick="writingSplitOpenMenu(event)" style="flex-shrink:0">📂 가져오기 ▾</button>
+            </div>
+            <!-- 가져오기 드롭다운 메뉴 -->
+            <div id="writing-xpanel-menu" style="display:none;position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:9999;min-width:200px;max-height:400px;overflow-y:auto;padding:4px"></div>
+            <!-- pane2 에디터 영역 -->
+            <div id="writing-ce2" class="mbedit" style="font-family:'맑은 고딕',Georgia,serif;font-size:14pt;line-height:2.0;padding:32px 48px;max-width:800px;margin:0 auto;width:100%" contenteditable="false" spellcheck="true" data-ph="가져오기 버튼으로 문서를 선택하세요"></div>
           </div>
         </div>
 
@@ -1973,6 +1999,8 @@ async function load(){
     S.archives    = data.archives     || [];
     S.profile     = data.profile      || {};
     S.writingNodes= data.writingNodes || [];
+    S._lastWritingWork = data.lastWritingWork || null;
+    S._lastWritingCh   = data.lastWritingCh   || null;
     S.toolNodes   = data.toolNodes    || [];
     // ── 데이터 마이그레이션: 구버전 toolNodes (id 필드 없음) 처리 ──
     S.toolNodes.forEach((n,i)=>{
@@ -2853,7 +2881,7 @@ function loadEditorDefaults(){
 //  SETTINGS — BACKUP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function exportData(){
-  const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,v:1,date:new Date().toISOString()};
+  const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,lastWritingWork:S._lastWritingWork,lastWritingCh:S._lastWritingCh,v:1,date:new Date().toISOString()};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
   a.download='집필스튜디오_백업_'+new Date().toLocaleDateString('ko-KR').replace(/\.\s*/g,'-').replace(/-$/,'')+'.json';
   a.click();toast('백업 파일이 다운로드되었습니다.');
@@ -3320,7 +3348,7 @@ function writingRenderTree(){
         const chItem=document.createElement('div');chItem.className='wt-ch-item'+(ch.id===_writingSelCh?' active':'')+(ch.done?' done':'');chItem.dataset.id=ch.id;chItem.draggable=true;
         const dragH=document.createElement('span');dragH.className='wt-ch-drag';dragH.textContent='⠿';dragH.onmousedown=e=>e.stopPropagation();
         const chkbox=document.createElement('input');chkbox.type='checkbox';chkbox.className='wt-ch-done';chkbox.checked=!!ch.done;chkbox.title='완성 표시';
-        chkbox.onclick=e=>{e.stopPropagation();ch.done=chkbox.checked;dsave();writingRenderTree();writingRenderChList(w.id);};
+        chkbox.onclick=e=>{e.stopPropagation();ch.done=chkbox.checked;dsave();writingRenderTree();writingUpdateProgress(w.id);};
         const numEl=document.createElement('span');numEl.className='wt-ch-num';numEl.textContent=(ci+1)+'화';
         const titleEl=document.createElement('span');titleEl.className='wt-ch-title-lbl';titleEl.textContent=ch.title||'(제목 없음)';
         const wcEl=document.createElement('span');wcEl.className='wt-ch-wc';wcEl.textContent=charsOf(ch)+'자';
@@ -3342,7 +3370,7 @@ function writingRenderTree(){
         chItem.addEventListener('dragstart',e=>{dragChId=ch.id;e.dataTransfer.setData('text/plain',ch.id);e.dataTransfer.effectAllowed='move';setTimeout(()=>chItem.classList.add('dragging'),0);});
         chItem.addEventListener('dragend',()=>{dragChId=null;dragOverChId=null;dragPos=null;chItem.classList.remove('dragging');tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));});
         chItem.addEventListener('dragover',e=>{if(!dragChId||dragChId===ch.id)return;e.preventDefault();tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));const rect=chItem.getBoundingClientRect();dragOverChId=ch.id;if(e.clientY<rect.top+rect.height/2){chItem.classList.add('drag-over-above');dragPos='before';}else{chItem.classList.add('drag-over-below');dragPos='after';}});
-        chItem.addEventListener('drop',e=>{e.preventDefault();if(!dragChId||!dragOverChId||dragChId===dragOverChId)return;const chsArr=wChapters(w.id);const src=chsArr.find(c=>c.id===dragChId);const tgt=chsArr.find(c=>c.id===dragOverChId);if(!src||!tgt)return;const arr=chsArr.filter(c=>c.id!==src.id);const ti=arr.indexOf(tgt);const ins=dragPos==='before'?ti:ti+1;arr.splice(ins,0,src);arr.forEach((c,i)=>c.o=i);dsave();writingRenderTree();writingRenderChList(w.id);});
+        chItem.addEventListener('drop',e=>{e.preventDefault();if(!dragChId||!dragOverChId||dragChId===dragOverChId)return;const chsArr=wChapters(w.id);const src=chsArr.find(c=>c.id===dragChId);const tgt=chsArr.find(c=>c.id===dragOverChId);if(!src||!tgt)return;const arr=chsArr.filter(c=>c.id!==src.id);const ti=arr.indexOf(tgt);const ins=dragPos==='before'?ti:ti+1;arr.splice(ins,0,src);arr.forEach((c,i)=>c.o=i);dsave();writingRenderTree();writingUpdateProgress(w.id);});
         tree.appendChild(chItem);
       });
     }
@@ -3353,14 +3381,14 @@ function charsOf(ch){return ((ch.content||'').replace(/<[^>]*>/g,'').replace(/\s
 
 // ── 회차 목록 패널 ──
 function writingShowChList(workId){
-  const panel=document.getElementById('writing-chlist-panel');if(!panel)return;
   _writingSelWork=workId;
-  panel.style.display='flex';
-  writingRenderChList(workId);
   writingUpdateProgress(workId);
+  // 트래커 갱신
+  const trkWrap=document.getElementById('writing-tracker-wrap');
+  if(trkWrap) writingBuildTracker(trkWrap, workId);
 }
 
-function writingRenderChList(workId){
+function writingUpdateProgress(workId){
   const listEl=document.getElementById('writing-chlist');if(!listEl)return;
   const titleEl=document.getElementById('writing-chlist-title');
   const w=wNodes().find(n=>n.id===workId);if(!w)return;
@@ -3373,7 +3401,7 @@ function writingRenderChList(workId){
   }
   chs.forEach((ch,ci)=>{
     const item=document.createElement('div');item.className='wt-ch-item'+(ch.id===_writingSelCh?' active':'')+(ch.done?' done':'');
-    const chk=document.createElement('input');chk.type='checkbox';chk.className='wt-ch-done';chk.checked=!!ch.done;chk.onclick=e=>{e.stopPropagation();ch.done=chk.checked;dsave();writingRenderTree();writingRenderChList(workId);writingUpdateProgress(workId);};
+    const chk=document.createElement('input');chk.type='checkbox';chk.className='wt-ch-done';chk.checked=!!ch.done;chk.onclick=e=>{e.stopPropagation();ch.done=chk.checked;dsave();writingRenderTree();writingUpdateProgress(workId);writingUpdateProgress(workId);};
     const num=document.createElement('span');num.className='wt-ch-num';num.textContent=(ci+1)+'화';
     const tl=document.createElement('span');tl.className='wt-ch-title-lbl';tl.textContent=ch.title||'(제목 없음)';
     const wc=document.createElement('span');wc.className='wt-ch-wc';wc.textContent=charsOf(ch).toLocaleString()+'자';
@@ -3383,43 +3411,182 @@ function writingRenderChList(workId){
   });
   const twEl=document.getElementById('writing-total-wc');
   if(twEl){const total=chs.reduce((s,ch)=>s+charsOf(ch),0);twEl.textContent='전체 '+total.toLocaleString()+'자';}
+  // 트래커 빌드
+  const trkWrap=document.getElementById('writing-tracker-wrap');
+  if(trkWrap) writingBuildTracker(trkWrap, workId);
 }
 
-// ── 집필 진행 ──
-function writingUpdateProgress(workId){
-  const w=wNodes().find(n=>n.id===workId);if(!w)return;
-  const chs=wChapters(workId);
-  const total=chs.reduce((s,ch)=>s+charsOf(ch),0);
-  const goal=parseInt(w.goal)||0;
-  const pct=goal>0?Math.min(100,Math.round(total/goal*100)):0;
-  const remain=goal>0?Math.max(0,goal-total):0;
-  const bar=document.getElementById('writing-prog-bar');if(bar)bar.style.width=pct+'%';
-  const inp=document.getElementById('writing-goal-inp');if(inp&&!inp._focused)inp.value=w.goal||'';
-  const stats=document.getElementById('writing-prog-stats');
-  if(stats){
-    const mkStat=(val,lbl,cls='')=>`<div class="writing-stat-card${cls?' '+cls:''}"><div class="writing-stat-val">${val}</div><div class="writing-stat-lbl">${lbl}</div></div>`;
-    let html=mkStat(total.toLocaleString()+'자','총 집필량');
-    if(goal>0){html+=mkStat(pct+'%','달성률',pct<30?'danger':pct<70?'warn':'');html+=mkStat(remain.toLocaleString()+'자','남은 분량');}
-    const done=chs.filter(c=>c.done).length;
-    html+=mkStat(done+'/'+chs.length,'완성 회차');
-    stats.innerHTML=html;
+// ── 집필 탭 트래커 (컴팩트 사이드바형) ──
+function writingBuildTracker(wrap, workId){
+  wrap.innerHTML = '';
+  const w = wNodes().find(n=>n.id===workId);
+  if(!w) return;
+
+  const container = document.createElement('div');
+  container.className = 'wt-trk-wrap';
+
+  // ── 헤더 (클릭으로 접기/펼치기) ──
+  const hdr = document.createElement('div');
+  hdr.className = 'wt-trk-hdr';
+  const hdrLeft = document.createElement('span');
+  hdrLeft.textContent = '📊 집필 진행';
+  const toggle = document.createElement('span');
+  toggle.className = 'wt-trk-hdr-toggle' + (w._trkOpen!==false?' open':'');
+  toggle.textContent = '▶';
+  hdr.append(hdrLeft, toggle);
+
+  // ── 바디 ──
+  const body = document.createElement('div');
+  body.className = 'wt-trk-body' + (w._trkOpen!==false?' open':'');
+  body.id = 'wt-trk-body-' + workId;
+
+  hdr.onclick = ()=>{
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+    w._trkOpen = !isOpen; dsave();
+  };
+
+  container.append(hdr, body);
+  wrap.appendChild(container);
+  writingRenderTracker(body, workId);
+}
+
+function writingRenderTracker(body, workId){
+  body.innerHTML = '';
+  const w = wNodes().find(n=>n.id===workId);
+  if(!w) return;
+  if(!w.logs) w.logs = [];
+
+  const total = _wtTotalChars(workId);
+  const goal  = parseInt(w.goal)||0;
+  const pct   = goal>0 ? Math.min(100,Math.round(total/goal*100)) : 0;
+  const remain= goal>0 ? Math.max(0,goal-total) : 0;
+  const chs   = wChapters(workId);
+  const done  = chs.filter(c=>c.done).length;
+  const activeDays = w.logs.filter(l=>parseInt(l.chars)>0).length;
+  const avg   = activeDays>0 ? Math.round(total/activeDays) : 0;
+  const daysLeft = remain>0&&avg>0 ? Math.ceil(remain/avg) : 0;
+
+  // ① 목표 자수 입력
+  const goalRow = document.createElement('div');
+  goalRow.className = 'wt-trk-goal-row';
+  const goalLbl = document.createElement('span');
+  goalLbl.className = 'wt-trk-goal-lbl';
+  goalLbl.textContent = '🎯 목표';
+  const goalInp = document.createElement('input');
+  goalInp.className = 'wt-trk-goal-inp';
+  goalInp.type='number'; goalInp.min='0';
+  goalInp.value = w.goal||''; goalInp.placeholder='목표 자수';
+  goalInp.addEventListener('input',()=>{ w.goal=parseInt(goalInp.value)||0; dsave(); writingRenderTracker(body,workId); });
+  goalInp.addEventListener('keydown',e=>e.stopPropagation());
+  goalRow.append(goalLbl, goalInp);
+  body.appendChild(goalRow);
+
+  // ② 진행바
+  if(goal>0){
+    const barWrap=document.createElement('div'); barWrap.className='wt-trk-bar-wrap';
+    const fill=document.createElement('div'); fill.className='wt-trk-bar-fill'; fill.style.width=pct+'%';
+    const pctLbl=document.createElement('div'); pctLbl.className='wt-trk-bar-pct'; pctLbl.textContent=pct+'%';
+    barWrap.append(fill,pctLbl); body.appendChild(barWrap);
   }
+
+  // ③ 통계 카드
+  const stats=document.createElement('div'); stats.className='wt-trk-stats';
+  const mkStat=(val,lbl,cls='')=>{
+    const c=document.createElement('div'); c.className='wt-trk-stat'+(cls?' '+cls:'');
+    const v=document.createElement('div'); v.className='wt-trk-stat-val'; v.textContent=val;
+    const l=document.createElement('div'); l.className='wt-trk-stat-lbl'; l.textContent=lbl;
+    c.append(v,l); return c;
+  };
+  stats.appendChild(mkStat(total.toLocaleString()+'자','총 집필량'));
+  stats.appendChild(mkStat(done+'/'+chs.length,'완성 회차'));
+  if(goal>0) stats.appendChild(mkStat(pct+'%','달성률',pct<30?'danger':pct<70?'warn':''));
+  if(avg>0)  stats.appendChild(mkStat(avg.toLocaleString()+'자','일평균'));
+  if(daysLeft>0) stats.appendChild(mkStat(daysLeft+'일','예상 완료'));
+  body.appendChild(stats);
+
+  // ④ 오늘 기록 버튼
+  const todayStr=new Date().toISOString().slice(0,10);
+  const todayLog=w.logs.find(l=>l.date===todayStr);
+  const todayBtn=document.createElement('button');
+  todayBtn.className='wt-trk-today-btn';
+  todayBtn.textContent=todayLog?'📝 오늘 기록 수정':'📝 오늘 기록하기';
+  todayBtn.onclick=()=>{
+    if(todayLog){todayLog.chars=String(total);}
+    else{w.logs.push({id:uid(),date:todayStr,chars:String(total),memo:''});}
+    dsave(); writingRenderTracker(body,workId);
+    toast('기록됐습니다 ('+total.toLocaleString()+'자)');
+  };
+  body.appendChild(todayBtn);
+
+  // ⑤ 날짜별 로그 (접기/펼치기)
+  const logToggle=document.createElement('div');
+  logToggle.className='wt-trk-log-toggle';
+  const logOpen=w._logOpen||false;
+  logToggle.innerHTML=`<span style="transition:transform .15s;display:inline-block;transform:rotate(${logOpen?90:0}deg)">▶</span> 날짜별 기록 (${w.logs.length}건)`;
+  const logSection=document.createElement('div');
+  logSection.className='wt-trk-log-section'+(logOpen?' open':'');
+  logToggle.onclick=()=>{
+    const isOpen=logSection.classList.contains('open');
+    logSection.classList.toggle('open',!isOpen);
+    logToggle.querySelector('span').style.transform=`rotate(${!isOpen?90:0}deg)`;
+    w._logOpen=!isOpen; dsave();
+  };
+
+  const maxChars=Math.max(1,...w.logs.map(l=>parseInt(l.chars)||0));
+  w.logs.forEach((log,li)=>{
+    const row=document.createElement('div'); row.className='wt-trk-log-row';
+    const mkInp=(key,type,ph,isDate)=>{
+      const inp=document.createElement('input'); inp.className='wt-trk-log-inp';
+      inp.type=isDate?'date':(type==='number'?'number':'text');
+      inp.value=log[key]||''; inp.placeholder=ph||'';
+      inp.addEventListener('input',()=>{log[key]=inp.value;dsave();if(key==='chars')writingRenderTracker(body,workId);});
+      inp.addEventListener('keydown',e=>e.stopPropagation());
+      return inp;
+    };
+    const del=document.createElement('button'); del.className='wt-trk-del'; del.textContent='✕';
+    del.onclick=()=>{w.logs.splice(li,1);dsave();writingRenderTracker(body,workId);};
+    row.append(mkInp('date','text','',true),mkInp('chars','number','0'),mkInp('memo','text','메모'),del);
+    // 미니 bar
+    const barBg=document.createElement('div'); barBg.className='wt-trk-log-bar-bg';
+    const barFg=document.createElement('div'); barFg.className='wt-trk-log-bar-fg';
+    barFg.style.width=Math.round((parseInt(log.chars)||0)/maxChars*100)+'%';
+    barBg.appendChild(barFg);
+    logSection.append(row, barBg);
+  });
+
+  // + 추가 버튼
+  const addBtn=document.createElement('div'); addBtn.className='wt-trk-add-btn';
+  addBtn.textContent='＋ 날짜 추가';
+  addBtn.onclick=()=>{
+    w.logs.push({id:uid(),date:new Date().toISOString().slice(0,10),chars:'0',memo:''});
+    w._logOpen=true; dsave(); writingRenderTracker(body,workId);
+  };
+  logSection.appendChild(addBtn);
+  body.append(logToggle, logSection);
 }
 
+// 트래커 갱신 (에디터 저장 시 호출)
+function writingUpdateProgress(workId){
+  const body=document.getElementById('wt-trk-body-'+workId);
+  if(body) writingRenderTracker(body, workId);
+}
+
+// 하위 호환
 function writingUpdateGoal(val){
   const w=wNodes().find(n=>n.id===_writingSelWork);if(!w)return;
-  w.goal=parseInt(val)||0;dsave();writingUpdateProgress(_writingSelWork);
+  w.goal=parseInt(val)||0; dsave(); writingUpdateProgress(_writingSelWork);
 }
-
 function writingLogToday(){
   const w=wNodes().find(n=>n.id===_writingSelWork);if(!w)return;
-  const chs=wChapters(_writingSelWork);
-  const total=chs.reduce((s,ch)=>s+charsOf(ch),0);
+  const total=_wtTotalChars(_writingSelWork);
   const today=new Date().toISOString().slice(0,10);
   if(!w.logs)w.logs=[];
-  const existing=w.logs.find(l=>l.date===today);
-  if(existing){existing.chars=total;}else{w.logs.push({id:uid(),date:today,chars:total});}
-  dsave();toast('오늘 집필량 기록됨 ('+total.toLocaleString()+'자)');
+  const ex=w.logs.find(l=>l.date===today);
+  if(ex){ex.chars=String(total);}else{w.logs.push({id:uid(),date:today,chars:String(total),memo:''});}
+  dsave(); toast('오늘 집필량 기록됨 ('+total.toLocaleString()+'자)');
+  writingUpdateProgress(_writingSelWork);
 }
 
 // ── 에디터 열기 ──
@@ -3433,23 +3600,19 @@ function writingNavChapter(dir){
 }
 function writingOpenChapter(workId,chId){
   _writingSelWork=workId;_writingSelCh=chId;
+  S._lastWritingWork=workId; S._lastWritingCh=chId;
   const w=wNodes().find(n=>n.id===workId);
   const ch=wNodes().find(n=>n.id===chId);if(!ch)return;
   const chs=wChapters(workId);
   const ci=chs.findIndex(c=>c.id===chId);
 
-  // 트리/목록 갱신
-  writingRenderTree();
-  writingRenderChList(workId);
-  writingUpdateProgress(workId);
-
-  // UI 전환
+  // ① 에디터 가장 먼저 표시 (오류에 영향 없도록)
   document.getElementById('writing-empty-state').style.display='none';
   document.getElementById('writing-editor-wrap').style.display='flex';
 
   // 타이틀 입력
   const titleInp=document.getElementById('writing-ch-title-inp');
-  if(titleInp){titleInp.value=ch.title||'';titleInp.oninput=()=>{ch.title=titleInp.value;writingRenderTree();writingRenderChList(workId);clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);};}
+  if(titleInp){titleInp.value=ch.title||'';titleInp.oninput=()=>{ch.title=titleInp.value;writingRenderTree();writingUpdateProgress(workId);clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);};}
 
   // 이전/다음
   const prevBtn=document.getElementById('writing-prev-btn');const nextBtn=document.getElementById('writing-next-btn');
@@ -3479,16 +3642,15 @@ function writingOpenChapter(workId,chId){
   const sbInfo=document.getElementById('writing-statusbar-info');
   if(sbInfo)sbInfo.textContent=(w?.name||'')+' › '+(ci+1)+'화 / 전체 '+chs.length+'화';
 
-  // 분할보기 동기화
-  if(_writingSplitMode){
-    const ce2=document.getElementById('writing-ce2');if(ce2)ce2.innerHTML=ch.content||'';
-    // 회차 전환 시에도 sync 리스너 재부착
-    const ce1=document.getElementById('writing-ce1');
-    setTimeout(()=>_writingSetupSplitSync(ce1,ce2),50);
-  }
-
   // 맞춤법 패널 숨김
   const spellPanel=document.getElementById('writing-spell-panel');if(spellPanel)spellPanel.style.display='none';
+
+  // ⑦ 트리 갱신 + 트래커 (마지막에, 오류가 나도 에디터에 영향 없음)
+  writingRenderTree();
+  try{
+    const trkWrap=document.getElementById('writing-tracker-wrap');
+    if(trkWrap) writingBuildTracker(trkWrap, workId);
+  }catch(e){console.warn('tracker build error',e);}
 }
 
 // ── 작품/회차 추가/삭제 ──
@@ -3514,7 +3676,7 @@ function writingAddChapterTo(workId){
   const o=chs.reduce((m,c)=>Math.max(m,c.o),-1)+1;
   const ch={id:uid(),t:'CH',workId,title:(chs.length+1)+'화',content:'',o,done:false};
   S.writingNodes.push(ch);dsave();
-  writingRenderTree();writingRenderChList(workId);
+  writingRenderTree();writingUpdateProgress(workId);
   writingOpenChapter(workId,ch.id);
 }
 
@@ -3536,14 +3698,14 @@ function writingDeleteWork(workId){
   if(!confirm(`"${w.name}" 작품과 모든 회차를 삭제하시겠습니까?`))return;
   // 해당 작품 및 회차 모두 소프트 삭제
   S.writingNodes=S.writingNodes.filter(n=>n.id!==workId&&n.workId!==workId);
-  if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-chlist-panel').style.display='none';document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';}
+  if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';document.getElementById('writing-tracker-wrap').innerHTML='';}
   dsave();writingRenderTree();renderHome();renderToolsTree();toast(`"${w.name}" 삭제됨`);
 }
 
 function writingRenameChapter(workId,chId){
   const ch=wNodes().find(n=>n.id===chId);if(!ch)return;
   const title=prompt('회차 제목:',ch.title||'');if(title===null)return;
-  ch.title=title;dsave();writingRenderTree();writingRenderChList(workId);
+  ch.title=title;dsave();writingRenderTree();writingUpdateProgress(workId);
   const titleInp=document.getElementById('writing-ch-title-inp');if(titleInp&&_writingSelCh===chId)titleInp.value=title;
 }
 
@@ -3552,14 +3714,14 @@ function writingDuplicateCh(workId,chId){
   const chs=wChapters(workId);
   const o=chs.reduce((m,c)=>Math.max(m,c.o),-1)+1;
   const newCh={...clone(ch),id:uid(),o,title:(ch.title||'회차')+' (복사)'};
-  S.writingNodes.push(newCh);dsave();writingRenderTree();writingRenderChList(workId);toast('회차가 복사됐습니다.');
+  S.writingNodes.push(newCh);dsave();writingRenderTree();writingUpdateProgress(workId);toast('회차가 복사됐습니다.');
 }
 
 function writingTrashCh(chId){
   const ch=wNodes().find(n=>n.id===chId);if(!ch)return;
   ch.deleted=true;ch.deletedAt=new Date().toISOString();
   if(_writingSelCh===chId){_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';}
-  dsave();writingRenderTree();if(_writingSelWork)writingRenderChList(_writingSelWork);toast('회차가 휴지통으로 이동됐습니다.');
+  dsave();writingRenderTree();if(_writingSelWork)writingUpdateProgress(_writingSelWork);toast('회차가 휴지통으로 이동됐습니다.');
 }
 
 function writingOpenTrash(){
@@ -3574,7 +3736,7 @@ function writingOpenTrash(){
     const item=document.createElement('div');item.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--bdr2)';
     item.innerHTML=`<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--tx)">${n.title||'(제목 없음)'}</div><div style="font-size:10px;color:var(--tx3)">${w?.name||'?'} · ${new Date(n.deletedAt||'').toLocaleDateString('ko-KR')}</div></div>`;
     const restoreBtn=document.createElement('button');restoreBtn.className='btn btng';restoreBtn.style.cssText='font-size:11px;padding:3px 8px;flex-shrink:0';restoreBtn.textContent='복원';
-    restoreBtn.onclick=()=>{n.deleted=false;delete n.deletedAt;dsave();writingRenderTree();if(n.workId)writingRenderChList(n.workId);writingOpenTrash();toast('복원됐습니다.');};
+    restoreBtn.onclick=()=>{n.deleted=false;delete n.deletedAt;dsave();writingRenderTree();if(n.workId)writingUpdateProgress(n.workId);writingOpenTrash();toast('복원됐습니다.');};
     const delBtn=document.createElement('button');delBtn.className='btn btnr';delBtn.style.cssText='font-size:11px;padding:3px 8px;flex-shrink:0';delBtn.textContent='완전 삭제';
     delBtn.onclick=()=>{if(!confirm('완전히 삭제하시겠습니까? 복원 불가합니다.'))return;S.writingNodes=S.writingNodes.filter(x=>x.id!==n.id);dsave();writingRenderTree();writingOpenTrash();};
     item.append(restoreBtn,delBtn);list.appendChild(item);
@@ -3584,11 +3746,12 @@ function writingOpenTrash(){
 function writingUpdateChTitle(val){
   const ch=wNodes().find(n=>n.id===_writingSelCh);if(!ch)return;
   ch.title=val;clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);
-  writingRenderTree();if(_writingSelWork)writingRenderChList(_writingSelWork);
+  writingRenderTree();if(_writingSelWork)writingUpdateProgress(_writingSelWork);
 }
 
 // ── 분할 보기 ──
-let _splitSyncLock = false; // 무한 루프 방지
+let _splitSelDocType = null; // 'ch' | 'sched'
+let _splitSelDocId   = null; // chId or 'Y-M'
 
 function writingToggleSplit(){
   _writingSplitMode = !_writingSplitMode;
@@ -3596,44 +3759,131 @@ function writingToggleSplit(){
   pane2.style.display = _writingSplitMode ? 'flex' : 'none';
   const btn = document.getElementById('writing-split-btn');
   if(btn) btn.textContent = _writingSplitMode ? '분할 닫기' : '분할 보기';
-
-  if(_writingSplitMode && _writingSelCh){
-    const ch = wNodes().find(n=>n.id===_writingSelCh);
-    const ce1 = document.getElementById('writing-ce1');
-    const ce2 = document.getElementById('writing-ce2');
-    if(ce2 && ch) ce2.innerHTML = ch.content || '';
-
-    // ── 양방향 실시간 동기화 ──
-    _writingSetupSplitSync(ce1, ce2);
-  }
 }
 
-function _writingSetupSplitSync(ce1, ce2){
-  if(!ce1 || !ce2) return;
-  // 기존 리스너 제거 후 재등록
-  const newCe1 = ce1.cloneNode(true); ce1.parentNode.replaceChild(newCe1, ce1); ce1 = newCe1;
-  const newCe2 = ce2.cloneNode(true); ce2.parentNode.replaceChild(newCe2, ce2); ce2 = newCe2;
-  // 에디터1 재초기화 (MBEditor가 붙어 있으면 다시 붙여야 함)
-  if(window._writingMBEditor1){ try{ window._writingMBEditor1.destroy?.(); }catch(e){} }
-  // 간단 sync: input 이벤트로 서로 innerHTML 복사
-  ce1.addEventListener('input', () => {
-    if(_splitSyncLock) return;
-    _splitSyncLock = true;
-    const ch = wNodes().find(n=>n.id===_writingSelCh);
-    if(ch){ ch.content = ce1.innerHTML; clearTimeout(_writingSaveTimer); _writingSaveTimer = setTimeout(()=>dsave(),400); }
-    const c2 = document.getElementById('writing-ce2');
-    if(c2) c2.innerHTML = ce1.innerHTML;
-    _splitSyncLock = false;
+// 가져오기 드롭다운 메뉴
+function writingSplitOpenMenu(e){
+  e.stopPropagation();
+  const menu = document.getElementById('writing-xpanel-menu'); if(!menu) return;
+  if(menu.style.display !== 'none'){ menu.style.display='none'; return; }
+
+  menu.innerHTML = '';
+  const mkGroup = (t)=>{ const d=document.createElement('div'); d.style.cssText='padding:5px 10px;font-size:10px;font-weight:700;color:var(--tx3);border-top:1px solid var(--bdr);margin-top:2px'; d.textContent=t; return d; };
+  const mkItem  = (icon, label, onclick)=>{ const d=document.createElement('div'); d.style.cssText='padding:7px 14px;font-size:12px;color:var(--tx2);cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:6px'; d.innerHTML=`<span>${icon}</span><span>${label}</span>`; d.onmouseenter=()=>d.style.background='var(--surf2)'; d.onmouseleave=()=>d.style.background=''; d.onclick=onclick; return d; };
+
+  // ── 집필 회차 (다른 작품) ──
+  const otherWorks = wWorks().filter(w=> w.id !== _writingSelWork);
+  if(otherWorks.length){
+    menu.appendChild(mkGroup('✍️ 집필 회차'));
+    otherWorks.forEach(w=>{
+      const chs = wChapters(w.id);
+      chs.forEach((ch,ci)=>{
+        menu.appendChild(mkItem('📄', `[${w.name}] ${ci+1}화 ${ch.title||''}`, ()=>{ _splitLoadCh(ch, w); menu.style.display='none'; }));
+      });
+    });
+  }
+
+  // ── 현재 작품의 다른 회차 ──
+  if(_writingSelWork){
+    const sameChs = wChapters(_writingSelWork).filter(c=>c.id!==_writingSelCh);
+    if(sameChs.length){
+      const w = wNodes().find(n=>n.id===_writingSelWork);
+      menu.appendChild(mkGroup('📖 현재 작품의 다른 회차'));
+      sameChs.forEach((ch,ci)=>{
+        menu.appendChild(mkItem('📄', `${ci+1}화 ${ch.title||'(제목 없음)'}`, ()=>{ _splitLoadCh(ch, w); menu.style.display='none'; }));
+      });
+    }
+  }
+
+  // ── 스케줄 ──
+  menu.appendChild(mkGroup('📅 스케줄'));
+  const now = new Date();
+  [[-1],[0],[1]].forEach(([d])=>{
+    const dt = new Date(now.getFullYear(), now.getMonth()+d, 1);
+    const y=dt.getFullYear(), m=dt.getMonth()+1;
+    menu.appendChild(mkItem('📅', `${y}년 ${m}월 스케줄`, ()=>{ _splitLoadSched(y,m); menu.style.display='none'; }));
   });
-  ce2.addEventListener('input', () => {
-    if(_splitSyncLock) return;
-    _splitSyncLock = true;
-    const ch = wNodes().find(n=>n.id===_writingSelCh);
-    const c1 = document.getElementById('writing-ce1');
-    if(ch){ ch.content = ce2.innerHTML; clearTimeout(_writingSaveTimer); _writingSaveTimer = setTimeout(()=>dsave(),400); }
-    if(c1) c1.innerHTML = ce2.innerHTML;
-    _splitSyncLock = false;
+
+  // ── 작품도구 노드 ──
+  const toolNodes = (S.toolNodes||[]).filter(n=>['SY','WS','IM'].includes(n.type));
+  if(toolNodes.length){
+    menu.appendChild(mkGroup('🛠 작품도구'));
+    toolNodes.forEach(n=>{
+      menu.appendChild(mkItem('📋', n.name||n.type, ()=>{ _splitLoadTool(n); menu.style.display='none'; }));
+    });
+  }
+
+  // 위치 계산
+  const btn = document.getElementById('writing-xpanel-btn');
+  const r = btn.getBoundingClientRect();
+  menu.style.display = 'block';
+  menu.style.left = r.left + 'px';
+  menu.style.top  = r.bottom + 4 + 'px';
+  requestAnimationFrame(()=>{
+    if(menu.getBoundingClientRect().right > window.innerWidth){
+      menu.style.left = ''; menu.style.right = (window.innerWidth - r.right) + 'px';
+    }
   });
+  setTimeout(()=>document.addEventListener('click', function h(){ menu.style.display='none'; document.removeEventListener('click',h); }, true), 50);
+}
+
+// 집필 회차 로드
+function _splitLoadCh(ch, w){
+  _splitSelDocType='ch'; _splitSelDocId=ch.id;
+  const title = document.getElementById('writing-pane2-title');
+  if(title) title.textContent = `✍️ [${w?.name||''}] ${ch.title||'(제목 없음)'}`;
+  const ce2 = document.getElementById('writing-ce2');
+  if(!ce2) return;
+  ce2.contentEditable = 'true';
+  ce2.innerHTML = ch.content || '';
+  // 편집 → 실시간 저장
+  ce2._splitHandler && ce2.removeEventListener('input', ce2._splitHandler);
+  ce2._splitHandler = ()=>{
+    ch.content = ce2.innerHTML;
+    clearTimeout(_writingSaveTimer); _writingSaveTimer = setTimeout(()=>dsave(), 500);
+  };
+  ce2.addEventListener('input', ce2._splitHandler);
+}
+
+// 스케줄 로드 (읽기 전용)
+function _splitLoadSched(y, m){
+  _splitSelDocType='sched'; _splitSelDocId=`${y}-${m}`;
+  const title = document.getElementById('writing-pane2-title');
+  if(title) title.textContent = `📅 ${y}년 ${m}월 스케줄`;
+  const ce2 = document.getElementById('writing-ce2');
+  if(!ce2) return;
+  ce2.contentEditable = 'false';
+  // 스케줄 데이터를 간단 HTML로 렌더
+  const k = `${y}-${String(m).padStart(2,'0')}`;
+  const cells = S.scheds?.[k]?.cells || {};
+  const daysInMonth = new Date(y, m, 0).getDate();
+  let html = `<div style="font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:12px">📅 ${y}년 ${m}월</div>`;
+  html += '<div style="display:flex;flex-direction:column;gap:4px">';
+  for(let d=1; d<=daysInMonth; d++){
+    const dayStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayData = Object.entries(cells).filter(([k])=>k.startsWith(dayStr));
+    if(dayData.length){
+      const days=['일','월','화','수','목','금','토'];
+      const dow=days[new Date(y,m-1,d).getDay()];
+      html+=`<div style="font-size:11px;padding:4px 0;border-bottom:1px solid var(--bdr2)"><b>${m}/${d}(${dow})</b> `;
+      dayData.forEach(([,v])=>{ if(v) html+=`<span style="margin-right:8px;color:var(--tx)">${v}</span>`; });
+      html+='</div>';
+    }
+  }
+  html += '</div>';
+  ce2.innerHTML = html;
+}
+
+// 작품도구 노드 로드
+function _splitLoadTool(node){
+  _splitSelDocType='tool'; _splitSelDocId=node.id;
+  const title = document.getElementById('writing-pane2-title');
+  if(title) title.textContent = `🛠 ${node.name}`;
+  const ce2 = document.getElementById('writing-ce2');
+  if(!ce2) return;
+  ce2.contentEditable = 'false';
+  const content = node.data?.content || node.data?.body || '';
+  ce2.innerHTML = content ? content : `<div style="color:var(--tx3);font-size:12px">${node.name} — 내용 없음</div>`;
 }
 
 // ── 맞춤법 검사 ──
@@ -3854,9 +4104,11 @@ function writingExportAll(){
 // ── 집필 탭 초기화 ──
 function initWritingTab(){
   writingRenderTree();
-  // goal 입력 focus 추적
-  const goalInp=document.getElementById('writing-goal-inp');
-  if(goalInp){goalInp.addEventListener('focus',()=>{goalInp._focused=true;});goalInp.addEventListener('blur',()=>{goalInp._focused=false;});}
+  // 마지막 화면 복원
+  if(S._lastWritingWork && S._lastWritingCh){
+    const ch=wNodes().find(n=>n.id===S._lastWritingCh&&!n.deleted);
+    if(ch) writingOpenChapter(S._lastWritingWork, S._lastWritingCh);
+  }
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
