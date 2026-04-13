@@ -715,6 +715,619 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .writing-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
 .writing-field{display:flex;flex-direction:column;gap:4px}
 .writing-field label{font-size:11px;font-weight:600;color:var(--tx3)}
+.writing-field input[type=text],.writing-field textarea,.writing-field select{
+  background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;
+  padding:8px 10px;color:var(--tx);font-size:12px;font-family:inherit;
+  outline:none;resize:vertical;line-height:1.7;
+}
+.writing-field input[type=text]:focus,.writing-field textarea:focus{border-color:var(--ac)}
+.writing-field-row{display:flex;gap:12px;flex-wrap:wrap}
+.writing-field-row .writing-field{flex:1;min-width:120px}
+.writing-section-title{font-size:13px;font-weight:700;color:var(--tx);padding-bottom:6px;border-bottom:2px solid var(--ac);margin-bottom:4px}
+.writing-wc{font-size:10px;color:var(--tx3);text-align:right;margin-top:2px}
+.writing-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tx3);font-size:13px;gap:8px}
+.writing-type-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;background:var(--ac);color:#fff;margin-left:6px;vertical-align:middle}
+
+
+/* ── 시놉시스 태그 패널 ── */
+.sy-tag-panel{
+  position:absolute;right:0;top:0;bottom:0;
+  width:320px;min-width:180px;max-width:600px;
+  background:var(--surf);border-left:1px solid var(--bdr);
+  display:none;flex-direction:column;z-index:100;
+  box-shadow:-4px 0 16px rgba(0,0,0,.15);
+}
+.sy-tag-panel.open{display:flex}
+.sy-tag-panel-hdr{
+  padding:10px 14px;background:var(--surf2);
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.sy-tag-panel-hdr b{font-size:13px;color:var(--tx)}
+.sy-tag-tabs{display:flex;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.sy-tab-btn{flex:1;padding:7px 4px;font-size:10px;border:none;
+  background:var(--surf2);color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent}
+.sy-tab-btn.on{background:var(--surf);color:var(--ac);border-bottom-color:var(--ac);font-weight:700}
+.sy-tag-cats{flex:1;overflow-y:auto;padding:8px 12px;display:flex;flex-direction:column;gap:10px}
+.sy-cat-title{font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:4px}
+.sy-tag-chips-sel{display:flex;flex-wrap:wrap;gap:4px}
+.sy-kw-chip{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 8px;border-radius:12px;font-size:11px;
+  border:1px solid var(--bdr);background:var(--surf2);
+  color:var(--tx2);cursor:pointer;transition:all .12s;
+}
+.sy-kw-chip:hover{border-color:var(--ac);color:var(--ac)}
+.sy-kw-chip.selected{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sy-tag-drag{
+  position:absolute;left:0;top:0;bottom:0;width:5px;
+  cursor:col-resize;background:transparent;
+}
+.sy-tag-drag:hover{background:var(--ac);opacity:.4}
+/* 선택된 태그 칩 */
+.sy-selected-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.sy-sel-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:12px;font-size:11px;
+  background:var(--ac);color:#fff;
+}
+.sy-sel-chip button{
+  background:none;border:none;color:#fff;cursor:pointer;
+  font-size:12px;line-height:1;padding:0;opacity:.8;
+}
+.sy-sel-chip button:hover{opacity:1}
+/* 시놉시스 컨테이너 */
+.sy-container{flex:1;display:flex;overflow:hidden;position:relative}
+.sy-main{flex:1;overflow-y:auto}
+
+
+/* ── 캐릭터 시트 ── */
+.cs-container{flex:1;display:flex;overflow:hidden}
+.cs-left{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.cs-right{width:260px;min-width:180px;background:var(--surf2);border-left:1px solid var(--bdr);overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+.cs-right-hdr{padding:10px 12px;font-size:12px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--bdr);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.cs-trait-cats{padding:8px 10px;display:flex;flex-direction:column;gap:10px}
+.cs-cat-title{font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid var(--bdr)}
+.cs-trait-item{display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer}
+.cs-trait-item input[type=checkbox]{cursor:pointer;accent-color:var(--ac)}
+.cs-trait-item label{font-size:11px;color:var(--tx2);cursor:pointer;flex:1}
+.cs-trait-item .cs-trait-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:0 2px;opacity:0}
+.cs-trait-item:hover .cs-trait-del{opacity:1}
+.cs-add-custom{padding:10px 12px;border-top:1px solid var(--bdr)}
+/* 캐릭터 이미지 업로드 */
+.cs-img-area{width:100px;height:120px;border:2px dashed var(--bdr);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;background:var(--surf2);overflow:hidden}
+.cs-img-area img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+.cs-img-area:hover{border-color:var(--ac)}
+.cs-info-row{display:flex;gap:14px;align-items:flex-start}
+.cs-info-col{flex:1;display:flex;flex-direction:column;gap:8px}
+.cs-field-input{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;line-height:1.7;width:100%;box-sizing:border-box}
+.cs-field-input:focus{border-color:var(--ac)}
+.cs-trait-field{display:flex;flex-direction:column;gap:4px}
+.cs-trait-field label{font-size:11px;font-weight:600;color:var(--tx3)}
+
+
+/* ── 타임라인 ── */
+.tl-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tl-body{flex:1;overflow-y:auto;padding:20px 28px}
+.tl-list{display:flex;flex-direction:column;gap:0;position:relative;padding-left:110px}
+.tl-list::before{content:'';position:absolute;left:82px;top:0;bottom:0;width:2px;background:var(--bdr)}
+.tl-item{position:relative;margin-bottom:12px}
+.tl-item::before{content:'';position:absolute;left:-20px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--ac);border:2px solid var(--surf);z-index:1}
+.tl-item.dragging{opacity:.4}
+.tl-item.drag-over-top{border-top:2px solid var(--ac)}
+.tl-item.drag-over-bottom{border-bottom:2px solid var(--ac)}
+.tl-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.tl-card:hover{border-color:var(--ac)}
+.tl-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tl-drag-handle{color:var(--tx3);cursor:grab;font-size:14px;flex-shrink:0;padding:0 2px}
+.tl-drag-handle:active{cursor:grabbing}
+.tl-card-title{font-size:13px;font-weight:700;color:var(--tx);flex:1;min-width:0}
+.tl-chapter-badge{font-size:10px;color:var(--tx3);background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:1px 7px;flex-shrink:0}
+.tl-card-body{font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.tl-card-edit{display:none;flex-direction:column;gap:8px}
+.tl-card-edit.open{display:flex}
+.tl-edit-input{background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;width:100%;box-sizing:border-box}
+.tl-edit-input:focus{border-color:var(--ac)}
+.tl-card-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:4px}
+.tl-add-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border:2px dashed var(--bdr);border-radius:8px;color:var(--tx3);cursor:pointer;font-size:12px;background:none;width:100%;margin-top:4px}
+.tl-add-btn:hover{border-color:var(--ac);color:var(--ac)}
+
+
+/* ── 관계도 ── */
+.rm-container{flex:1;display:flex;overflow:hidden}
+.rm-canvas-wrap{flex:1;position:relative;overflow:visible;background:var(--surf);cursor:default;min-height:300px}
+.rm-canvas{position:absolute;inset:0;pointer-events:none}
+.rm-char-card{
+  position:absolute;width:110px;
+  background:var(--surf2);border:2px solid var(--bdr);border-radius:10px;
+  padding:10px 8px 8px;text-align:center;cursor:move;user-select:none;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:10;
+}
+.rm-char-card:hover{border-color:var(--ac)}
+.rm-char-card.selected{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}
+.rm-char-img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--surf3);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0}
+.rm-char-img img{width:100%;height:100%;object-fit:cover}
+.rm-char-name{font-size:11px;font-weight:700;color:var(--tx);word-break:break-all;line-height:1.3}
+.rm-char-summary{font-size:9px;color:var(--tx3);word-break:break-all;line-height:1.3;max-height:28px;overflow:hidden}
+/* 연결 포인트 */
+.rm-connect-dot{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:var(--ac);border:2px solid var(--surf);
+  cursor:crosshair;opacity:0;transition:opacity .15s;z-index:20;
+}
+.rm-char-card:hover .rm-connect-dot{opacity:1}
+.rm-connect-dot.top{top:-8px;left:50%;transform:translateX(-50%)}
+.rm-connect-dot.bottom{bottom:-8px;left:50%;transform:translateX(-50%)}
+.rm-connect-dot.left{left:-8px;top:50%;transform:translateY(-50%)}
+.rm-connect-dot.right{right:-8px;top:50%;transform:translateY(-50%)}
+/* 사이드패널 */
+.rm-side{width:200px;background:var(--surf2);border-left:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.rm-side-hdr{padding:10px 12px;font-size:12px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.rm-side-list{flex:1;overflow-y:auto;padding:8px}
+.rm-side-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--tx2)}
+.rm-side-item:hover{background:var(--surf)}
+.rm-side-item.added{color:var(--tx3)}
+.rm-side-add-btn{padding:4px 8px;font-size:10px;border-radius:4px;border:1px solid var(--bdr);background:var(--surf);color:var(--ac);cursor:pointer;flex-shrink:0}
+.rm-side-add-btn.remove{color:var(--rd)}
+/* 관계선 라벨 팝업 */
+.rm-rel-popup{
+  position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;
+  padding:14px 16px;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:9999;
+  display:flex;flex-direction:column;gap:10px;min-width:220px;
+}
+.rm-rel-popup input,.rm-rel-popup select{
+  background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;
+  padding:6px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;width:100%;box-sizing:border-box;
+}
+.rm-rel-popup input:focus{border-color:var(--ac)}
+
+
+/* ── 아이디어 메모 드래그 ── */
+.im-field-wrap{display:flex;flex-direction:column;gap:4px;position:relative;margin-bottom:12px}
+.im-label-row{display:flex;align-items:center;gap:4px;cursor:pointer}
+.im-drag-handle{color:var(--tx3);cursor:grab;font-size:13px;flex-shrink:0;padding:0 2px;user-select:none}
+.im-drag-handle:active{cursor:grabbing}
+.im-label{font-size:11px;font-weight:600;color:var(--tx3);flex:1;cursor:text;border-radius:3px;padding:1px 3px}
+.im-label.editing{background:var(--surf2);border:1px solid var(--ac);outline:none;color:var(--tx)}
+.im-field-wrap.dragging{opacity:.4}
+.im-field-wrap.drag-over-top{border-top:2px solid var(--ac)}
+.im-field-wrap.drag-over-bottom{border-bottom:2px solid var(--ac)}
+.im-del-btn{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;opacity:0;padding:0 3px}
+.im-label-row:hover .im-del-btn{opacity:1}
+
+
+/* ── 관계도 C단계 ── */
+.rm-legend{
+  position:absolute;bottom:12px;right:12px;
+  background:var(--surf);border:1px solid var(--bdr);border-radius:8px;
+  padding:10px 12px;font-size:10px;color:var(--tx3);z-index:20;
+  max-width:180px;
+}
+.rm-legend-title{font-weight:700;color:var(--tx2);margin-bottom:6px;font-size:11px}
+.rm-legend-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.rm-legend-line{width:32px;height:2px;flex-shrink:0}
+.rm-ctx-menu-hint{
+  position:absolute;top:8px;left:8px;
+  font-size:10px;color:var(--tx3);background:var(--surf2);
+  border-radius:5px;padding:3px 8px;pointer-events:none;
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   E단계: 집필 툴 디자인 개선
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ── 시트 타입별 색상 팔레트 ── */
+:root{
+  --wtr-color:#e67e22; --wim-color:#8e44ad; --wws-color:#27ae60;
+  --wsy-color:#2980b9; --wcs-color:#e74c3c; --wtl-color:#16a085; --wrm-color:#2c3e50;
+}
+
+/* ── 집필 툴바 개선 ── */
+.writing-toolbar{
+  height:44px;gap:10px;padding:0 16px;
+  border-bottom:2px solid var(--bdr);
+}
+.writing-toolbar-title{font-size:13px;font-weight:800;letter-spacing:-.2px}
+
+/* 타입별 툴바 강조색 (JS에서 data-type 속성 설정) */
+.writing-toolbar[data-type="WTR"]{border-bottom-color:var(--wtr-color)}
+.writing-toolbar[data-type="WIM"]{border-bottom-color:var(--wim-color)}
+.writing-toolbar[data-type="WWS"]{border-bottom-color:var(--wws-color)}
+.writing-toolbar[data-type="WSY"]{border-bottom-color:var(--wsy-color)}
+.writing-toolbar[data-type="WCS"]{border-bottom-color:var(--wcs-color)}
+.writing-toolbar[data-type="WTL"]{border-bottom-color:var(--wtl-color)}
+.writing-toolbar[data-type="WRM"]{border-bottom-color:var(--wrm-color)}
+.writing-toolbar[data-type="WMB"]{border-bottom-color:#e91e63}
+.writing-toolbar[data-type="WPT"]{border-bottom-color:#00b894}
+.writing-toolbar[data-type="WED"]{border-bottom-color:#6c5ce7}
+
+/* ── 섹션 타이틀 개선 ── */
+.writing-section-title{
+  font-size:12px;font-weight:800;color:var(--tx);
+  padding:6px 10px;margin:4px 0;
+  background:var(--surf2);border-radius:6px;
+  border-left:3px solid var(--ac);
+  display:flex;align-items:center;gap:6px;
+}
+
+/* ── 필드 개선 ── */
+.writing-field label{
+  font-size:11px;font-weight:700;color:var(--tx2);
+  margin-bottom:5px;display:block;
+}
+.writing-field input[type=text],
+.writing-field textarea,
+.writing-field select,
+.cs-field-input,
+.tl-edit-input{
+  border-radius:7px;
+  border:1.5px solid var(--bdr);
+  transition:border-color .15s, box-shadow .15s;
+  padding:9px 11px;font-size:12px;
+}
+.writing-field input[type=text]:focus,
+.writing-field textarea:focus,
+.writing-field select:focus,
+.cs-field-input:focus,
+.tl-edit-input:focus{
+  border-color:var(--ac);
+  box-shadow:0 0 0 3px rgba(56,139,253,.12);
+  outline:none;
+}
+
+/* ── 트리트먼트 핵심내용 강조 ── */
+.wtr-core-field textarea{
+  background:var(--surf2);
+  border-left:3px solid var(--wtr-color) !important;
+  min-height:120px;
+}
+.wtr-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:10px;font-weight:700;background:var(--wtr-color);color:#fff;margin-left:6px;
+}
+
+/* ── 아이디어 메모 필드 카드화 ── */
+.im-field-wrap{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:8px;padding:10px 12px;
+  transition:border-color .15s, box-shadow .15s;
+}
+.im-field-wrap:hover{border-color:var(--ac);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.im-drag-handle{font-size:16px;opacity:.4}
+.im-drag-handle:hover{opacity:1}
+.im-label{font-size:11px;font-weight:700;color:var(--tx2)}
+.im-label.editing{background:var(--surf2);border:1.5px solid var(--ac);border-radius:4px;padding:1px 5px}
+
+/* ── 세계관 섹션 카드 ── */
+.ws-section-card{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:10px;padding:14px 16px;margin-bottom:16px;
+}
+.ws-section-card .writing-section-title{
+  margin:-14px -16px 12px;border-radius:10px 10px 0 0;
+  border-left:none;padding:10px 16px;
+  background:var(--surf2);border-bottom:1px solid var(--bdr);
+  font-size:12px;
+}
+
+/* ── 시놉시스 기승전결 카드 ── */
+.sy-story-card{
+  border-radius:8px;overflow:hidden;margin-bottom:2px;
+}
+.sy-story-label{
+  display:block;font-size:11px;font-weight:800;
+  padding:6px 12px;color:#fff;
+}
+.sy-story-label.기{background:#e74c3c}
+.sy-story-label.승{background:#e67e22}
+.sy-story-label.전{background:#8e44ad}
+.sy-story-label.결{background:#2980b9}
+.sy-story-card textarea{border-radius:0 0 8px 8px;border-top:none}
+
+/* ── 캐릭터 시트 개선 ── */
+.cs-img-area{
+  width:110px;height:130px;border-radius:50%;
+  border:3px dashed var(--bdr);
+  transition:border-color .15s, box-shadow .15s;
+}
+.cs-img-area:hover{border-color:var(--ac);box-shadow:0 0 0 4px rgba(56,139,253,.15)}
+.cs-img-area img{border-radius:50%}
+.cs-cat-title{
+  font-size:10px;font-weight:800;color:#fff;
+  background:var(--ac);border-radius:4px;
+  padding:2px 8px;margin-bottom:6px;display:inline-block;
+}
+.cs-right{background:var(--surf)}
+.cs-trait-item label{font-size:11px;color:var(--tx2)}
+.cs-trait-section .writing-section-title{
+  background:linear-gradient(90deg,var(--surf2),transparent);
+  border-radius:0 6px 6px 0;
+}
+
+/* ── 타임라인 개선 ── */
+.tl-list::before{background:linear-gradient(to bottom,var(--ac),var(--bdr))}
+.tl-item::before{
+  background:var(--ac);
+  box-shadow:0 0 0 3px var(--surf),0 0 0 5px var(--ac);
+  transition:transform .15s;
+}
+.tl-item:hover::before{transform:scale(1.3)}
+.tl-card{
+  border-radius:10px;
+  border-left:3px solid var(--ac);
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+  transition:box-shadow .15s, border-color .15s;
+}
+.tl-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.tl-chapter-label{
+  font-size:11px;font-weight:800;
+  color:var(--ac);
+  background:var(--surf2);border-radius:4px;padding:2px 6px;
+}
+.tl-drag-handle{font-size:15px;opacity:.3}
+.tl-drag-handle:hover{opacity:1}
+.tl-card-title{font-size:13px;font-weight:700;color:var(--tx)}
+
+/* ── 관계도 개선 ── */
+.rm-char-card{
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+  transition:box-shadow .15s, transform .1s, border-color .15s;
+}
+.rm-char-card:hover{
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
+  transform:translateY(-1px);
+}
+.rm-char-card.selected{border-color:var(--ac);box-shadow:0 0 0 3px rgba(56,139,253,.25)}
+.rm-char-img{
+  width:48px;height:48px;border-radius:50%;
+  border:2px solid var(--bdr);
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+.rm-char-name{font-size:11px;font-weight:700;color:var(--tx)}
+.rm-connect-dot{
+  width:12px;height:12px;
+  animation:none;
+  transition:opacity .2s, transform .15s;
+}
+.rm-char-card:hover .rm-connect-dot{opacity:1;transform:scale(1.2)}
+.rm-legend{border-radius:10px;box-shadow:0 3px 12px rgba(0,0,0,.12)}
+
+/* ── 집필 뷰 컨테이너 ── */
+.writing-view{
+  background:var(--surf);
+}
+.writing-body{gap:12px}
+
+/* ── 집필 빈 상태 ── */
+.writing-empty{
+  gap:12px;
+}
+.writing-empty span:first-child{
+  font-size:48px;opacity:.3;
+}
+.writing-empty span:last-child{
+  font-size:14px;color:var(--tx3);font-weight:500;
+}
+
+/* ── wt-btn 개선 ── */
+.wt-btn{
+  border-radius:6px;padding:4px 12px;
+  font-size:11px;transition:background .12s, opacity .12s;
+  cursor:pointer;border:1px solid var(--bdr);
+  background:var(--surf2);color:var(--tx2);
+}
+.wt-btn:hover{background:var(--surf3,var(--surf));opacity:.85}
+
+
+/* ── 용어 사전 ── */
+.gs-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.gs-tab-bar{display:flex;align-items:center;gap:0;border-bottom:2px solid var(--bdr);background:var(--surf2);flex-shrink:0;overflow-x:auto;overflow-y:hidden}
+.gs-tab-bar::-webkit-scrollbar{height:3px}
+.gs-tab-btn{
+  padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;
+  border:none;background:none;color:var(--tx3);white-space:nowrap;
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;
+}
+.gs-tab-btn.on{color:var(--ac);border-bottom-color:var(--ac);background:var(--surf)}
+.gs-tab-btn:hover:not(.on){color:var(--tx2);background:var(--surf)}
+.gs-tab-add{padding:8px 10px;font-size:16px;cursor:pointer;color:var(--tx3);background:none;border:none;flex-shrink:0}
+.gs-tab-add:hover{color:var(--ac)}
+.gs-body{flex:1;overflow:auto;padding:16px 20px}
+.gs-table{width:100%;border-collapse:collapse;font-size:12px}
+.gs-table thead th{
+  background:var(--surf2);border:1px solid var(--bdr);
+  padding:8px 12px;font-weight:700;color:var(--tx2);
+  text-align:left;position:sticky;top:0;z-index:2;
+}
+.gs-table tbody tr:hover{background:var(--surf2)}
+.gs-table td{
+  border:1px solid var(--bdr);padding:0;vertical-align:top;
+}
+.gs-cell{
+  width:100%;min-height:36px;padding:8px 10px;
+  background:transparent;border:none;outline:none;resize:none;
+  font-size:12px;font-family:inherit;color:var(--tx);line-height:1.6;
+  overflow:hidden;
+}
+.gs-cell:focus{background:var(--surf2);box-shadow:inset 0 0 0 2px var(--ac)}
+.gs-row-del{
+  width:28px;background:none;border:none;cursor:pointer;
+  color:var(--tx3);font-size:14px;opacity:0;transition:opacity .1s;padding:8px 4px;
+}
+.gs-table tbody tr:hover .gs-row-del{opacity:1}
+.gs-row-del:hover{color:var(--rd)}
+.gs-add-row{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  cursor:pointer;color:var(--tx3);font-size:12px;border-top:1px solid var(--bdr);
+  background:var(--surf);border-radius:0 0 8px 8px;
+}
+.gs-add-row:hover{color:var(--ac);background:var(--surf2)}
+.gs-tab-rename{
+  font-size:12px;padding:2px 6px;border:1.5px solid var(--ac);
+  border-radius:4px;background:var(--surf);color:var(--tx);
+  font-family:inherit;outline:none;
+}
+
+
+/* ── 무드보드 ── */
+.mb-board{
+  flex:1;position:relative;overflow:hidden;
+  background:var(--surf);
+  background-image:radial-gradient(var(--bdr) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.mb-toolbar-sub{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  background:var(--surf2);border-bottom:1px solid var(--bdr);flex-shrink:0;
+}
+.mb-pin{
+  position:absolute;cursor:move;user-select:none;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:8px;background:var(--surf);border:2px solid var(--bdr);
+  border-radius:10px;box-shadow:0 3px 12px rgba(0,0,0,.15);
+  transition:border-color .15s,box-shadow .15s;
+  min-width:120px;max-width:200px;
+}
+.mb-pin:hover{border-color:var(--ac);box-shadow:0 6px 20px rgba(0,0,0,.22);z-index:20}
+.mb-pin.selected{border-color:var(--ac);box-shadow:0 0 0 3px rgba(56,139,253,.25);z-index:25}
+.mb-pin img{
+  width:100%;max-height:160px;object-fit:cover;
+  border-radius:6px;display:block;cursor:zoom-in;
+}
+.mb-pin-caption{
+  font-size:10px;color:var(--tx3);text-align:center;
+  width:100%;border:none;background:transparent;outline:none;
+  font-family:inherit;resize:none;padding:0;line-height:1.4;
+}
+.mb-pin-caption:focus{color:var(--tx)}
+.mb-pin-del{
+  position:absolute;top:-8px;right:-8px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--rd);color:#fff;border:2px solid var(--surf);
+  font-size:11px;cursor:pointer;display:none;
+  align-items:center;justify-content:center;line-height:1;z-index:30;
+}
+.mb-pin:hover .mb-pin-del{display:flex}
+.mb-zoom-hint{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  font-size:10px;color:var(--tx3);background:var(--surf2);
+  border-radius:12px;padding:3px 10px;pointer-events:none;opacity:.7;
+}
+.idea-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.idea-toolbar{padding:8px 14px;background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;gap:6px;align-items:center;flex-shrink:0}
+.idea-grid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;align-content:start}
+.idea-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;cursor:default;position:relative;min-height:100px}
+.idea-card:hover{border-color:var(--tx3)}
+.idea-card-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;background:var(--ac);color:#fff;display:inline-block;margin-bottom:6px}
+.idea-card-content{font-size:12px;color:var(--tx);line-height:1.7;outline:none;min-height:60px;white-space:pre-wrap;word-break:break-word}
+.idea-card-content:empty::before{content:'아이디어를 입력하세요...';color:var(--tx3);pointer-events:none}
+.idea-card-del{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--tx3);font-size:13px;opacity:0;padding:2px}
+.idea-card:hover .idea-card-del{opacity:1}
+.idea-card-del:hover{color:var(--rd)}
+
+.home-chart-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:16px;margin-top:8px}
+.home-chart-title{font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:10px}
+.home-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.home-bar-label{width:80px;flex-shrink:0;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-bar-track{flex:1;height:14px;background:var(--surf2);border-radius:7px;overflow:hidden}
+.home-bar-fill{height:100%;border-radius:7px;transition:width .5s}
+.home-bar-val{width:50px;flex-shrink:0;text-align:right;color:var(--tx3)}
+
+
+/* ── POMODORO ── */
+.pomo-display{font-size:56px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--tx);letter-spacing:2px;text-align:center;padding:16px 0}
+.pomo-presets{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.pomo-preset{background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r);padding:5px 14px;font-size:12px;cursor:pointer;color:var(--tx2)}
+.pomo-preset:hover{border-color:var(--ac);color:var(--ac)}
+.pomo-preset.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pomo-start{width:100%;max-width:260px;background:var(--gn);border:none;border-radius:var(--r);padding:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:block;margin:0 auto}
+.pomo-start:hover{opacity:.88}
+.pomo-start.running{background:var(--rd)}
+
+/* ── PROFILE CARD ── */
+.profile-card{display:flex;align-items:center;gap:16px;padding:12px 0;margin-bottom:4px}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;cursor:pointer}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-info{flex:1}
+.profile-name{font-size:16px;font-weight:700;color:var(--tx)}
+.profile-pen{font-size:12px;color:var(--tx3);margin-top:2px}
+
+/* ── WORKS MANAGEMENT ── */
+.work-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.work-card-color{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.work-card-name{flex:1;font-size:13px;font-weight:600;color:var(--tx)}
+.work-card-genre{font-size:11px;color:var(--tx3)}
+.work-card-actions{display:flex;gap:4px}
+
+/* ── SCHEDULE ── */
+.schedtb{min-height:44px;background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;align-items:center;flex-wrap:wrap;padding:0 14px;gap:14px;flex-shrink:0}
+.mnav{display:flex;align-items:center;gap:8px}
+.mlabel{font-size:14px;font-weight:700;color:var(--tx)}
+.mnavbtn{background:none;border:1px solid var(--bdr);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--tx3)}
+.mnavbtn:hover{border-color:var(--tx3);color:var(--tx)}
+.schedbody{flex:1;display:flex;overflow:hidden;min-height:0}
+.schedmain{flex:1;overflow:auto;padding:0}
+.weeksec{border-bottom:1px solid var(--bdr)}
+.wkhdr{display:grid;grid-template-columns:52px repeat(5,1fr);background:var(--surf2);border-bottom:1px solid var(--bdr)}
+.wkhdrcell{padding:6px 8px;font-size:11px;font-weight:700;color:var(--tx3);border-right:1px solid var(--bdr);display:flex;flex-direction:column;gap:2px}
+.wkhdrcell:last-child{border-right:none}
+.wkdate{font-size:10px;font-weight:400;color:var(--tx3)}
+.crow{display:grid;grid-template-columns:52px repeat(5,1fr);border-bottom:1px solid var(--bdr2)}
+.crow:last-child{border-bottom:none}
+.clabel{padding:4px 8px;font-size:10px;font-weight:600;color:var(--tx3);border-right:1px solid var(--bdr);background:var(--surf);display:flex;align-items:center}
+.scell{padding:4px 6px;min-height:32px;font-size:11px;border-right:1px solid var(--bdr2);outline:none;color:var(--tx);background:var(--bg);line-height:1.5}
+.scell:last-child{border-right:none}
+.scell:focus{background:rgba(56,139,253,.06);box-shadow:inset 0 0 0 1.5px var(--ac);position:relative;z-index:1}
+.today-hdr{background:rgba(56,139,253,.12)!important;color:var(--ac)!important}
+.today-col{background:rgba(56,139,253,.04)!important}
+/* tracker panel */
+.tracker{width:260px;flex-shrink:0;background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.trktitle{padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.trkbody{flex:1;overflow-y:auto;padding:8px}
+.trk-row{display:grid;grid-template-columns:1fr 56px 56px 56px;gap:0;border-bottom:1px solid var(--bdr2);align-items:center;font-size:10px}
+.trk-row:last-child{border-bottom:none}
+.trk-cell{padding:5px 6px;color:var(--tx2)}
+.trk-cell.hd{font-weight:700;color:var(--tx3);background:var(--surf2);font-size:9px}
+.trk-cell.name{font-weight:600;color:var(--tx)}
+.trk-inp{width:100%;background:transparent;border:none;outline:none;font-size:10px;color:var(--tx);font-family:inherit;padding:3px 4px;text-align:center}
+.trk-inp:focus{background:var(--surf2);border-radius:3px}
+/* monthly status table */
+.mst-title{padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx2);border-top:1px solid var(--bdr);background:var(--surf2)}
+.mst-row{display:grid;grid-template-columns:1fr 52px 52px 52px;border-bottom:1px solid var(--bdr2);align-items:center;font-size:10px}
+.mst-cell{padding:5px 6px;color:var(--tx2)}
+.mst-cell.hd{font-weight:700;color:var(--tx3);background:var(--surf2);font-size:9px;text-align:center}
+.mst-inp{width:100%;background:transparent;border:none;outline:none;font-size:10px;color:var(--tx);font-family:inherit;padding:3px 4px;text-align:center}
+.mst-inp:focus{background:var(--surf2);border-radius:3px}
+
+/* ── ARCHIVE (자료실) ── */
+.archive-sidebar{width:200px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.archive-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.archive-tb{padding:12px 16px;border-bottom:1px solid var(--bdr);background:var(--surf2);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.fmgrid{flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;align-content:start}
+.fccard{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:14px 12px;cursor:default;transition:border-color .15s}
+.fccard:hover{border-color:var(--ac)}
+.fcico{font-size:28px;margin-bottom:8px}
+.fcname{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px;word-break:break-all}
+.fcmeta{font-size:10px;color:var(--tx3);margin-bottom:2px}
+.fcbtns{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.fcbtn{background:var(--surf);border:1px solid var(--bdr);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--tx2);cursor:pointer}
+.fcbtn:hover{border-color:var(--ac);color:var(--ac)}
+.fcbtn.d{color:var(--rd);border-color:transparent}
+.fcbtn.d:hover{border-color:var(--rd)}
+
+/* ── WRITING TOOLS SHARED ── */
+.writing-view{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--surf)}
+.writing-toolbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surf2);border-bottom:1px solid var(--bdr);flex-shrink:0;flex-wrap:wrap}
+.writing-toolbar-title{font-size:13px;font-weight:700;color:var(--tx);flex:1}
+.writing-toolbar .wt-btn{padding:4px 12px;border-radius:6px;border:1px solid var(--bdr);background:var(--surf);color:var(--tx2);font-size:11px;cursor:pointer}
+.writing-toolbar .wt-btn:hover{background:var(--surf2)}
+.writing-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.writing-field{display:flex;flex-direction:column;gap:4px}
+.writing-field label{font-size:11px;font-weight:600;color:var(--tx3)}
 .writing-field input[type=text],.writing-field textarea,.writing-field select{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;line-height:1.7}
 .writing-field input[type=text]:focus,.writing-field textarea:focus{border-color:var(--ac)}
 .writing-field-row{display:flex;gap:12px;flex-wrap:wrap}
@@ -1602,24 +2215,39 @@ function renderHome(){
     <div class="home-grid">
       <div class="home-card" onclick="switchTab('writing')">
         <div class="home-card-icon">✍️</div>
-        <div class="home-card-title">집필 탭</div>
+        <div class="home-card-title">집필</div>
         <div class="home-card-desc">작품과 회차를 관리하고<br>집필 에디터로 글을 씁니다</div>
         ${totalChapters>0?`<div class="home-card-badge">${totalChapters}회차</div>`:''}
       </div>
       <div class="home-card" onclick="switchTab('schedule')">
         <div class="home-card-icon">📅</div>
-        <div class="home-card-title">스케줄 탭</div>
+        <div class="home-card-title">스케줄</div>
         <div class="home-card-desc">월간 집필 계획과<br>작품별 진행 트래커</div>
       </div>
       <div class="home-card" onclick="switchTab('tools')">
         <div class="home-card-icon">🛠️</div>
-        <div class="home-card-title">작품도구 탭</div>
-        <div class="home-card-desc">시놉시스, 세계관, 캐릭터시트 등<br>창작 자료를 관리합니다</div>
+        <div class="home-card-title">작품도구</div>
+        <div class="home-card-desc">시놉시스·세계관·캐릭터시트 등<br>창작 자료를 관리합니다</div>
       </div>
       <div class="home-card" onclick="switchTab('archive')">
         <div class="home-card-icon">📁</div>
-        <div class="home-card-title">자료실 탭</div>
+        <div class="home-card-title">자료실</div>
         <div class="home-card-desc">작품 관련 파일 관리<br>${S.archives.length}개 파일 보관 중</div>
+      </div>
+      <div class="home-card" onclick="switchTab('settle')">
+        <div class="home-card-icon">💰</div>
+        <div class="home-card-title">정산관리</div>
+        <div class="home-card-desc">플랫폼별 회차 정산 입력<br>수익 차트 (준비 중)</div>
+      </div>
+      <div class="home-card" onclick="switchTab('analysis')">
+        <div class="home-card-icon">🤖</div>
+        <div class="home-card-title">작품분석</div>
+        <div class="home-card-desc">AI 작품·회차 분석<br>(준비 중)</div>
+      </div>
+      <div class="home-card" onclick="switchTab('settings')">
+        <div class="home-card-icon">⚙️</div>
+        <div class="home-card-title">설정</div>
+        <div class="home-card-desc">작품 관리·테마·알림<br>Google Drive 연동</div>
       </div>
     </div>
   </div>
@@ -3580,88 +4208,103 @@ let _syTagPanelOpen=false;
 let _syCurrentTab=Object.keys(SY_KEYWORDS)[0];
 let _syTagDragging=false,_syTagDragStartX=0,_syTagPanelStartW=0;
 
-function renderToolsSY(node,container){
-  container.innerHTML='';
-  const d=node.data||{};
-  if(!d.tags)d.tags=[];
+function renderToolsSY(node, container){
+  container.innerHTML = '';
+  const d = node.data || {};
+  if(!d.tags) d.tags = [];
 
   // 외부 컨테이너 (시놉시스 + 태그패널 나란히)
-  const outer=document.createElement('div');
-  outer.className='sy-container';
+  const outer = document.createElement('div');
+  outer.className = 'sy-container';
 
   // ── 메인 폼 ──
-  const main=document.createElement('div');
-  main.className='sy-main';
-  const body=document.createElement('div');
-  body.className='writing-body';
+  const main = document.createElement('div');
+  main.className = 'sy-main';
+  const body = document.createElement('div');
+  body.className = 'writing-body';
 
   // 툴바
-  const tb=document.createElement('div');tb.className='writing-toolbar';
-  const tbTitle=document.createElement('span');tbTitle.className='writing-toolbar-title';tbTitle.textContent='📖 시놉시스';
-  const tagOpenBtn=document.createElement('button');tagOpenBtn.className='wt-btn';tagOpenBtn.textContent='🏷 태그 패널';
-  tagOpenBtn.onclick=()=>_syTogglePanel(node,outer,d);
-  tb.append(tbTitle,tagOpenBtn);
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  const tbTitle = document.createElement('span');
+  tbTitle.className = 'writing-toolbar-title';
+  tb.setAttribute('data-type','WSY');
+  tbTitle.textContent = '📖 시놉시스';
+  const tagOpenBtn = document.createElement('button');
+  tagOpenBtn.className = 'wt-btn';
+  tagOpenBtn.textContent = '🏷 태그 패널';
+  tagOpenBtn.onclick = ()=>_syTogglePanel(node, outer, d);
+  tb.append(tbTitle, tagOpenBtn);
   main.appendChild(tb);
 
   // 제목
-  const fTitle=_wField('제목','text',d.title,v=>{d.title=v;_toolsSave(node);},{placeholder:'작품 제목'});
+  const fTitle = _wField('제목', 'text', d.title, v=>_writingAutoSave(node.id,{title:v}), {placeholder:'작품 제목'});
   body.appendChild(fTitle.wrap);
 
   // 작가명 / 장르 / 연령가
-  const fAuthor=_wField('작가명','text',d.author,v=>{d.author=v;_toolsSave(node);},{placeholder:'필명 또는 본명'});
-  const fGenre=_wField('장르','text',d.genre,v=>{d.genre=v;_toolsSave(node);},{placeholder:'예: 로맨스판타지, BL'});
-  const fAge=_wField('연령가','text',d.age,v=>{d.age=v;_toolsSave(node);},{placeholder:'전체/15세/성인'});
-  body.appendChild(_wRow(fAuthor,fGenre,fAge));
+  const fAuthor = _wField('작가명','text', d.author, v=>_writingAutoSave(node.id,{author:v}), {placeholder:'필명 또는 본명'});
+  const fGenre  = _wField('장르','text',  d.genre,  v=>_writingAutoSave(node.id,{genre:v}),  {placeholder:'예: 로맨스판타지, BL'});
+  const fAge    = _wField('연령가','text', d.age,    v=>_writingAutoSave(node.id,{age:v}),    {placeholder:'전체/15세/성인'});
+  body.appendChild(_wRow(fAuthor, fGenre, fAge));
 
   // 연재이력 / 예상분량 / 출간작
-  const fSerial=_wField('연재이력','text',d.serial,v=>{d.serial=v;_toolsSave(node);},{placeholder:'연재 플랫폼 및 이력'});
-  const fLen=_wField('예상분량','text',d.length,v=>{d.length=v;_toolsSave(node);},{placeholder:'예: 100화, 장편 등'});
-  const fPublished=_wField('출간작','text',d.published,v=>{d.published=v;_toolsSave(node);},{placeholder:'기출간 작품명'});
-  body.appendChild(_wRow(fSerial,fLen,fPublished));
+  const fSerial = _wField('연재이력','text', d.serial, v=>_writingAutoSave(node.id,{serial:v}), {placeholder:'연재 플랫폼 및 이력'});
+  const fLen    = _wField('예상분량','text', d.length,  v=>_writingAutoSave(node.id,{length:v}), {placeholder:'예: 100화, 장편 등'});
+  const fPublished = _wField('출간작','text', d.published, v=>_writingAutoSave(node.id,{published:v}), {placeholder:'기출간 작품명'});
+  body.appendChild(_wRow(fSerial, fLen, fPublished));
 
   // 주요 키워드 (태그 칩)
-  const kwWrap=document.createElement('div');kwWrap.className='writing-field';
-  const kwLbl=document.createElement('label');kwLbl.textContent='주요 키워드';kwWrap.appendChild(kwLbl);
-  const tagDisplay=document.createElement('div');tagDisplay.className='sy-selected-tags';
-  tagDisplay.id='sy-tags-display-'+node.id;
-  _syRenderTagChips(tagDisplay,d.tags,node);
-  const addTagBtn=document.createElement('button');addTagBtn.className='wt-btn';
-  addTagBtn.style.cssText='margin-top:6px;font-size:11px';addTagBtn.textContent='＋ 태그 추가';
-  addTagBtn.onclick=()=>_syTogglePanel(node,outer,d);
-  kwWrap.append(tagDisplay,addTagBtn);
+  const kwWrap = document.createElement('div');
+  kwWrap.className = 'writing-field';
+  const kwLbl = document.createElement('label');
+  kwLbl.textContent = '주요 키워드';
+  kwWrap.appendChild(kwLbl);
+  const tagDisplay = document.createElement('div');
+  tagDisplay.className = 'sy-selected-tags';
+  tagDisplay.id = 'sy-tags-display-'+node.id;
+  _syRenderTagChips(tagDisplay, d.tags, node);
+  const addTagBtn = document.createElement('button');
+  addTagBtn.className = 'wt-btn';
+  addTagBtn.style.cssText = 'margin-top:6px;font-size:11px';
+  addTagBtn.textContent = '＋ 태그 추가';
+  addTagBtn.onclick = ()=>_syTogglePanel(node, outer, d);
+  kwWrap.append(tagDisplay, addTagBtn);
   body.appendChild(kwWrap);
 
   // 로그라인
   body.appendChild(_wSection('로그라인'));
-  const fLog=_wField('','textarea',d.logline,v=>{d.logline=v;_toolsSave(node);},{rows:2,placeholder:'한두 문장으로 작품의 핵심을 요약'});
+  const fLog = _wField('', 'textarea', d.logline, v=>_writingAutoSave(node.id,{logline:v}), {rows:2, placeholder:'한두 문장으로 작품의 핵심을 요약'});
   body.appendChild(fLog.wrap);
 
   // 작품 소개
   body.appendChild(_wSection('작품 소개'));
-  const fIntro=_wField('','textarea',d.intro,v=>{d.intro=v;_toolsSave(node);},{rows:5,placeholder:'작품 전반적인 소개, 세계관, 분위기 등'});
+  const fIntro = _wField('', 'textarea', d.intro, v=>_writingAutoSave(node.id,{intro:v}), {rows:5, placeholder:'작품 전반적인 소개, 세계관, 분위기 등'});
   body.appendChild(fIntro.wrap);
 
   // 인물 소개
   body.appendChild(_wSection('인물 소개'));
-  const fMale=_wField('- 남자 주인공','textarea',d.char_m,v=>{d.char_m=v;_toolsSave(node);},{rows:3,placeholder:'이름, 나이, 직업, 성격, 역할 등'});
-  const fFemale=_wField('- 여자 주인공','textarea',d.char_f,v=>{d.char_f=v;_toolsSave(node);},{rows:3,placeholder:'이름, 나이, 직업, 성격, 역할 등'});
+  const fMale   = _wField('- 남자 주인공','textarea', d.char_m, v=>_writingAutoSave(node.id,{char_m:v}), {rows:3, placeholder:'이름, 나이, 직업, 성격, 역할 등'});
+  const fFemale = _wField('- 여자 주인공','textarea', d.char_f, v=>_writingAutoSave(node.id,{char_f:v}), {rows:3, placeholder:'이름, 나이, 직업, 성격, 역할 등'});
   body.appendChild(fMale.wrap);
   body.appendChild(fFemale.wrap);
 
   // 줄거리 기승전결
   body.appendChild(_wSection('줄거리 (기승전결)'));
   ['기','승','전','결'].forEach(ch=>{
-    const key='story_'+ch;
-    const cardWrap=document.createElement('div');cardWrap.className='sy-story-card writing-field';
-    const lbl=document.createElement('span');lbl.className='sy-story-label '+ch;lbl.textContent='['+ch+']';
-    const ta=document.createElement('textarea');
+    const key = 'story_'+ch;
+    const cardWrap = document.createElement('div');
+    cardWrap.className = 'sy-story-card writing-field';
+    const lbl = document.createElement('span');
+    lbl.className = 'sy-story-label '+ch;
+    lbl.textContent = '['+ch+']';
+    const ta = document.createElement('textarea');
     ta.style.cssText='width:100%;box-sizing:border-box;border-radius:0 0 8px 8px;border:1.5px solid var(--bdr);border-top:none;padding:9px 11px;background:var(--surf2);color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;line-height:1.7;min-height:80px';
-    ta.rows=4;ta.placeholder=ch+'에 해당하는 내용을 입력하세요';
+    ta.rows=4; ta.placeholder=ch+'에 해당하는 내용을 입력하세요';
     ta.value=d[key]||'';
-    ta.addEventListener('input',()=>{d[key]=ta.value;_toolsSave(node);});
+    ta.addEventListener('input',()=>_writingAutoSave(node.id,{[key]:ta.value}));
     ta.addEventListener('focus',()=>{ta.style.borderColor='var(--ac)';ta.style.boxShadow='0 0 0 3px rgba(56,139,253,.12)';});
     ta.addEventListener('blur',()=>{ta.style.borderColor='var(--bdr)';ta.style.boxShadow='';});
-    cardWrap.append(lbl,ta);
+    cardWrap.append(lbl, ta);
     body.appendChild(cardWrap);
   });
 
@@ -3669,7 +4312,7 @@ function renderToolsSY(node,container){
   outer.appendChild(main);
 
   // ── 태그 패널 ──
-  const panel=_syCreatePanel(node,d);
+  const panel = _syCreatePanel(node, d);
   outer.appendChild(panel);
 
   // 드래그 핸들
@@ -3679,111 +4322,143 @@ function renderToolsSY(node,container){
 }
 
 // 태그 칩 렌더
-function _syRenderTagChips(container,tags,node){
-  container.innerHTML='';
+function _syRenderTagChips(container, tags, node){
+  container.innerHTML = '';
   (tags||[]).forEach(tag=>{
-    const chip=document.createElement('span');chip.className='sy-sel-chip';
-    chip.innerHTML=`${tag} `;
-    const btn=document.createElement('button');btn.textContent='×';
-    btn.onclick=e=>{
+    const chip = document.createElement('span');
+    chip.className = 'sy-sel-chip';
+    chip.innerHTML = `${tag} <button onclick="event.stopPropagation();_syRemoveTag('${tag}',this)">&times;</button>`;
+    chip.querySelector('button').onclick = e=>{
       e.stopPropagation();
-      node.data.tags=(node.data.tags||[]).filter(t=>t!==tag);
-      _toolsSave(node);
-      const disp=document.getElementById('sy-tags-display-'+node.id);
-      if(disp)_syRenderTagChips(disp,node.data.tags,node);
-      document.querySelectorAll('.sy-kw-chip').forEach(el=>{if(el.textContent===tag)el.classList.remove('selected');});
+      _syRemoveTag(tag, node);
     };
-    chip.appendChild(btn);
     container.appendChild(chip);
   });
 }
 
+function _syRemoveTag(tag, node){
+  if(typeof node === 'object'){
+    if(!node.data) node.data={};
+    node.data.tags = (node.data.tags||[]).filter(t=>t!==tag);
+    dsave();
+    const disp = document.getElementById('sy-tags-display-'+node.id);
+    if(disp) _syRenderTagChips(disp, node.data.tags, node);
+    // 패널 내 칩 상태 업데이트
+    document.querySelectorAll('.sy-kw-chip').forEach(el=>{
+      if(el.textContent===tag) el.classList.remove('selected');
+    });
+  }
+}
+
 // 패널 생성
-function _syCreatePanel(node,d){
-  const panel=document.createElement('div');
-  panel.className='sy-tag-panel'+(_syTagPanelOpen?' open':'');
-  panel.id='sy-panel-'+node.id;
-  panel.style.width='320px';
+function _syCreatePanel(node, d){
+  const panel = document.createElement('div');
+  panel.className = 'sy-tag-panel' + (_syTagPanelOpen?' open':'');
+  panel.id = 'sy-panel-'+node.id;
+  panel.style.width = '300px';
 
   // 드래그 핸들
-  const drag=document.createElement('div');drag.className='sy-tag-drag';panel.appendChild(drag);
+  const drag = document.createElement('div');
+  drag.className = 'sy-tag-drag';
+  panel.appendChild(drag);
 
   // 헤더
-  const hdr=document.createElement('div');hdr.className='sy-tag-panel-hdr';
-  hdr.innerHTML='<b>🏷 태그 선택</b>';
-  const closeBtn=document.createElement('button');closeBtn.className='wt-btn';closeBtn.textContent='✕ 닫기';
-  closeBtn.onclick=()=>{panel.classList.remove('open');_syTagPanelOpen=false;};
-  hdr.appendChild(closeBtn);panel.appendChild(hdr);
+  const hdr = document.createElement('div');
+  hdr.className = 'sy-tag-panel-hdr';
+  hdr.innerHTML = `<b>🏷 태그 선택</b>`;
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'wt-btn';
+  closeBtn.textContent = '✕ 닫기';
+  closeBtn.onclick = ()=>{ panel.classList.remove('open'); _syTagPanelOpen=false; };
+  hdr.appendChild(closeBtn);
+  panel.appendChild(hdr);
 
   // 탭
-  const tabs=document.createElement('div');tabs.className='sy-tag-tabs';
+  const tabs = document.createElement('div');
+  tabs.className = 'sy-tag-tabs';
   Object.keys(SY_KEYWORDS).forEach(tabName=>{
-    const btn=document.createElement('button');
-    btn.className='sy-tab-btn'+(tabName===_syCurrentTab?' on':'');
-    btn.textContent=tabName;
-    btn.onclick=()=>{
-      _syCurrentTab=tabName;
+    const btn = document.createElement('button');
+    btn.className = 'sy-tab-btn' + (tabName===_syCurrentTab?' on':'');
+    btn.textContent = tabName;
+    btn.onclick = ()=>{
+      _syCurrentTab = tabName;
       tabs.querySelectorAll('.sy-tab-btn').forEach(b=>b.classList.toggle('on',b===btn));
-      _syRenderCats(catsEl,node,d,tabName);
+      _syRenderCats(catsEl, node, d, tabName);
     };
     tabs.appendChild(btn);
   });
   panel.appendChild(tabs);
 
   // 카테고리 영역
-  const catsEl=document.createElement('div');catsEl.className='sy-tag-cats';
-  _syRenderCats(catsEl,node,d,_syCurrentTab);
+  const catsEl = document.createElement('div');
+  catsEl.className = 'sy-tag-cats';
+  _syRenderCats(catsEl, node, d, _syCurrentTab);
   panel.appendChild(catsEl);
+
   return panel;
 }
 
-function _syRenderCats(container,node,d,tabName){
-  container.innerHTML='';
-  const cats=SY_KEYWORDS[tabName]||{};
-  Object.entries(cats).forEach(([catName,keywords])=>{
-    const catDiv=document.createElement('div');
-    const title=document.createElement('div');title.className='sy-cat-title';title.textContent=catName;catDiv.appendChild(title);
-    const chips=document.createElement('div');chips.className='sy-tag-chips-sel';
+function _syRenderCats(container, node, d, tabName){
+  container.innerHTML = '';
+  const cats = SY_KEYWORDS[tabName] || {};
+  Object.entries(cats).forEach(([catName, keywords])=>{
+    const catDiv = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'sy-cat-title';
+    title.textContent = catName;
+    catDiv.appendChild(title);
+    const chips = document.createElement('div');
+    chips.className = 'sy-tag-chips-sel';
     keywords.forEach(kw=>{
-      const chip=document.createElement('span');chip.className='sy-kw-chip'+((d.tags||[]).includes(kw)?' selected':'');
-      chip.textContent=kw;
-      chip.onclick=()=>{
-        if(!d.tags)d.tags=[];
-        if(d.tags.includes(kw)){d.tags=d.tags.filter(t=>t!==kw);chip.classList.remove('selected');}
-        else{d.tags.push(kw);chip.classList.add('selected');}
-        _toolsSave(node);
-        const disp=document.getElementById('sy-tags-display-'+node.id);
-        if(disp)_syRenderTagChips(disp,d.tags,node);
+      const chip = document.createElement('span');
+      chip.className = 'sy-kw-chip' + ((d.tags||[]).includes(kw)?' selected':'');
+      chip.textContent = kw;
+      chip.onclick = ()=>{
+        if(!d.tags) d.tags=[];
+        if(d.tags.includes(kw)){
+          d.tags = d.tags.filter(t=>t!==kw);
+          chip.classList.remove('selected');
+        } else {
+          d.tags.push(kw);
+          chip.classList.add('selected');
+        }
+        _saveWritingData(node.id, {tags:[...d.tags]});
+        const disp = document.getElementById('sy-tags-display-'+node.id);
+        if(disp) _syRenderTagChips(disp, d.tags, node);
       };
       chips.appendChild(chip);
     });
-    catDiv.appendChild(chips);container.appendChild(catDiv);
+    catDiv.appendChild(chips);
+    container.appendChild(catDiv);
   });
 }
 
-function _syTogglePanel(node,outer,d){
-  const panel=outer.querySelector('.sy-tag-panel');
-  if(!panel)return;
-  _syTagPanelOpen=!panel.classList.contains('open');
-  panel.classList.toggle('open',_syTagPanelOpen);
+function _syTogglePanel(node, outer, d){
+  const panel = outer.querySelector('.sy-tag-panel');
+  if(!panel) return;
+  _syTagPanelOpen = !panel.classList.contains('open');
+  panel.classList.toggle('open', _syTagPanelOpen);
 }
 
 function _syBindPanelDrag(panel){
-  const handle=panel.querySelector('.sy-tag-drag');
-  if(!handle)return;
-  handle.addEventListener('mousedown',e=>{
+  const handle = panel.querySelector('.sy-tag-drag');
+  if(!handle) return;
+  handle.addEventListener('mousedown', e=>{
     e.preventDefault();
-    _syTagDragging=true;_syTagDragStartX=e.clientX;_syTagPanelStartW=panel.offsetWidth;
-    document.body.style.cursor='col-resize';document.body.style.userSelect='none';
+    _syTagDragging = true;
+    _syTagDragStartX = e.clientX;
+    _syTagPanelStartW = panel.offsetWidth;
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
   });
-  document.addEventListener('mousemove',e=>{
-    if(!_syTagDragging)return;
-    const dx=_syTagDragStartX-e.clientX;
-    const nw=Math.max(180,Math.min(600,_syTagPanelStartW+dx));
-    panel.style.width=nw+'px';
+  document.addEventListener('mousemove', e=>{
+    if(!_syTagDragging) return;
+    const dx = _syTagDragStartX - e.clientX;
+    const nw = Math.max(180, Math.min(600, _syTagPanelStartW+dx));
+    panel.style.width = nw+'px';
   });
-  document.addEventListener('mouseup',()=>{
-    if(_syTagDragging){_syTagDragging=false;document.body.style.cursor='';document.body.style.userSelect='';}
+  document.addEventListener('mouseup', ()=>{
+    if(_syTagDragging){ _syTagDragging=false; document.body.style.cursor=''; document.body.style.userSelect=''; }
   });
 }
 
@@ -4187,745 +4862,33 @@ function _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d){
 // ────────────────────────────────────
 //  4. 인물 관계도 (RM)
 // ────────────────────────────────────
-const RM_REL_COLORS=['#388bfd','#f85149','#3fb950','#d29922','#bc8cff','#ffa657','#e91e63','#00bcd4'];
-const RM_LINE_STYLES=[
-  {id:'solid',  label:'실선',     dash:null,       sw:2},
-  {id:'dashed', label:'점선',     dash:'8,4',      sw:2},
-  {id:'dotted', label:'점점',     dash:'2,4',      sw:2},
-  {id:'double', label:'굵은 선', dash:null,       sw:4},
-  {id:'wave',   label:'파선(경계)',dash:'12,3,3,3', sw:2},
-  {id:'zigzag', label:'물결선',   dash:'6,2,2,2',  sw:2},
-  {id:'cut',    label:'단점(X)',  dash:'1,6',      sw:2},
-];
-const RM_DIR = {
-  one:  '→ 단방향',
-  both: '↔ 양방향',
-  none: '— 연결선만',
-};
+let _rmDragCard = null;
+let _rmDragOffX = 0, _rmDragOffY = 0;
+let _rmConnecting = null;
+let _rmNode = null;
+let _rmCvWrap = null;
+let _rmSvg = null;
+let _rmD_global = null;
+let _rmGlobalBound = false;
 
-let _rmNode=null,_rmSvg=null,_rmCvWrap=null,_rmD=null,_rmConnecting=null;
+const RM_REL_COLORS = ['#388bfd','#3fb950','#f85149','#d29922','#bc8cff','#ff7b72','#56d364','#58a6ff'];
 
-function renderToolsRM(node,container){
-  const d=node.data; if(!d.chars)d.chars=[]; if(!d.rels)d.rels=[];
-  _rmNode=node; _rmD=d;
 
-  const tb=document.createElement('div'); tb.className='writing-toolbar';
-  tb.innerHTML='<span class="writing-toolbar-title">🕸 인물 관계도</span><span style="font-size:10px;color:var(--tx3)">연결점(●)을 드래그 → 관계선 추가 | 선 우클릭 → 편집</span>';
-  container.appendChild(tb);
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  추가 기능: 용어 사전 (WGS)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// data 구조: { tabs:[{id,name,rows:[{id,word,desc}]}], activeTab:id }
 
-  const main=document.createElement('div'); main.className='rm-container';
-  const cvWrap=document.createElement('div'); cvWrap.className='rm-canvas-wrap'; _rmCvWrap=cvWrap;
-  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.className='rm-canvas'; _rmSvg=svg;
 
-  // SVG defs: 화살표 마커 정의
-  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-  // 색상별 마커는 동적으로 생성하므로 defs만 먼저
-  svg.appendChild(defs);
-  cvWrap.appendChild(svg); main.appendChild(cvWrap);
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  추가 기능: 무드보드 (WMB)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// data: { pins:[{id,src,x,y,w,caption}] }
 
-  const side=document.createElement('div'); side.className='rm-side';
-  const sideHdr=document.createElement('div'); sideHdr.className='rm-side-hdr'; sideHdr.textContent='👥 캐릭터'; side.appendChild(sideHdr);
-  const sideList=document.createElement('div'); sideList.className='rm-side-list'; sideList.id='rm-side-list'; side.appendChild(sideList);
-  main.appendChild(side); container.appendChild(main);
-
-  _rmRenderSide(sideList,node,d,cvWrap,svg);
-  d.chars.forEach(ch=>_rmRenderCard(ch,cvWrap,node,d,svg));
-  setTimeout(()=>_rmDrawAllLines(svg,d,cvWrap),50);
-
-  cvWrap.addEventListener('click',e=>{if(e.target===cvWrap||e.target===svg) _rmCancelConnect();});
-  cvWrap.addEventListener('mousemove',e=>{
-    if(!_rmConnecting||!svg) return;
-    const rect=cvWrap.getBoundingClientRect();
-    _rmDrawPreviewLine(svg,_rmConnecting.sx,_rmConnecting.sy,e.clientX-rect.left,e.clientY-rect.top);
-  });
-}
-
-function _rmRenderSide(sideEl,node,d,cvWrap,svg){
-  sideEl.innerHTML='';
-  const csNodes=(S.toolNodes||[]).filter(n=>n.workId===node.workId&&n.type==='CS');
-  if(!csNodes.length){
-    sideEl.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:8px;line-height:1.6">캐릭터 시트를<br>먼저 추가하세요</div>';
-    return;
-  }
-  csNodes.forEach(csNode=>{
-    const already=d.chars.find(c=>c.csId===csNode.id);
-    const row=document.createElement('div'); row.className='rm-side-item'+(already?' added':'');
-    const ico=document.createElement('span'); ico.style.cssText='font-size:16px;flex-shrink:0';
-    if(csNode.data?.image){const img=document.createElement('img');img.src=csNode.data.image;img.style.cssText='width:22px;height:22px;border-radius:50%;object-fit:cover';ico.appendChild(img);}
-    else ico.textContent='👤';
-    const name=document.createElement('span'); name.style.cssText='flex:1;font-size:11px;color:var(--tx2)'; name.textContent=csNode.data?.name||csNode.name||'?';
-    const btn=document.createElement('button'); btn.className='rm-side-add-btn'+(already?' remove':''); btn.textContent=already?'제거':'추가';
-    btn.onclick=()=>{
-      if(already){d.chars=d.chars.filter(c=>c.csId!==csNode.id);d.rels=d.rels.filter(r=>r.from!==already.id&&r.to!==already.id);}
-      else{d.chars.push({id:uid(),csId:csNode.id,x:60+Math.random()*300,y:40+Math.random()*200});}
-      _toolsSave(node); toolsOpenSheetNode(node);
-    };
-    row.append(ico,name,btn); sideEl.appendChild(row);
-  });
-}
-
-function _rmRenderCard(ch,cvWrap,node,d,svg){
-  const csNode=(S.toolNodes||[]).find(n=>n.id===ch.csId);
-  if(!csNode) return;
-  const csChar=csNode.data||{};
-
-  const card=document.createElement('div'); card.className='rm-char-card'; card.id='rm-card-'+ch.id;
-  card.style.left=ch.x+'px'; card.style.top=ch.y+'px';
-
-  const imgDiv=document.createElement('div'); imgDiv.className='rm-char-img';
-  if(csChar.image){const img=document.createElement('img');img.src=csChar.image;imgDiv.appendChild(img);}
-  else imgDiv.textContent='👤';
-  const nameEl=document.createElement('div'); nameEl.className='rm-char-name'; nameEl.textContent=csChar.name||csNode.name||'?';
-  const summEl=document.createElement('div'); summEl.className='rm-char-summary'; summEl.textContent=csChar.summary||csChar.f_role||'';
-  card.append(imgDiv,nameEl,summEl);
-
-  // 연결점 4방향 (rm-connect-dot — mbhub 방식)
-  ['top','bottom','left','right'].forEach(pos=>{
-    const dot=document.createElement('div'); dot.className='rm-connect-dot '+pos;
-    dot.addEventListener('pointerdown',e=>{
-      e.stopPropagation(); e.preventDefault();
-      const rect=cvWrap.getBoundingClientRect(); const cr=card.getBoundingClientRect();
-      _rmConnecting={fromId:ch.id, sx:cr.left-rect.left+cr.width/2, sy:cr.top-rect.top+cr.height/2};
-    });
-    card.appendChild(dot);
-  });
-
-  // 드래그 (pointerCapture)
-  let _dragOffX=0,_dragOffY=0;
-  card.addEventListener('pointerdown',e=>{
-    if(e.target.classList.contains('rm-connect-dot')) return;
-    e.preventDefault();
-    _dragOffX=e.clientX-ch.x; _dragOffY=e.clientY-ch.y;
-    card.style.zIndex='10'; card.setPointerCapture(e.pointerId);
-  });
-  card.addEventListener('pointermove',e=>{
-    if(!card.hasPointerCapture(e.pointerId)) return;
-    if(e.target.classList.contains('rm-connect-dot')) return;
-    ch.x=e.clientX-_dragOffX; ch.y=e.clientY-_dragOffY;
-    card.style.left=ch.x+'px'; card.style.top=ch.y+'px';
-    _rmDrawAllLines(svg,d,cvWrap);
-  });
-  card.addEventListener('pointerup',e=>{
-    if(!card.hasPointerCapture(e.pointerId)) return;
-    card.style.zIndex=''; _toolsSave(node);
-    if(_rmConnecting){
-      const rect=cvWrap.getBoundingClientRect();
-      const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-      const target=d.chars.find(c=>{
-        if(c.id===_rmConnecting.fromId) return false;
-        const el=document.getElementById('rm-card-'+c.id); if(!el) return false;
-        const er=el.getBoundingClientRect(), wr=cvWrap.getBoundingClientRect();
-        return mx>=er.left-wr.left&&mx<=er.right-wr.left&&my>=er.top-wr.top&&my<=er.bottom-wr.top;
-      });
-      if(target) _rmOpenRelPopup(e,_rmConnecting.fromId,target.id,node,d,cvWrap,svg);
-      else _rmCancelConnect();
-    }
-  });
-
-  card.addEventListener('contextmenu',e=>{
-    e.preventDefault();
-    const myRels=d.rels.filter(r=>r.from===ch.id||r.to===ch.id);
-    const menu=[
-      {l:'🔗 이 캐릭터의 관계선 보기',a:()=>_rmShowRelList(ch,csChar,myRels,d,svg,cvWrap,node)},
-      'sep',
-      {l:'🗑 카드 제거',d:true,a:()=>{
-        d.chars=d.chars.filter(c=>c.id!==ch.id);
-        d.rels=d.rels.filter(r=>r.from!==ch.id&&r.to!==ch.id);
-        _toolsSave(node); toolsOpenSheetNode(node);
-      }}
-    ];
-    showCtx(e,menu);
-  });
-  cvWrap.appendChild(card);
-}
-
-// ── 캐릭터 관계선 목록 팝업 ──
-function _rmShowRelList(ch,csChar,rels,d,svg,cvWrap,node){
-  document.querySelector('.rm-rel-list-popup')?.remove();
-  const pop=document.createElement('div'); pop.className='rm-rel-popup rm-rel-list-popup';
-  pop.style.minWidth='280px';
-  const hdr=document.createElement('div'); hdr.style.cssText='font-size:12px;font-weight:700;color:var(--tx);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
-  hdr.innerHTML=`🔗 ${csChar.name||'캐릭터'}의 관계선`;
-  const cls=document.createElement('button'); cls.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:14px'; cls.textContent='✕'; cls.onclick=()=>pop.remove();
-  hdr.appendChild(cls); pop.appendChild(hdr);
-  if(!rels.length){
-    const empty=document.createElement('div'); empty.style.cssText='font-size:11px;color:var(--tx3);padding:8px 0'; empty.textContent='관계선이 없습니다.'; pop.appendChild(empty);
-  } else {
-    rels.forEach(rel=>{
-      const otherId=rel.from===ch.id?rel.to:rel.from;
-      const otherPos=d.chars.find(c=>c.id===otherId);
-      const otherCsNode=otherPos?(S.toolNodes||[]).find(n=>n.id===otherPos.csId):null;
-      const otherName=otherCsNode?.data?.name||otherCsNode?.name||'?';
-      const dir=rel.dir||'none';
-      const dirLabel=dir==='one'?(rel.from===ch.id?`→ ${otherName}`:`${otherName} →`):dir==='both'?`↔ ${otherName}`:`— ${otherName}`;
-      const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bdr2)';
-      const dot=document.createElement('span'); dot.style.cssText=`width:10px;height:10px;border-radius:50%;background:${rel.color||'#388bfd'};flex-shrink:0`;
-      const lbl=document.createElement('span'); lbl.style.cssText='flex:1;font-size:11px;color:var(--tx2)'; lbl.textContent=(rel.label?`"${rel.label}" `:'')+dirLabel;
-      const editBtn=document.createElement('button'); editBtn.className='wt-btn'; editBtn.style.cssText='font-size:10px;padding:2px 7px'; editBtn.textContent='편집';
-      editBtn.onclick=()=>{pop.remove(); _rmEditRelPopup({clientX:window.innerWidth/2,clientY:window.innerHeight/2},rel,d,svg,cvWrap,node);};
-      row.append(dot,lbl,editBtn); pop.appendChild(row);
-    });
-  }
-  document.body.appendChild(pop);
-  pop.style.left=Math.min(window.innerWidth/2-140,window.innerWidth-300)+'px';
-  pop.style.top=(window.innerHeight/2-100)+'px';
-  setTimeout(()=>document.addEventListener('click',function h(ev){if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}},100));
-}
-
-function _rmCancelConnect(){
-  _rmConnecting=null;
-  if(_rmSvg) _rmSvg.querySelector('#rm-preview-line')?.remove();
-}
-
-function _rmDrawPreviewLine(svg,x1,y1,x2,y2){
-  let line=svg.querySelector('#rm-preview-line');
-  if(!line){
-    line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.id='rm-preview-line';
-    line.setAttribute('stroke','var(--ac)'); line.setAttribute('stroke-width','2');
-    line.setAttribute('stroke-dasharray','6,3'); line.setAttribute('pointer-events','none');
-    svg.appendChild(line);
-  }
-  line.setAttribute('x1',x1); line.setAttribute('y1',y1);
-  line.setAttribute('x2',x2); line.setAttribute('y2',y2);
-}
-
-// ── 마커(화살표) 동적 생성 ──
-function _rmEnsureMarker(svg,color,id){
-  if(svg.querySelector('#'+id)) return;
-  const defs=svg.querySelector('defs'); if(!defs) return;
-  const marker=document.createElementNS('http://www.w3.org/2000/svg','marker');
-  marker.setAttribute('id',id);
-  marker.setAttribute('viewBox','0 0 10 10');
-  marker.setAttribute('refX','9'); marker.setAttribute('refY','5');
-  marker.setAttribute('markerWidth','6'); marker.setAttribute('markerHeight','6');
-  marker.setAttribute('orient','auto-start-reverse');
-  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-  path.setAttribute('d','M 0 0 L 10 5 L 0 10 z');
-  path.setAttribute('fill',color);
-  marker.appendChild(path); defs.appendChild(marker);
-}
-
-// ── 같은 쌍 사이 선이 여러 개일 때 오프셋 계산 ──
-function _rmGetOffset(d,rel,index,total){
-  if(total<=1) return {ox:0,oy:0};
-  // 두 선 사이 간격: 12px
-  const gap=12;
-  const offset=(index-(total-1)/2)*gap;
-  // 선의 수직 방향으로 오프셋
-  const fc=document.getElementById('rm-card-'+rel.from);
-  const tc=document.getElementById('rm-card-'+rel.to);
-  if(!fc||!tc) return {ox:0,oy:0};
-  const fr=fc.getBoundingClientRect(); const tr=tc.getBoundingClientRect();
-  const dx=tr.left-fr.left; const dy=tr.top-fr.top;
-  const len=Math.sqrt(dx*dx+dy*dy)||1;
-  // 수직 단위 벡터
-  return {ox:(-dy/len)*offset, oy:(dx/len)*offset};
-}
-
-function _rmDrawAllLines(svg,d,cvWrap){
-  svg.querySelectorAll('g.rm-rel-line').forEach(g=>g.remove());
-
-  // 각 쌍(정방향+역방향 포함)별로 선 그룹핑
-  const pairMap={};
-  (d.rels||[]).forEach(rel=>{
-    const key=[rel.from,rel.to].sort().join('__');
-    if(!pairMap[key]) pairMap[key]=[];
-    pairMap[key].push(rel);
-  });
-
-  (d.rels||[]).forEach(rel=>{
-    const fc=document.getElementById('rm-card-'+rel.from);
-    const tc=document.getElementById('rm-card-'+rel.to);
-    if(!fc||!tc) return;
-
-    const fr=fc.getBoundingClientRect(); const tr=tc.getBoundingClientRect(); const wr=cvWrap.getBoundingClientRect();
-    const cx1=fr.left-wr.left+fr.width/2, cy1=fr.top-wr.top+fr.height/2;
-    const cx2=tr.left-wr.left+tr.width/2, cy2=tr.top-wr.top+tr.height/2;
-
-    // 같은 쌍에서의 인덱스 (오프셋 계산용)
-    const key=[rel.from,rel.to].sort().join('__');
-    const pairRels=pairMap[key];
-    const idx=pairRels.indexOf(rel);
-    const {ox,oy}=_rmGetOffset(d,rel,idx,pairRels.length);
-
-    const x1=cx1+ox, y1=cy1+oy, x2=cx2+ox, y2=cy2+oy;
-
-    const style=RM_LINE_STYLES.find(s=>s.id===rel.lineStyle)||RM_LINE_STYLES[0];
-    const color=rel.color||'#388bfd';
-    const dir=rel.dir||'none';
-
-    // 마커 ID
-    const markerId='arr-'+color.replace('#','')+'_'+(rel.id||'x');
-
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.className.baseVal='rm-rel-line'; g.style.cursor='pointer';
-
-    // 화살표 마커 등록
-    if(dir==='one'||dir==='both') _rmEnsureMarker(svg,color,markerId);
-
-    // 히트 영역 (투명 넓은 선)
-    const hitLine=document.createElementNS('http://www.w3.org/2000/svg','line');
-    hitLine.setAttribute('x1',x1); hitLine.setAttribute('y1',y1);
-    hitLine.setAttribute('x2',x2); hitLine.setAttribute('y2',y2);
-    hitLine.setAttribute('stroke','transparent'); hitLine.setAttribute('stroke-width','16');
-    g.appendChild(hitLine);
-
-    // 실제 선
-    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
-    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
-    line.setAttribute('stroke',color); line.setAttribute('stroke-width',style.sw||2);
-    if(style.dash) line.setAttribute('stroke-dasharray',style.dash);
-    line.setAttribute('pointer-events','none');
-
-    // 방향 화살표
-    if(dir==='one'){
-      line.setAttribute('marker-end','url(#'+markerId+')');
-    } else if(dir==='both'){
-      line.setAttribute('marker-start','url(#'+markerId+')');
-      line.setAttribute('marker-end','url(#'+markerId+')');
-    }
-    g.appendChild(line);
-
-    // 라벨
-    if(rel.label){
-      const mx=(x1+x2)/2, my=(y1+y2)/2;
-      // 라벨 배경
-      const labelBg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      const approxW=rel.label.length*7+8, approxH=16;
-      labelBg.setAttribute('x',mx-approxW/2); labelBg.setAttribute('y',my-approxH+2);
-      labelBg.setAttribute('width',approxW); labelBg.setAttribute('height',approxH);
-      labelBg.setAttribute('rx','4'); labelBg.setAttribute('fill','var(--surf)');
-      labelBg.setAttribute('fill-opacity','0.85'); labelBg.setAttribute('pointer-events','none');
-      g.appendChild(labelBg);
-      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tx.setAttribute('x',mx); tx.setAttribute('y',my-2);
-      tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','11');
-      tx.setAttribute('font-weight','600'); tx.setAttribute('fill',color);
-      tx.setAttribute('pointer-events','none'); tx.textContent=rel.label;
-      g.appendChild(tx);
-    }
-
-    // 우클릭 → 편집 팝업
-    g.addEventListener('contextmenu',e=>{
-      e.preventDefault(); e.stopPropagation();
-      _rmEditRelPopup(e,rel,d,svg,cvWrap,_rmNode);
-    });
-    // 클릭도 편집
-    g.onclick=e=>{ e.stopPropagation(); _rmEditRelPopup(e,rel,d,svg,cvWrap,_rmNode); };
-
-    svg.appendChild(g);
-  });
-}
-
-function _rmOpenRelPopup(e,fromId,toId,node,d,cvWrap,svg){
-  _rmCancelConnect();
-  document.querySelector('.rm-rel-popup')?.remove();
-  const pop=document.createElement('div'); pop.className='rm-rel-popup';
-
-  let selColor=RM_REL_COLORS[0], selStyle='solid', selDir='none';
-
-  const mkLbl=t=>{const l=document.createElement('div');l.style.cssText='font-size:10px;font-weight:600;color:var(--tx3);margin:8px 0 3px';l.textContent=t;return l;};
-
-  pop.appendChild(Object.assign(document.createElement('div'),{style:'font-size:12px;font-weight:700;color:var(--tx);margin-bottom:6px',textContent:'🔗 관계 추가'}));
-
-  // 관계 설명
-  pop.appendChild(mkLbl('관계 설명'));
-  const labelInp=document.createElement('input');
-  labelInp.placeholder='관계 설명 (예: 진짜 사랑하는 사이)';
-  labelInp.style.cssText='width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;color:var(--tx);font-size:11px;font-family:inherit;outline:none';
-  labelInp.addEventListener('keydown',e=>e.stopPropagation());
-  pop.appendChild(labelInp);
-
-  // 선 스타일
-  pop.appendChild(mkLbl('선 스타일'));
-  const styleRow=document.createElement('div'); styleRow.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
-  RM_LINE_STYLES.forEach(st=>{
-    const btn=document.createElement('button'); btn.className='wt-btn';
-    btn.style.cssText=`font-size:10px;padding:2px 7px;${st.id==='solid'?'background:var(--ac);color:#fff;':''}`;
-    btn.textContent=st.label;
-    btn.onclick=()=>{
-      selStyle=st.id;
-      styleRow.querySelectorAll('button').forEach(b=>{b.style.background='';b.style.color='';});
-      btn.style.background='var(--ac)'; btn.style.color='#fff';
-    };
-    styleRow.appendChild(btn);
-  });
-  pop.appendChild(styleRow);
-
-  // 방향
-  pop.appendChild(mkLbl('방향'));
-  const dirSel=document.createElement('select');
-  dirSel.style.cssText='width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;color:var(--tx);font-size:11px;font-family:inherit;outline:none';
-  Object.entries(RM_DIR).forEach(([val,label])=>{
-    const op=document.createElement('option'); op.value=val; op.textContent=label;
-    if(val==='none') op.selected=true;
-    dirSel.appendChild(op);
-  });
-  dirSel.onchange=()=>{ selDir=dirSel.value; };
-  pop.appendChild(dirSel);
-
-  // 색상
-  pop.appendChild(mkLbl('색상'));
-  const colorRow=document.createElement('div'); colorRow.style.cssText='display:flex;gap:5px;flex-wrap:wrap';
-  RM_REL_COLORS.forEach((col,ci)=>{
-    const sw=document.createElement('div');
-    sw.style.cssText=`width:20px;height:20px;border-radius:50%;background:${col};cursor:pointer;border:${ci===0?'2px solid var(--tx)':'2px solid transparent'}`;
-    sw.onclick=()=>{
-      colorRow.querySelectorAll('div').forEach(s=>s.style.borderColor='transparent');
-      sw.style.borderColor='var(--tx)'; selColor=col;
-    };
-    colorRow.appendChild(sw);
-  });
-  pop.appendChild(colorRow);
-
-  // 버튼
-  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:10px';
-  const cancel=document.createElement('button'); cancel.className='wt-btn'; cancel.textContent='취소'; cancel.onclick=()=>pop.remove();
-  const ok=document.createElement('button'); ok.className='wt-btn'; ok.style.cssText='background:var(--ac);color:#fff'; ok.textContent='추가';
-  ok.onclick=()=>{
-    d.rels.push({id:uid(), from:fromId, to:toId, label:labelInp.value.trim(), color:selColor, lineStyle:selStyle, dir:selDir});
-    _toolsSave(node); _rmDrawAllLines(svg,d,cvWrap); pop.remove();
-  };
-  btnRow.append(cancel,ok); pop.appendChild(btnRow);
-
-  document.body.appendChild(pop);
-  pop.style.left=Math.min(e.clientX, window.innerWidth-260)+'px';
-  pop.style.top=Math.min(e.clientY, window.innerHeight-320)+'px';
-  labelInp.focus();
-  setTimeout(()=>document.addEventListener('click',function h(ev){
-    if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}
-  },100));
-}
-
-function _rmEditRelPopup(e,rel,d,svg,cvWrap,node){
-  document.querySelector('.rm-rel-popup')?.remove();
-  const pop=document.createElement('div'); pop.className='rm-rel-popup';
-
-  const mkLbl=t=>{const l=document.createElement('div');l.style.cssText='font-size:10px;font-weight:600;color:var(--tx3);margin:8px 0 3px';l.textContent=t;return l;};
-  pop.appendChild(Object.assign(document.createElement('div'),{style:'font-size:12px;font-weight:700;color:var(--tx);margin-bottom:6px',textContent:'✏️ 관계 편집'}));
-
-  // 관계 설명
-  pop.appendChild(mkLbl('관계 설명'));
-  const labelInp=document.createElement('input');
-  labelInp.value=rel.label||''; labelInp.placeholder='관계 설명';
-  labelInp.style.cssText='width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;color:var(--tx);font-size:11px;font-family:inherit;outline:none';
-  labelInp.addEventListener('keydown',e=>e.stopPropagation());
-  pop.appendChild(labelInp);
-
-  // 선 스타일
-  pop.appendChild(mkLbl('선 스타일'));
-  const styleRow=document.createElement('div'); styleRow.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
-  RM_LINE_STYLES.forEach(st=>{
-    const btn=document.createElement('button'); btn.className='wt-btn';
-    const isActive=rel.lineStyle===st.id;
-    btn.style.cssText=`font-size:10px;padding:2px 7px;${isActive?'background:var(--ac);color:#fff;':''}`;
-    btn.textContent=st.label;
-    btn.onclick=()=>{
-      rel.lineStyle=st.id;
-      styleRow.querySelectorAll('button').forEach(b=>{b.style.background='';b.style.color='';});
-      btn.style.background='var(--ac)'; btn.style.color='#fff';
-    };
-    styleRow.appendChild(btn);
-  });
-  pop.appendChild(styleRow);
-
-  // 방향
-  pop.appendChild(mkLbl('방향'));
-  const dirSel=document.createElement('select');
-  dirSel.style.cssText='width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;color:var(--tx);font-size:11px;font-family:inherit;outline:none';
-  Object.entries(RM_DIR).forEach(([val,label])=>{
-    const op=document.createElement('option'); op.value=val; op.textContent=label;
-    if(val===(rel.dir||'none')) op.selected=true;
-    dirSel.appendChild(op);
-  });
-  dirSel.onchange=()=>{ rel.dir=dirSel.value; };
-  pop.appendChild(dirSel);
-
-  // 색상
-  pop.appendChild(mkLbl('색상'));
-  const colorRow=document.createElement('div'); colorRow.style.cssText='display:flex;gap:5px;flex-wrap:wrap';
-  RM_REL_COLORS.forEach(col=>{
-    const sw=document.createElement('div');
-    const isActive=rel.color===col;
-    sw.style.cssText=`width:20px;height:20px;border-radius:50%;background:${col};cursor:pointer;border:${isActive?'2px solid var(--tx)':'2px solid transparent'}`;
-    sw.onclick=()=>{
-      colorRow.querySelectorAll('div').forEach(s=>s.style.borderColor='transparent');
-      sw.style.borderColor='var(--tx)'; rel.color=col;
-    };
-    colorRow.appendChild(sw);
-  });
-  pop.appendChild(colorRow);
-
-  // 버튼
-  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:10px';
-  const del=document.createElement('button'); del.className='wt-btn'; del.style.color='var(--rd)'; del.textContent='🗑 삭제';
-  del.onclick=()=>{d.rels=d.rels.filter(r=>r.id!==rel.id);_toolsSave(node);_rmDrawAllLines(svg,d,cvWrap);pop.remove();};
-  const cancel=document.createElement('button'); cancel.className='wt-btn'; cancel.textContent='취소'; cancel.onclick=()=>pop.remove();
-  const ok=document.createElement('button'); ok.className='wt-btn'; ok.style.cssText='background:var(--ac);color:#fff'; ok.textContent='저장';
-  ok.onclick=()=>{
-    rel.label=labelInp.value.trim();
-    _toolsSave(node); _rmDrawAllLines(svg,d,cvWrap); pop.remove();
-  };
-  btnRow.append(del,cancel,ok); pop.appendChild(btnRow);
-
-  document.body.appendChild(pop);
-  pop.style.left=Math.min(e.clientX, window.innerWidth-260)+'px';
-  pop.style.top=Math.min(e.clientY, window.innerHeight-380)+'px';
-  setTimeout(()=>document.addEventListener('click',function h(ev){
-    if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}
-  },100));
-}
-
-
-// ────────────────────────────────────
-//  5. 용어사전 (GS)
-// ────────────────────────────────────
-function _gsInit(node){
-  if(!node.data) node.data={};
-  if(!node.data.tabs || !node.data.tabs.length){
-    node.data.tabs = [{id:'tab'+Date.now(), name:'기본', rows:[]}];
-  }
-  if(!node.data.activeTab) node.data.activeTab = node.data.tabs[0].id;
-  return node.data;
-}
-
-function renderToolsGS(node, container){
-  container.innerHTML = '';
-  const d = _gsInit(node);
-
-  // 툴바
-  const tb = document.createElement('div');
-  tb.className = 'writing-toolbar';
-  tb.setAttribute('data-type','WGS');
-  const tbTitle = document.createElement('span');
-  tbTitle.className = 'writing-toolbar-title';
-  tbTitle.textContent = '📚 용어 사전';
-  const hint = document.createElement('span');
-  hint.style.cssText = 'font-size:10px;color:var(--tx3)';
-  hint.textContent = '탭 더블클릭으로 이름 변경 • 행 우클릭으로 삭제';
-  tb.append(tbTitle, hint);
-  container.appendChild(tb);
-
-  // 본문
-  const wrap = document.createElement('div');
-  wrap.className = 'gs-container';
-
-  // 탭 바
-  const tabBar = document.createElement('div');
-  tabBar.className = 'gs-tab-bar';
-  tabBar.id = 'gs-tabbar-'+node.id;
-  _gsRenderTabs(tabBar, node, d, wrap);
-
-  // 탭 추가 버튼
-  const addTabBtn = document.createElement('button');
-  addTabBtn.className = 'gs-tab-add';
-  addTabBtn.textContent = '＋';
-  addTabBtn.title = '새 탭 추가';
-  addTabBtn.onclick = ()=>{
-    const name = '탭'+(d.tabs.length+1);
-    const newTab = {id:'tab'+Date.now(), name, rows:[]};
-    d.tabs.push(newTab);
-    d.activeTab = newTab.id;
-    _saveWritingData(node.id, {tabs:[...d.tabs], activeTab:d.activeTab});
-    renderToolsGS(node, container);
-  };
-  tabBar.appendChild(addTabBtn);
-  wrap.appendChild(tabBar);
-
-  // 본문 테이블 영역
-  const body = document.createElement('div');
-  body.className = 'gs-body';
-  body.id = 'gs-body-'+node.id;
-  _gsRenderTable(body, node, d);
-  wrap.appendChild(body);
-
-  container.appendChild(wrap);
-}
-
-function _gsRenderTabs(tabBar, node, d, wrap){
-  // 기존 탭 버튼들만 제거 (addTabBtn 제외)
-  Array.from(tabBar.children).forEach(el=>{
-    if(!el.classList.contains('gs-tab-add')) el.remove();
-  });
-  const addBtn = tabBar.querySelector('.gs-tab-add');
-
-  d.tabs.forEach((tab, ti)=>{
-    const btn = document.createElement('button');
-    btn.className = 'gs-tab-btn' + (tab.id===d.activeTab?' on':'');
-    btn.textContent = tab.name;
-    btn.title = tab.name;
-
-    // 클릭 → 탭 전환
-    btn.onclick = ()=>{
-      d.activeTab = tab.id;
-      _saveWritingData(node.id, {activeTab:tab.id});
-      tabBar.querySelectorAll('.gs-tab-btn').forEach(b=>b.classList.remove('on'));
-      btn.classList.add('on');
-      const body = document.getElementById('gs-body-'+node.id);
-      if(body) _gsRenderTable(body, node, d);
-    };
-
-    // 더블클릭 → 이름 변경
-    btn.addEventListener('dblclick', e=>{
-      e.stopPropagation();
-      const inp = document.createElement('input');
-      inp.className = 'gs-tab-rename';
-      inp.value = tab.name;
-      inp.style.width = Math.max(60, tab.name.length*9)+'px';
-      btn.replaceWith(inp);
-      inp.focus(); inp.select();
-      const commit = ()=>{
-        const v = inp.value.trim() || tab.name;
-        tab.name = v;
-        _saveWritingData(node.id, {tabs:[...d.tabs]});
-        inp.replaceWith(btn);
-        btn.textContent = v;
-      };
-      inp.addEventListener('blur', commit, {once:true});
-      inp.addEventListener('keydown', e2=>{
-        if(e2.key==='Enter'){e2.preventDefault(); inp.removeEventListener('blur',commit); commit();}
-        if(e2.key==='Escape'){inp.replaceWith(btn);}
-        e2.stopPropagation();
-      });
-    });
-
-    // 우클릭 → 탭 삭제
-    btn.addEventListener('contextmenu', e=>{
-      e.preventDefault();
-      if(d.tabs.length<=1){toast('마지막 탭은 삭제할 수 없습니다.',true);return;}
-      showCtx(e,[
-        {l:'✏️ 이름 변경', a:()=>btn.dispatchEvent(new MouseEvent('dblclick',{bubbles:true}))},
-        'sep',
-        {l:'🗑 탭 삭제', d:true, a:()=>{
-          if(!confirm(`"${tab.name}" 탭을 삭제하시겠습니까? 내용도 모두 삭제됩니다.`)) return;
-          d.tabs.splice(ti,1);
-          if(d.activeTab===tab.id) d.activeTab=d.tabs[0].id;
-          _saveWritingData(node.id,{tabs:[...d.tabs],activeTab:d.activeTab});
-          const cont=document.getElementById('pub-writing-content');
-          if(cont){cont.innerHTML='';renderToolsGS(node,cont);}
-        }},
-      ]);
-    });
-
-    tabBar.insertBefore(btn, addBtn);
-  });
-}
-
-function _gsRenderTable(body, node, d){
-  body.innerHTML = '';
-  const tab = d.tabs.find(t=>t.id===d.activeTab);
-  if(!tab) return;
-  if(!tab.rows) tab.rows = [];
-
-  const tableWrap = document.createElement('div');
-  tableWrap.style.cssText='border:1px solid var(--bdr);border-radius:8px;overflow:hidden';
-
-  const table = document.createElement('table');
-  table.className = 'gs-table';
-
-  // 헤더
-  const thead = document.createElement('thead');
-  thead.innerHTML = `<tr>
-    <th style="width:28%">단어 / 용어</th>
-    <th>설명</th>
-    <th style="width:28px"></th>
-  </tr>`;
-  table.appendChild(thead);
-
-  // 바디
-  const tbody = document.createElement('tbody');
-  tab.rows.forEach((row, ri)=>{
-    tbody.appendChild(_gsCreateRow(row, ri, node, d, tab, body));
-  });
-  table.appendChild(tbody);
-  tableWrap.appendChild(table);
-
-  // 행 추가 버튼
-  const addRow = document.createElement('div');
-  addRow.className = 'gs-add-row';
-  addRow.innerHTML = '<span style="font-size:14px">＋</span> 행 추가';
-  addRow.onclick = ()=>{
-    const newRow = {id:'row'+Date.now(), word:'', desc:''};
-    tab.rows.push(newRow);
-    _saveWritingData(node.id, {tabs:[...d.tabs]});
-    const tr = _gsCreateRow(newRow, tab.rows.length-1, node, d, tab, body);
-    tbody.appendChild(tr);
-    tr.querySelector('.gs-cell')?.focus();
-  };
-  tableWrap.appendChild(addRow);
-  body.appendChild(tableWrap);
-}
-
-function _gsCreateRow(row, ri, node, d, tab, body){
-  const tr = document.createElement('tr');
-  tr.dataset.id = row.id;
-
-  const mkTd = (key, isDesc)=>{
-    const td = document.createElement('td');
-    const ta = document.createElement('textarea');
-    ta.className = 'gs-cell';
-    ta.rows = 1;
-    ta.value = row[key] || '';
-    ta.placeholder = isDesc ? '단어 설명...' : '용어 입력...';
-    // 자동 높이
-    const autoH = ()=>{ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; };
-    ta.addEventListener('input', ()=>{
-      row[key] = ta.value;
-      _saveWritingData(node.id, {tabs:[...d.tabs]});
-      autoH();
-    });
-    ta.addEventListener('focus', autoH);
-    setTimeout(autoH, 0);
-    // Tab으로 다음 셀로 이동
-    ta.addEventListener('keydown', e=>{
-      if(e.key==='Tab' && !e.shiftKey && isDesc){
-        e.preventDefault();
-        // 다음 행 word 셀로
-        const rows=[...tr.parentElement.children];
-        const ni=rows.indexOf(tr)+1;
-        if(ni<rows.length) rows[ni].querySelector('.gs-cell')?.focus();
-        else body.querySelector('.gs-add-row')?.click();
-      }
-      e.stopPropagation();
-    });
-    td.appendChild(ta);
-    return td;
-  };
-
-  tr.append(mkTd('word',false), mkTd('desc',true));
-
-  // 삭제 버튼
-  const delTd = document.createElement('td');
-  delTd.style.cssText='text-align:center;vertical-align:middle;width:28px;padding:0';
-  const delBtn = document.createElement('button');
-  delBtn.className = 'gs-row-del';
-  delBtn.textContent = '✕';
-  delBtn.title = '행 삭제';
-  delBtn.onclick = ()=>{
-    if(!confirm('이 행을 삭제하시겠습니까?')) return;
-    tab.rows.splice(ri,1);
-    _saveWritingData(node.id,{tabs:[...d.tabs]});
-    tr.remove();
-  };
-  // 우클릭도 삭제
-  tr.addEventListener('contextmenu', e=>{
-    e.preventDefault();
-    showCtx(e,[{l:'🗑 행 삭제',d:true,a:()=>delBtn.click()}]);
-  });
-  delTd.appendChild(delBtn);
-  tr.appendChild(delTd);
-  return tr;
-}
-
-
-// ────────────────────────────────────
-//  6. 무드보드 (MB)
-// ────────────────────────────────────
+let _mbDragPin=null, _mbDragOffX=0, _mbDragOffY=0;
 let _mbNode=null, _mbD=null;
 
-function renderToolsMB(node, container){
+function renderWritingMB(node, container){
   container.innerHTML='';
   _mbNode=node;
   if(!node.data) node.data={};
@@ -5196,6 +5159,1912 @@ function _mbCreatePin(pin, node, board){
 
   return el;
 }
+
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  추가 기능: 집필 진행률 트래커 (WPT)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// data: { goal:0, logs:[{id,date,chars,memo}] }
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  집필 에디터 (WED)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// data: { chapters:[{id,title,content,order}], activeCh:id }
+
+let _wedEditor = null;  // 현재 활성 MBEditor 인스턴스
+let _wedNode   = null;  // 현재 WED 노드
+let _wedActiveCh = null; // 현재 회차 ID
+let _wedSaveTimer = null;
+
+function _wedInit(node){
+  if(!node.data) node.data={};
+  if(!node.data.chapters || !node.data.chapters.length){
+    node.data.chapters=[{id:'ch'+Date.now(),title:'1화',content:'',order:0}];
+  }
+  if(!node.data.activeCh) node.data.activeCh=node.data.chapters[0].id;
+  return node.data;
+}
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  WED 사이드바 트래커 (집필 진행 기록)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function _wedBuildTracker(sidebar, node, d){
+  // 드래그 핸들
+  const dragH = document.createElement('div');
+  dragH.className = 'wed-tracker-drag';
+  dragH.title = '드래그하여 크기 조절';
+  sidebar.appendChild(dragH);
+
+  // 트래커 패널
+  const panel = document.createElement('div');
+  panel.className = 'wed-tracker-panel';
+  panel.style.height = (d.trackerH || 220) + 'px';
+  sidebar.appendChild(panel);
+
+  // 드래그 리사이즈
+  let _dragging = false, _startY = 0, _startH = 0;
+  dragH.addEventListener('mousedown', e=>{
+    e.preventDefault();
+    _dragging = true; _startY = e.clientY; _startH = panel.offsetHeight;
+    dragH.classList.add('active');
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!_dragging) return;
+    const dy = _startY - e.clientY; // 위로 드래그 = 트래커 커짐
+    const nh = Math.max(80, Math.min(500, _startH + dy));
+    panel.style.height = nh + 'px';
+  });
+  document.addEventListener('mouseup', ()=>{
+    if(!_dragging) return;
+    _dragging = false;
+    dragH.classList.remove('active');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    d.trackerH = panel.offsetHeight;
+    _saveWritingData(node.id, {trackerH: d.trackerH});
+  });
+
+  // 헤더
+  const hdr = document.createElement('div');
+  hdr.className = 'wed-trk-hdr';
+  hdr.innerHTML = '<span>📊 집필 진행</span>';
+  panel.appendChild(hdr);
+
+  // 바디
+  const body = document.createElement('div');
+  body.className = 'wed-trk-body';
+  body.id = 'wed-trk-body-' + node.id;
+  panel.appendChild(body);
+
+  _wedRenderTracker(body, node, d);
+}
+
+function _wedTotalChars(d){
+  return (d.chapters||[]).reduce((s,ch)=>{
+    return s + (ch.content||'').replace(/<[^>]*>/g,'').replace(/\s/g,'').length;
+  }, 0);
+}
+
+function _wedRenderTracker(body, node, d){
+  body.innerHTML = '';
+  if(!d.logs) d.logs = [];
+  if(!d.goal) d.goal = 0;
+
+  const total = _wedTotalChars(d);
+  const goal = parseInt(d.goal) || 0;
+  const pct = goal > 0 ? Math.min(100, Math.round(total/goal*100)) : 0;
+  const remain = goal > 0 ? Math.max(0, goal - total) : 0;
+  const days = d.logs.filter(l=>parseInt(l.chars)>0).length;
+  const avg = days > 0 ? Math.round(total/days) : 0;
+  const daysLeft = remain > 0 && avg > 0 ? Math.ceil(remain/avg) : 0;
+
+  // 목표 입력
+  const goalRow = document.createElement('div');
+  goalRow.className = 'wed-trk-goal-row';
+  const goalLbl = document.createElement('span');
+  goalLbl.className = 'wed-trk-goal-lbl';
+  goalLbl.textContent = '🎯 목표';
+  const goalInp = document.createElement('input');
+  goalInp.className = 'wed-trk-goal-inp';
+  goalInp.type = 'number';
+  goalInp.value = d.goal || '';
+  goalInp.placeholder = '목표 자수';
+  goalInp.min = '0';
+  goalInp.addEventListener('input', ()=>{
+    d.goal = parseInt(goalInp.value) || 0;
+    _saveWritingData(node.id, {goal: d.goal});
+    _wedRenderTracker(body, node, d);
+  });
+  goalInp.addEventListener('keydown', e=>e.stopPropagation());
+  goalRow.append(goalLbl, goalInp);
+  body.appendChild(goalRow);
+
+  // 진행률 바
+  const barWrap = document.createElement('div');
+  barWrap.className = 'wed-trk-bar-wrap';
+  const fill = document.createElement('div');
+  fill.className = 'wed-trk-bar-fill';
+  fill.style.width = pct + '%';
+  const pctLbl = document.createElement('div');
+  pctLbl.className = 'wed-trk-bar-pct';
+  pctLbl.textContent = goal > 0 ? pct + '%' : '';
+  barWrap.append(fill, pctLbl);
+  body.appendChild(barWrap);
+
+  // 통계 카드
+  const stats = document.createElement('div');
+  stats.className = 'wed-trk-stats';
+  const mkStat = (val, lbl, cls='') => {
+    const card = document.createElement('div');
+    card.className = 'wed-trk-stat' + (cls?' '+cls:'');
+    const v = document.createElement('div'); v.className='wed-trk-stat-val'; v.textContent=val;
+    const l = document.createElement('div'); l.className='wed-trk-stat-lbl'; l.textContent=lbl;
+    card.append(v, l); return card;
+  };
+  stats.appendChild(mkStat(total.toLocaleString()+'자', '총 집필량'));
+  if(goal > 0){
+    stats.appendChild(mkStat(pct+'%', '달성률', pct<30?'danger':pct<70?'warn':''));
+    stats.appendChild(mkStat(remain.toLocaleString()+'자', '남은 분량'));
+  }
+  if(avg > 0) stats.appendChild(mkStat(avg.toLocaleString()+'자', '일평균'));
+  if(daysLeft > 0) stats.appendChild(mkStat(daysLeft+'일', '예상 완료'));
+  body.appendChild(stats);
+
+  // 오늘 기록 버튼
+  const todayBtn = document.createElement('button');
+  todayBtn.className = 'wed-trk-today-btn';
+  const todayStr = new Date().toISOString().slice(0,10);
+  const todayLog = d.logs.find(l=>l.date===todayStr);
+  todayBtn.textContent = todayLog ? '📝 오늘 기록 수정' : '📝 오늘 기록하기';
+  todayBtn.onclick = ()=>{
+    if(todayLog){
+      todayLog.chars = String(total);
+    } else {
+      d.logs.push({id:'log'+Date.now(), date:todayStr, chars:String(total), memo:''});
+    }
+    _saveWritingData(node.id, {logs:[...d.logs]});
+    _wedRenderTracker(body, node, d);
+    toast('오늘 집필량이 기록됐습니다 (' + total.toLocaleString() + '자)');
+  };
+  body.appendChild(todayBtn);
+
+  // 날짜별 로그
+  if(d.logs.length > 0){
+    const tableWrap = document.createElement('div');
+    tableWrap.style.cssText = 'overflow:auto;border:1px solid var(--bdr);border-radius:5px';
+    const table = document.createElement('table');
+    table.className = 'wed-trk-log-table';
+    table.innerHTML = `<thead><tr>
+      <th style="width:72px">날짜</th>
+      <th style="width:52px">글자수</th>
+      <th>메모</th>
+      <th style="width:30px">달성</th>
+      <th style="width:18px"></th>
+    </tr></thead>`;
+    const tbody = document.createElement('tbody');
+
+    const maxChars = Math.max(1, ...d.logs.map(l=>parseInt(l.chars)||0));
+    d.logs.forEach((log, li)=>{
+      const tr = document.createElement('tr');
+      tr.dataset.id = log.id;
+
+      const mkTd = (key, type, ph, isDate) => {
+        const td = document.createElement('td');
+        const inp = document.createElement('input');
+        inp.className = 'wed-trk-log-cell';
+        inp.type = isDate ? 'date' : (type==='number'?'number':'text');
+        inp.value = log[key] || '';
+        inp.placeholder = ph || '';
+        inp.addEventListener('input', ()=>{
+          log[key] = inp.value;
+          _saveWritingData(node.id, {logs:[...d.logs]});
+          if(key==='chars') _wedRenderTracker(body, node, d);
+        });
+        inp.addEventListener('keydown', e=>e.stopPropagation());
+        td.appendChild(inp);
+        return td;
+      };
+
+      // 달성 바
+      const barTd = document.createElement('td');
+      barTd.className = 'wed-trk-log-bar-wrap';
+      const bar = document.createElement('div');
+      bar.className = 'wed-trk-log-bar';
+      const chars = parseInt(log.chars)||0;
+      bar.style.width = Math.round(chars/maxChars*100)+'%';
+      barTd.appendChild(bar);
+
+      const delTd = document.createElement('td');
+      delTd.style.cssText = 'text-align:center;padding:0';
+      const delBtn = document.createElement('button');
+      delBtn.className = 'wed-trk-del'; delBtn.textContent = '✕';
+      delBtn.onclick = ()=>{
+        d.logs.splice(li,1);
+        _saveWritingData(node.id,{logs:[...d.logs]});
+        _wedRenderTracker(body,node,d);
+      };
+      delTd.appendChild(delBtn);
+
+      tr.append(mkTd('date','text','',true), mkTd('chars','number','0'), mkTd('memo','text','메모'), barTd, delTd);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tableWrap.appendChild(table);
+
+    // 행 추가
+    const addRow = document.createElement('div');
+    addRow.className = 'wed-trk-add-row';
+    addRow.innerHTML = '＋ 날짜 추가';
+    addRow.onclick = ()=>{
+      d.logs.push({id:'log'+Date.now(), date:new Date().toISOString().slice(0,10), chars:'', memo:''});
+      _saveWritingData(node.id,{logs:[...d.logs]});
+      _wedRenderTracker(body,node,d);
+    };
+    tableWrap.appendChild(addRow);
+    body.appendChild(tableWrap);
+  } else {
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:10px;color:var(--tx3);text-align:center;padding:8px 0';
+    hint.textContent = '위 버튼으로 오늘 기록을 추가하세요';
+    body.appendChild(hint);
+  }
+}
+
+
+function renderWritingED(node, container){
+  container.innerHTML='';
+  _wedNode=node;
+  const d=_wedInit(node);
+
+  // 툴바
+  const tb=document.createElement('div');
+  tb.className='writing-toolbar';
+  tb.setAttribute('data-type','WED');
+  const tbTitle=document.createElement('span');
+  tbTitle.className='writing-toolbar-title';
+  tbTitle.textContent='✏️ 집필 에디터';
+  // 전체 글자수
+  const totalWc=document.createElement('span');
+  totalWc.id='wed-total-wc-'+node.id;
+  totalWc.style.cssText='font-size:10px;color:var(--tx3)';
+  tb.append(tbTitle,totalWc);
+  container.appendChild(tb);
+
+  // 본문 컨테이너
+  const main=document.createElement('div');
+  main.className='wed-container';
+
+  // ── 사이드바 ──
+  const sidebar=document.createElement('div');
+  sidebar.className='wed-sidebar';
+
+  const sideHdr=document.createElement('div');
+  sideHdr.className='wed-sidebar-hdr';
+  sideHdr.innerHTML='<span>📋 회차 목록</span>';
+  const addChBtn=document.createElement('button');
+  addChBtn.className='wt-btn';
+  addChBtn.style.cssText='font-size:10px;padding:2px 7px';
+  addChBtn.textContent='＋';
+  addChBtn.title='회차 추가';
+  addChBtn.onclick=()=>_wedAddChapter(node,d,chList,editorArea);
+  sideHdr.appendChild(addChBtn);
+  sidebar.appendChild(sideHdr);
+
+  const chList=document.createElement('div');
+  chList.className='wed-ch-list';
+  chList.id='wed-chlist-'+node.id;
+  sidebar.appendChild(chList);
+
+  const addChBottom=document.createElement('div');
+  addChBottom.className='wed-add-ch';
+  addChBottom.innerHTML='<span>＋</span> 회차 추가';
+  addChBottom.onclick=()=>_wedAddChapter(node,d,chList,editorArea);
+  sidebar.appendChild(addChBottom);
+  // 트래커 사이드바
+  _wedBuildTracker(sidebar, node, d);
+
+  // ── 에디터 영역 ──
+  const editorArea=document.createElement('div');
+  editorArea.className='wed-editor-area';
+  editorArea.id='wed-editor-area-'+node.id;
+
+  // 빈 상태
+  const empty=document.createElement('div');
+  empty.className='wed-empty';
+  empty.innerHTML='<span style="font-size:36px">✏️</span><span>왼쪽에서 회차를 선택하세요</span>';
+  editorArea.appendChild(empty);
+
+  main.append(sidebar, editorArea);
+  container.appendChild(main);
+
+  // 회차 목록 렌더
+  _wedRenderChList(chList, node, d, editorArea);
+
+  // 마지막 활성 회차 열기
+  const activeCh=d.chapters.find(ch=>ch.id===d.activeCh) || d.chapters[0];
+  if(activeCh) _wedOpenChapter(activeCh, node, d, chList, editorArea);
+
+  _wedUpdateTotalWc(node,d);
+}
+
+function _wedRenderChList(chList, node, d, editorArea){
+  chList.innerHTML='';
+  const sorted=[...d.chapters].sort((a,b)=>a.order-b.order);
+  sorted.forEach((ch,idx)=>{
+    const item=document.createElement('div');
+    item.className='wed-ch-item'+(ch.id===_wedActiveCh?' active':'');
+    item.dataset.id=ch.id;
+    item.draggable=true;
+
+    const num=document.createElement('span');
+    num.className='wed-ch-num';
+    num.textContent=(idx+1)+'화';
+
+    const title=document.createElement('span');
+    title.className='wed-ch-title';
+    title.textContent=ch.title||((idx+1)+'화');
+
+    const wc=document.createElement('span');
+    wc.className='wed-ch-wc';
+    wc.textContent=((ch.content||'').replace(/<[^>]*>/g,'').replace(/\s/g,'').length||'')+'자';
+
+    item.append(num,title,wc);
+    item.onclick=()=>_wedOpenChapter(ch,node,d,chList,editorArea);
+
+    // 우클릭 메뉴
+    item.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+      const menu=[
+        {l:'✏️ 이름 변경',a:()=>{
+          const nv=prompt('회차 이름:',ch.title);
+          if(nv===null) return;
+          ch.title=nv.trim()||ch.title;
+          _saveWritingData(node.id,{chapters:[...d.chapters]});
+          _wedRenderChList(chList,node,d,editorArea);
+          // 에디터 상단 제목도 갱신
+          const ti=document.getElementById('wed-ch-title-'+node.id);
+          if(ti&&_wedActiveCh===ch.id) ti.value=ch.title;
+        }},
+        'sep',
+      ];
+      if(d.chapters.length>1){
+        if(idx>0) menu.push({l:'⬆ 위로',a:()=>{
+          const prev=sorted[idx-1];
+          [ch.order,prev.order]=[prev.order,ch.order];
+          _saveWritingData(node.id,{chapters:[...d.chapters]});
+          _wedRenderChList(chList,node,d,editorArea);
+        }});
+        if(idx<sorted.length-1) menu.push({l:'⬇ 아래로',a:()=>{
+          const next=sorted[idx+1];
+          [ch.order,next.order]=[next.order,ch.order];
+          _saveWritingData(node.id,{chapters:[...d.chapters]});
+          _wedRenderChList(chList,node,d,editorArea);
+        }});
+        menu.push('sep');
+        menu.push({l:'🗑 회차 삭제',d:true,a:()=>{
+          if(!confirm(`"${ch.title||((idx+1)+'화')}" 회차를 삭제하시겠습니까?`)) return;
+          const di=d.chapters.findIndex(c=>c.id===ch.id);
+          d.chapters.splice(di,1);
+          _saveWritingData(node.id,{chapters:[...d.chapters]});
+          _wedRenderChList(chList,node,d,editorArea);
+          if(_wedActiveCh===ch.id){
+            _wedActiveCh=null;
+            if(d.chapters.length) _wedOpenChapter(d.chapters[0],node,d,chList,editorArea);
+            else _wedClearEditor(editorArea,node);
+          }
+          _wedUpdateTotalWc(node,d);
+        }});
+      }
+      showCtx(e,menu);
+    });
+
+    // 드래그 정렬
+    let _dragOver=null;
+    item.addEventListener('dragstart',e=>{
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',ch.id);
+      setTimeout(()=>item.classList.add('dragging'),0);
+    });
+    item.addEventListener('dragend',()=>{
+      item.classList.remove('dragging');
+      chList.querySelectorAll('.wed-ch-item').forEach(el=>el.classList.remove('drag-over'));
+    });
+    item.addEventListener('dragover',e=>{
+      e.preventDefault();
+      chList.querySelectorAll('.wed-ch-item').forEach(el=>el.classList.remove('drag-over'));
+      item.classList.add('drag-over');
+    });
+    item.addEventListener('drop',e=>{
+      e.preventDefault();
+      const fromId=e.dataTransfer.getData('text/plain');
+      const fromCh=d.chapters.find(c=>c.id===fromId);
+      if(!fromCh||fromId===ch.id) return;
+      // 순서 교환
+      [fromCh.order,ch.order]=[ch.order,fromCh.order];
+      _saveWritingData(node.id,{chapters:[...d.chapters]});
+      _wedRenderChList(chList,node,d,editorArea);
+    });
+
+    chList.appendChild(item);
+  });
+}
+
+function _wedOpenChapter(ch, node, d, chList, editorArea){
+  // 현재 에디터 내용 저장
+  if(_wedEditor && _wedActiveCh){
+    const cur=d.chapters.find(c=>c.id===_wedActiveCh);
+    if(cur){ cur.content=_wedEditor.html; _saveWritingData(node.id,{chapters:[...d.chapters]}); }
+  }
+
+  _wedActiveCh=ch.id;
+  d.activeCh=ch.id;
+  _wedNode=node;
+
+  // 사이드바 active 갱신
+  chList.querySelectorAll('.wed-ch-item').forEach(el=>{
+    el.classList.toggle('active',el.dataset.id===ch.id);
+  });
+
+  // 에디터 영역 구성
+  editorArea.innerHTML='';
+
+  // 상단 (제목 + 탐색)
+  const top=document.createElement('div');
+  top.className='wed-editor-top';
+
+  const titleInp=document.createElement('input');
+  titleInp.type='text';
+  titleInp.className='wed-ch-title-input';
+  titleInp.id='wed-ch-title-'+node.id;
+  titleInp.value=ch.title||'';
+  titleInp.placeholder='회차 제목 입력...';
+  titleInp.addEventListener('input',()=>{
+    ch.title=titleInp.value;
+    // 사이드바 항목 제목 갱신
+    const si=chList.querySelector(`.wed-ch-item[data-id="${ch.id}"] .wed-ch-title`);
+    if(si) si.textContent=ch.title;
+    clearTimeout(_wedSaveTimer);
+    _wedSaveTimer=setTimeout(()=>_saveWritingData(node.id,{chapters:[...d.chapters]}),400);
+  });
+  titleInp.addEventListener('keydown',e=>e.stopPropagation());
+
+  // 글자수
+  const wcBadge=document.createElement('span');
+  wcBadge.className='wed-wc-badge';
+  wcBadge.id='wed-wc-'+node.id;
+
+  // 이전/다음 회차
+  const sorted=[...d.chapters].sort((a,b)=>a.order-b.order);
+  const curIdx=sorted.findIndex(c=>c.id===ch.id);
+
+  const prevBtn=document.createElement('button');
+  prevBtn.className='wed-nav-btn';
+  prevBtn.textContent='◀ 이전';
+  prevBtn.disabled=curIdx<=0;
+  if(curIdx>0) prevBtn.onclick=()=>_wedOpenChapter(sorted[curIdx-1],node,d,chList,editorArea);
+
+  const nextBtn=document.createElement('button');
+  nextBtn.className='wed-nav-btn';
+  nextBtn.textContent='다음 ▶';
+  nextBtn.disabled=curIdx>=sorted.length-1;
+  if(curIdx<sorted.length-1) nextBtn.onclick=()=>_wedOpenChapter(sorted[curIdx+1],node,d,chList,editorArea);
+
+  top.append(titleInp, wcBadge, prevBtn, nextBtn);
+  editorArea.appendChild(top);
+
+  // 툴바
+  const tbWrap=document.createElement('div');
+  tbWrap.className='wed-toolbar-wrap';
+  const tbDiv=document.createElement('div');
+  tbDiv.id='wed-toolbar-'+node.id+'-'+ch.id;
+  tbWrap.appendChild(tbDiv);
+  editorArea.appendChild(tbWrap);
+
+  // 에디터 본문
+  const bodyWrap=document.createElement('div');
+  bodyWrap.className='wed-body';
+  const ceDiv=document.createElement('div');
+  ceDiv.id='wed-ce-'+node.id+'-'+ch.id;
+  bodyWrap.appendChild(ceDiv);
+  editorArea.appendChild(bodyWrap);
+
+  // MBEditor 초기화
+  const editor=new MBEditor(
+    'wed-toolbar-'+node.id+'-'+ch.id,
+    'wed-ce-'+node.id+'-'+ch.id,
+    '이곳에 집필을 시작하세요...',
+    html=>{
+      ch.content=html;
+      // 글자수 갱신
+      const plain=html.replace(/<[^>]*>/g,'').replace(/\s/g,'').length;
+      const wb=document.getElementById('wed-wc-'+node.id);
+      if(wb) wb.textContent=plain.toLocaleString()+'자';
+      const si=chList.querySelector(`.wed-ch-item[data-id="${ch.id}"] .wed-ch-wc`);
+      if(si) si.textContent=plain.toLocaleString()+'자';
+      clearTimeout(_wedSaveTimer);
+      _wedSaveTimer=setTimeout(()=>{
+        _saveWritingData(node.id,{chapters:[...d.chapters]});
+        _wedUpdateTotalWc(node,d);
+        // 트래커 통계 갱신
+        const _tb=document.getElementById('wed-trk-body-'+node.id);
+        if(_tb) _wedRenderTracker(_tb, node, d);
+      },600);
+    }
+  );
+  editor.html=ch.content||'';
+  _wedEditor=editor;
+
+  // 초기 글자수
+  const initPlain=(ch.content||'').replace(/<[^>]*>/g,'').replace(/\s/g,'').length;
+  const wb=document.getElementById('wed-wc-'+node.id);
+  if(wb) wb.textContent=initPlain.toLocaleString()+'자';
+
+  // Ctrl+Enter → 다음 회차
+  ceDiv.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+      e.preventDefault();
+      if(curIdx<sorted.length-1) _wedOpenChapter(sorted[curIdx+1],node,d,chList,editorArea);
+    }
+  });
+}
+
+function _wedClearEditor(editorArea, node){
+  editorArea.innerHTML='<div class="wed-empty"><span style="font-size:36px">✏️</span><span>회차를 추가하세요</span></div>';
+  _wedEditor=null;
+  const tw=document.getElementById('wed-total-wc-'+node.id);
+  if(tw) tw.textContent='';
+}
+
+function _wedAddChapter(node, d, chList, editorArea){
+  const maxOrder=d.chapters.reduce((m,ch)=>Math.max(m,ch.order),-1);
+  const newCh={
+    id:'ch'+Date.now(),
+    title:(d.chapters.length+1)+'화',
+    content:'',
+    order:maxOrder+1
+  };
+  d.chapters.push(newCh);
+  _saveWritingData(node.id,{chapters:[...d.chapters]});
+  _wedRenderChList(chList,node,d,editorArea);
+  _wedOpenChapter(newCh,node,d,chList,editorArea);
+}
+
+function _wedUpdateTotalWc(node, d){
+  const total=(d.chapters||[]).reduce((s,ch)=>{
+    return s+(ch.content||'').replace(/<[^>]*>/g,'').replace(/\s/g,'').length;
+  },0);
+  const tw=document.getElementById('wed-total-wc-'+node.id);
+  if(tw) tw.textContent='전체 '+total.toLocaleString()+'자';
+}
+
+
+function _ptInit(node){
+  if(!node.data) node.data={};
+  if(!node.data.logs) node.data.logs=[];
+  if(!node.data.goal) node.data.goal=0;
+  return node.data;
+}
+
+function _ptTotal(d){ return (d.logs||[]).reduce((s,l)=>s+(parseInt(l.chars)||0),0); }
+
+function renderWritingPT(node, container){
+  container.innerHTML='';
+  const d=_ptInit(node);
+
+  // 툴바
+  const tb=document.createElement('div');
+  tb.className='writing-toolbar';
+  tb.setAttribute('data-type','WPT');
+  const tbTitle=document.createElement('span');
+  tbTitle.className='writing-toolbar-title';
+  tbTitle.textContent='📊 집필 진행률 트래커';
+  const hint=document.createElement('span');
+  hint.style.cssText='font-size:10px;color:var(--tx3)';
+  hint.textContent='목표 분량과 날짜별 집필량을 기록하세요';
+  tb.append(tbTitle, hint);
+  container.appendChild(tb);
+
+  // 헤더 (목표 + 통계카드)
+  const header=document.createElement('div');
+  header.className='pt-header';
+  header.id='pt-header-'+node.id;
+  container.appendChild(header);
+
+  // 진행률 바
+  const progressWrap=document.createElement('div');
+  progressWrap.className='pt-progress-wrap';
+  progressWrap.id='pt-progress-'+node.id;
+  container.appendChild(progressWrap);
+
+  // 본문 (로그 테이블)
+  const body=document.createElement('div');
+  body.className='pt-body';
+
+  const table=document.createElement('table');
+  table.className='pt-log-table';
+  const thead=document.createElement('thead');
+  thead.innerHTML=`<tr>
+    <th style="width:120px">날짜</th>
+    <th style="width:110px">집필량 (자)</th>
+    <th>메모</th>
+    <th style="width:80px">일간 달성</th>
+    <th style="width:28px"></th>
+  </tr>`;
+  table.appendChild(thead);
+
+  const tbody=document.createElement('tbody');
+  tbody.id='pt-tbody-'+node.id;
+  d.logs.forEach((log,i)=>tbody.appendChild(_ptCreateRow(log,i,node,d,container)));
+  table.appendChild(tbody);
+  body.appendChild(table);
+
+  // 행 추가 버튼
+  const addRow=document.createElement('div');
+  addRow.className='pt-add-row';
+  addRow.innerHTML='<span style="font-size:14px">＋</span> 날짜 추가';
+  addRow.onclick=()=>{
+    const today=new Date().toISOString().slice(0,10);
+    const newLog={id:'log'+Date.now(),date:today,chars:'',memo:''};
+    d.logs.push(newLog);
+    _saveWritingData(node.id,{logs:[...d.logs]});
+    const tr=_ptCreateRow(newLog,d.logs.length-1,node,d,container);
+    tbody.appendChild(tr);
+    tr.querySelector('.pt-log-cell')?.focus();
+    _ptRefresh(node,d,container);
+  };
+  body.appendChild(addRow);
+  container.appendChild(body);
+
+  _ptRefresh(node,d,container);
+}
+
+function _ptRefresh(node, d, container){
+  const total=_ptTotal(d);
+  const goal=parseInt(d.goal)||0;
+  const pct=goal>0?Math.min(100,Math.round(total/goal*100)):0;
+  const remain=goal>0?Math.max(0,goal-total):0;
+  const days=(d.logs||[]).filter(l=>parseInt(l.chars)>0).length;
+  const avgDay=days>0?Math.round(total/days):0;
+  const daysLeft=remain>0&&avgDay>0?Math.ceil(remain/avgDay):0;
+
+  // 헤더
+  const hdr=document.getElementById('pt-header-'+node.id);
+  if(!hdr) return;
+  hdr.innerHTML='';
+
+  // 목표 입력
+  const goalBlock=document.createElement('div');
+  goalBlock.className='pt-goal-block';
+  const goalLbl=document.createElement('label');
+  goalLbl.textContent='🎯 목표 분량 (공백 미포함 자수)';
+  const goalInp=document.createElement('input');
+  goalInp.className='pt-goal-input';
+  goalInp.type='number';
+  goalInp.value=d.goal||'';
+  goalInp.placeholder='예: 100000';
+  goalInp.min='0';
+  goalInp.oninput=()=>{
+    d.goal=parseInt(goalInp.value)||0;
+    _saveWritingData(node.id,{goal:d.goal});
+    _ptRefresh(node,d,container);
+  };
+  goalBlock.append(goalLbl,goalInp);
+  hdr.appendChild(goalBlock);
+
+  // 통계 카드
+  const stats=document.createElement('div');
+  stats.className='pt-stat-cards';
+  const mkCard=(val,lbl,cls='')=>{
+    const card=document.createElement('div');
+    card.className='pt-stat'+(cls?' '+cls:'');
+    const v=document.createElement('div'); v.className='pt-stat-val'; v.textContent=val;
+    const l=document.createElement('div'); l.className='pt-stat-lbl'; l.textContent=lbl;
+    card.append(v,l); return card;
+  };
+  stats.appendChild(mkCard(total.toLocaleString()+'자','총 집필량'));
+  if(goal>0){
+    stats.appendChild(mkCard(pct+'%','달성률', pct<30?'danger':pct<70?'warning':''));
+    stats.appendChild(mkCard(remain.toLocaleString()+'자','남은 분량', remain>0&&pct<50?'warning':''));
+  }
+  stats.appendChild(mkCard(avgDay.toLocaleString()+'자','일평균'));
+  if(daysLeft>0) stats.appendChild(mkCard(daysLeft+'일','예상 완료'));
+  hdr.appendChild(stats);
+
+  // 진행률 바
+  const pw=document.getElementById('pt-progress-'+node.id);
+  if(pw){
+    pw.innerHTML='';
+    const bg=document.createElement('div'); bg.className='pt-progress-bg';
+    const fill=document.createElement('div'); fill.className='pt-progress-fill';
+    fill.style.width=pct+'%';
+    const pctLbl=document.createElement('div'); pctLbl.className='pt-progress-pct';
+    pctLbl.textContent=goal>0?pct+'%':total.toLocaleString()+'자 작성됨';
+    bg.append(fill,pctLbl);
+    pw.appendChild(bg);
+  }
+
+  // 일간 달성 바 갱신
+  const maxChars=Math.max(1,...(d.logs||[]).map(l=>parseInt(l.chars)||0));
+  document.querySelectorAll('.pt-log-bar').forEach(bar=>{
+    const chars=parseInt(bar.dataset.chars)||0;
+    bar.style.width=Math.round(chars/maxChars*100)+'%';
+  });
+}
+
+function _ptCreateRow(log, idx, node, d, container){
+  const tr=document.createElement('tr');
+  tr.dataset.id=log.id;
+
+  const mkInput=(key,type,ph)=>{
+    const td=document.createElement('td');
+    const inp=document.createElement(type==='textarea'?'textarea':'input');
+    inp.className='pt-log-cell';
+    if(type!=='textarea') inp.type=type;
+    else inp.rows=1;
+    inp.value=log[key]||'';
+    inp.placeholder=ph||'';
+    inp.oninput=()=>{
+      log[key]=inp.value;
+      _saveWritingData(node.id,{logs:[...d.logs]});
+      if(key==='chars') _ptRefresh(node,d,container);
+    };
+    inp.addEventListener('keydown',e=>e.stopPropagation());
+    td.appendChild(inp);
+    return td;
+  };
+
+  tr.appendChild(mkInput('date','date',''));
+  tr.appendChild(mkInput('chars','number','0'));
+  tr.appendChild(mkInput('memo','textarea','메모'));
+
+  // 일간 달성 바
+  const barTd=document.createElement('td');
+  barTd.className='pt-log-bar-wrap';
+  const bar=document.createElement('div');
+  bar.className='pt-log-bar';
+  bar.dataset.chars=log.chars||0;
+  bar.style.width='0%';
+  barTd.appendChild(bar);
+  tr.appendChild(barTd);
+
+  // 삭제
+  const delTd=document.createElement('td');
+  delTd.style.cssText='text-align:center;padding:0';
+  const delBtn=document.createElement('button');
+  delBtn.className='pt-del-btn'; delBtn.textContent='✕';
+  delBtn.onclick=()=>{
+    if(!confirm('이 기록을 삭제하시겠습니까?')) return;
+    d.logs.splice(idx,1);
+    _saveWritingData(node.id,{logs:[...d.logs]});
+    tr.remove();
+    _ptRefresh(node,d,container);
+  };
+  tr.addEventListener('contextmenu',e=>{
+    e.preventDefault();
+    showCtx(e,[{l:'🗑 행 삭제',d:true,a:()=>delBtn.click()}]);
+  });
+  delTd.appendChild(delBtn);
+  tr.appendChild(delTd);
+  return tr;
+}
+
+
+function _gsInit(node){
+  if(!node.data) node.data={};
+  if(!node.data.tabs || !node.data.tabs.length){
+    node.data.tabs = [{id:'tab'+Date.now(), name:'기본', rows:[]}];
+  }
+  if(!node.data.activeTab) node.data.activeTab = node.data.tabs[0].id;
+  return node.data;
+}
+
+function renderWritingGS(node, container){
+  container.innerHTML = '';
+  const d = _gsInit(node);
+
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WGS');
+  const tbTitle = document.createElement('span');
+  tbTitle.className = 'writing-toolbar-title';
+  tbTitle.textContent = '📚 용어 사전';
+  const hint = document.createElement('span');
+  hint.style.cssText = 'font-size:10px;color:var(--tx3)';
+  hint.textContent = '탭 더블클릭으로 이름 변경 • 행 우클릭으로 삭제';
+  tb.append(tbTitle, hint);
+  container.appendChild(tb);
+
+  // 본문
+  const wrap = document.createElement('div');
+  wrap.className = 'gs-container';
+
+  // 탭 바
+  const tabBar = document.createElement('div');
+  tabBar.className = 'gs-tab-bar';
+  tabBar.id = 'gs-tabbar-'+node.id;
+  _gsRenderTabs(tabBar, node, d, wrap);
+
+  // 탭 추가 버튼
+  const addTabBtn = document.createElement('button');
+  addTabBtn.className = 'gs-tab-add';
+  addTabBtn.textContent = '＋';
+  addTabBtn.title = '새 탭 추가';
+  addTabBtn.onclick = ()=>{
+    const name = '탭'+(d.tabs.length+1);
+    const newTab = {id:'tab'+Date.now(), name, rows:[]};
+    d.tabs.push(newTab);
+    d.activeTab = newTab.id;
+    _saveWritingData(node.id, {tabs:[...d.tabs], activeTab:d.activeTab});
+    renderWritingGS(node, container);
+  };
+  tabBar.appendChild(addTabBtn);
+  wrap.appendChild(tabBar);
+
+  // 본문 테이블 영역
+  const body = document.createElement('div');
+  body.className = 'gs-body';
+  body.id = 'gs-body-'+node.id;
+  _gsRenderTable(body, node, d);
+  wrap.appendChild(body);
+
+  container.appendChild(wrap);
+}
+
+function _gsRenderTabs(tabBar, node, d, wrap){
+  // 기존 탭 버튼들만 제거 (addTabBtn 제외)
+  Array.from(tabBar.children).forEach(el=>{
+    if(!el.classList.contains('gs-tab-add')) el.remove();
+  });
+  const addBtn = tabBar.querySelector('.gs-tab-add');
+
+  d.tabs.forEach((tab, ti)=>{
+    const btn = document.createElement('button');
+    btn.className = 'gs-tab-btn' + (tab.id===d.activeTab?' on':'');
+    btn.textContent = tab.name;
+    btn.title = tab.name;
+
+    // 클릭 → 탭 전환
+    btn.onclick = ()=>{
+      d.activeTab = tab.id;
+      _saveWritingData(node.id, {activeTab:tab.id});
+      tabBar.querySelectorAll('.gs-tab-btn').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      const body = document.getElementById('gs-body-'+node.id);
+      if(body) _gsRenderTable(body, node, d);
+    };
+
+    // 더블클릭 → 이름 변경
+    btn.addEventListener('dblclick', e=>{
+      e.stopPropagation();
+      const inp = document.createElement('input');
+      inp.className = 'gs-tab-rename';
+      inp.value = tab.name;
+      inp.style.width = Math.max(60, tab.name.length*9)+'px';
+      btn.replaceWith(inp);
+      inp.focus(); inp.select();
+      const commit = ()=>{
+        const v = inp.value.trim() || tab.name;
+        tab.name = v;
+        _saveWritingData(node.id, {tabs:[...d.tabs]});
+        inp.replaceWith(btn);
+        btn.textContent = v;
+      };
+      inp.addEventListener('blur', commit, {once:true});
+      inp.addEventListener('keydown', e2=>{
+        if(e2.key==='Enter'){e2.preventDefault(); inp.removeEventListener('blur',commit); commit();}
+        if(e2.key==='Escape'){inp.replaceWith(btn);}
+        e2.stopPropagation();
+      });
+    });
+
+    // 우클릭 → 탭 삭제
+    btn.addEventListener('contextmenu', e=>{
+      e.preventDefault();
+      if(d.tabs.length<=1){toast('마지막 탭은 삭제할 수 없습니다.',true);return;}
+      showCtx(e,[
+        {l:'✏️ 이름 변경', a:()=>btn.dispatchEvent(new MouseEvent('dblclick',{bubbles:true}))},
+        'sep',
+        {l:'🗑 탭 삭제', d:true, a:()=>{
+          if(!confirm(`"${tab.name}" 탭을 삭제하시겠습니까? 내용도 모두 삭제됩니다.`)) return;
+          d.tabs.splice(ti,1);
+          if(d.activeTab===tab.id) d.activeTab=d.tabs[0].id;
+          _saveWritingData(node.id,{tabs:[...d.tabs],activeTab:d.activeTab});
+          const cont=document.getElementById('pub-writing-content');
+          if(cont){cont.innerHTML='';renderWritingGS(node,cont);}
+        }},
+      ]);
+    });
+
+    tabBar.insertBefore(btn, addBtn);
+  });
+}
+
+function _gsRenderTable(body, node, d){
+  body.innerHTML = '';
+  const tab = d.tabs.find(t=>t.id===d.activeTab);
+  if(!tab) return;
+  if(!tab.rows) tab.rows = [];
+
+  const tableWrap = document.createElement('div');
+  tableWrap.style.cssText='border:1px solid var(--bdr);border-radius:8px;overflow:hidden';
+
+  const table = document.createElement('table');
+  table.className = 'gs-table';
+
+  // 헤더
+  const thead = document.createElement('thead');
+  thead.innerHTML = `<tr>
+    <th style="width:28%">단어 / 용어</th>
+    <th>설명</th>
+    <th style="width:28px"></th>
+  </tr>`;
+  table.appendChild(thead);
+
+  // 바디
+  const tbody = document.createElement('tbody');
+  tab.rows.forEach((row, ri)=>{
+    tbody.appendChild(_gsCreateRow(row, ri, node, d, tab, body));
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+
+  // 행 추가 버튼
+  const addRow = document.createElement('div');
+  addRow.className = 'gs-add-row';
+  addRow.innerHTML = '<span style="font-size:14px">＋</span> 행 추가';
+  addRow.onclick = ()=>{
+    const newRow = {id:'row'+Date.now(), word:'', desc:''};
+    tab.rows.push(newRow);
+    _saveWritingData(node.id, {tabs:[...d.tabs]});
+    const tr = _gsCreateRow(newRow, tab.rows.length-1, node, d, tab, body);
+    tbody.appendChild(tr);
+    tr.querySelector('.gs-cell')?.focus();
+  };
+  tableWrap.appendChild(addRow);
+  body.appendChild(tableWrap);
+}
+
+function _gsCreateRow(row, ri, node, d, tab, body){
+  const tr = document.createElement('tr');
+  tr.dataset.id = row.id;
+
+  const mkTd = (key, isDesc)=>{
+    const td = document.createElement('td');
+    const ta = document.createElement('textarea');
+    ta.className = 'gs-cell';
+    ta.rows = 1;
+    ta.value = row[key] || '';
+    ta.placeholder = isDesc ? '단어 설명...' : '용어 입력...';
+    // 자동 높이
+    const autoH = ()=>{ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; };
+    ta.addEventListener('input', ()=>{
+      row[key] = ta.value;
+      _saveWritingData(node.id, {tabs:[...d.tabs]});
+      autoH();
+    });
+    ta.addEventListener('focus', autoH);
+    setTimeout(autoH, 0);
+    // Tab으로 다음 셀로 이동
+    ta.addEventListener('keydown', e=>{
+      if(e.key==='Tab' && !e.shiftKey && isDesc){
+        e.preventDefault();
+        // 다음 행 word 셀로
+        const rows=[...tr.parentElement.children];
+        const ni=rows.indexOf(tr)+1;
+        if(ni<rows.length) rows[ni].querySelector('.gs-cell')?.focus();
+        else body.querySelector('.gs-add-row')?.click();
+      }
+      e.stopPropagation();
+    });
+    td.appendChild(ta);
+    return td;
+  };
+
+  tr.append(mkTd('word',false), mkTd('desc',true));
+
+  // 삭제 버튼
+  const delTd = document.createElement('td');
+  delTd.style.cssText='text-align:center;vertical-align:middle;width:28px;padding:0';
+  const delBtn = document.createElement('button');
+  delBtn.className = 'gs-row-del';
+  delBtn.textContent = '✕';
+  delBtn.title = '행 삭제';
+  delBtn.onclick = ()=>{
+    if(!confirm('이 행을 삭제하시겠습니까?')) return;
+    tab.rows.splice(ri,1);
+    _saveWritingData(node.id,{tabs:[...d.tabs]});
+    tr.remove();
+  };
+  // 우클릭도 삭제
+  tr.addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    showCtx(e,[{l:'🗑 행 삭제',d:true,a:()=>delBtn.click()}]);
+  });
+  delTd.appendChild(delBtn);
+  tr.appendChild(delTd);
+  return tr;
+}
+
+
+function renderToolsRM(node, container){
+  container.innerHTML = '';
+  _rmNode = node; _rmGlobalBound = false;
+  const d = node.data || {};
+  if(!d.chars) d.chars = [];
+  if(!d.rels)  d.rels  = [];
+
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WRM');
+  tb.innerHTML = `<span class="writing-toolbar-title">🕸 관계도</span>
+    <span style="font-size:10px;color:var(--tx3)">카드 가장자리 ⊕에서 드래그 → 연결선 추가 &nbsp;|&nbsp; 선 클릭 → 편집/삭제</span>`;
+  container.appendChild(tb);
+
+  const main = document.createElement('div');
+  main.className = 'rm-container';
+
+  const cvWrap = document.createElement('div');
+  cvWrap.className = 'rm-canvas-wrap';
+  cvWrap.id = 'rm-wrap-'+node.id;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.className = 'rm-canvas';
+  svg.id = 'rm-svg-'+node.id;
+  svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible';
+  cvWrap.appendChild(svg);
+
+  // 사이드 패널
+  const side = document.createElement('div');
+  side.className = 'rm-side';
+  const sideHdr = document.createElement('div');
+  sideHdr.className = 'rm-side-hdr';
+  sideHdr.textContent = '👥 캐릭터';
+  side.appendChild(sideHdr);
+  const sideList = document.createElement('div');
+  sideList.className = 'rm-side-list';
+  sideList.id = 'rm-side-'+node.id;
+  side.appendChild(sideList);
+
+  main.appendChild(cvWrap);
+  main.appendChild(side);
+  container.appendChild(main);
+
+  // ★ DOM에 추가된 후 전역변수 설정 및 렌더
+  _rmD_global = d; _rmCvWrap = cvWrap; _rmSvg = svg;
+  _rmBindGlobalEvents();
+
+  // 카드 렌더
+  d.chars.forEach(ch => _rmRenderCard(ch, cvWrap, node, d, svg));
+
+  // 사이드 렌더
+  _rmRenderSide(sideList, node, d, cvWrap, svg);
+
+  // ★ 선 그리기 (DOM 추가 후)
+  setTimeout(() => _rmDrawAllLinesV2(svg, d, cvWrap), 0);
+
+  // 캔버스 클릭 해제
+  cvWrap.addEventListener('click', e => {
+    if(e.target === cvWrap || e.target === svg) _rmCancelConnect(node, d);
+  });
+  // 미리보기 선
+  cvWrap.addEventListener('mousemove', e => {
+    if(!_rmConnecting || !_rmSvg) return;
+    const rect = cvWrap.getBoundingClientRect();
+    _rmDrawPreviewLine(_rmSvg, _rmConnecting.startX, _rmConnecting.startY, e.clientX-rect.left, e.clientY-rect.top);
+  });
+}
+
+// ── 사이드 패널: 캐릭터 목록 ──
+function _rmRenderSide(sideEl, node, d, cvWrap, svg){
+  sideEl.innerHTML = '';
+  const csNodes = (S.toolNodes||[]).filter(n=>n.workId===node.workId&&n.type==='CS');
+  if(!csNodes.length){
+    sideEl.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:8px;line-height:1.6">캐릭터 시트를<br>먼저 추가하세요</div>';
+    return;
+  }
+  csNodes.forEach(csNode=>{
+    const already = d.chars.find(c=>c.csId===csNode.id);
+    const row = document.createElement('div');
+    row.className = 'rm-side-item' + (already?' added':'');
+    const ico = document.createElement('span');
+    ico.style.cssText='font-size:16px;flex-shrink:0';
+    if(csNode.data?.image){const img=document.createElement('img');img.src=csNode.data.image;img.style.cssText='width:22px;height:22px;border-radius:50%;object-fit:cover';ico.appendChild(img);}
+    else ico.textContent='👤';
+    const name = document.createElement('span');
+    name.style.cssText='flex:1;font-size:11px;color:var(--tx2)';
+    name.textContent = csNode.data?.name || csNode.name || '?';
+    const btn = document.createElement('button');
+    btn.className = 'rm-side-add-btn' + (already?' remove':'');
+    btn.textContent = already ? '제거' : '추가';
+    btn.onclick = e=>{
+      e.stopPropagation();
+      if(already){
+        d.chars = d.chars.filter(c=>c.csId!==csNode.id);
+        d.rels  = d.rels.filter(r=>r.from!==already.id&&r.to!==already.id);
+      } else {
+        const cx = 80+Math.random()*260;
+        const cy = 60+Math.random()*180;
+        d.chars.push({id:'rc'+Date.now(), csId:csNode.id, x:cx, y:cy});
+      }
+      _saveWritingData(node.id, {chars:[...d.chars], rels:[...d.rels]});
+      toolsOpenSheetNode(node);
+    };
+    row.append(ico, name, btn);
+    sideEl.appendChild(row);
+  });
+}
+
+// ── 캐릭터 카드 렌더 ──
+function _rmRenderCard(ch, cvWrap, node, d, svg){
+  const csNode = (S.toolNodes||[]).find(n=>n.id===ch.csId);
+  if(!csNode) return;
+  const csData = csNode.data||{};
+  const card = document.createElement('div');
+  card.className = 'rm-char-card';
+  card.id = 'rm-card-'+ch.id;
+  card.style.left = ch.x+'px';
+  card.style.top  = ch.y+'px';
+  const imgDiv = document.createElement('div');
+  imgDiv.className = 'rm-char-img';
+  if(csData.image){const img=document.createElement('img');img.src=csData.image;imgDiv.appendChild(img);}
+  else imgDiv.textContent='👤';
+  const nameEl = document.createElement('div');
+  nameEl.className = 'rm-char-name';
+  nameEl.textContent = csData.name || csNode.name || '?';
+  const summEl = document.createElement('div');
+  summEl.className = 'rm-char-summary';
+  summEl.textContent = csData.summary || csData.f_role || '';
+  card.append(imgDiv, nameEl, summEl);
+  // 연결점 4방향
+  ['top','bottom','left','right'].forEach(pos=>{
+    const dot = document.createElement('div');
+    dot.className = 'rm-connect-dot '+pos;
+    dot.addEventListener('pointerdown', e=>{
+      e.stopPropagation(); e.preventDefault();
+      const rect = cvWrap.getBoundingClientRect();
+      const cr = card.getBoundingClientRect();
+      _rmConnecting = {fromId:ch.id, startX:cr.left-rect.left+cr.width/2, startY:cr.top-rect.top+cr.height/2};
+      document.body.style.cursor='crosshair';
+    });
+    card.appendChild(dot);
+  });
+  // 드래그 (pointerCapture)
+  let _offX=0,_offY=0;
+  card.addEventListener('pointerdown',e=>{
+    if(e.target.classList.contains('rm-connect-dot')) return;
+    e.preventDefault();
+    _offX=e.clientX-ch.x; _offY=e.clientY-ch.y;
+    card.style.zIndex='30';
+    card.setPointerCapture(e.pointerId);
+  });
+  card.addEventListener('pointermove',e=>{
+    if(!card.hasPointerCapture(e.pointerId)) return;
+    if(e.target.classList.contains('rm-connect-dot')) return;
+    const rect=cvWrap.getBoundingClientRect();
+    ch.x=Math.max(0,Math.min(rect.width-120,e.clientX-_offX));
+    ch.y=Math.max(0,Math.min(rect.height-130,e.clientY-_offY));
+    card.style.left=ch.x+'px'; card.style.top=ch.y+'px';
+    _rmDrawAllLinesV2(svg,d,cvWrap);
+  });
+  card.addEventListener('pointerup',e=>{
+    if(!card.hasPointerCapture(e.pointerId)) return;
+    card.style.zIndex='';
+    _saveWritingData(node.id,{chars:[...d.chars]});
+    if(_rmConnecting){
+      const rect=cvWrap.getBoundingClientRect();
+      const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      const target=(d.chars||[]).find(c=>{
+        if(c.id===_rmConnecting.fromId) return false;
+        const el=document.getElementById('rm-card-'+c.id); if(!el) return false;
+        const er=el.getBoundingClientRect(), wr=cvWrap.getBoundingClientRect();
+        return mx>=er.left-wr.left&&mx<=er.right-wr.left&&my>=er.top-wr.top&&my<=er.bottom-wr.top;
+      });
+      if(target) _rmOpenRelPopupV2(e,_rmConnecting.fromId,target.id,node,d,cvWrap);
+      _rmCancelConnect(node,d);
+    }
+    document.body.style.cursor='';
+  });
+  card.addEventListener('contextmenu',e=>{
+    e.preventDefault();
+    _rmCardContextMenu(e,ch,node,d,cvWrap,svg);
+  });
+  cvWrap.appendChild(card);
+}
+
+// ── 관계선 전체 그리기 ──
+function _rmDrawAllLines(svg, d){
+  if(!svg) return;
+  // preview 선 제외하고 지우기
+  Array.from(svg.children).forEach(el=>{ if(!el.id||!el.id.startsWith('rm-prev')) el.remove(); });
+  (d.rels||[]).forEach(rel=>{
+    const from=d.chars.find(c=>c.id===rel.from);
+    const to=d.chars.find(c=>c.id===rel.to);
+    if(!from||!to) return;
+    const x1=from.x+55, y1=from.y+60, x2=to.x+55, y2=to.y+60;
+    _rmDrawLine(svg, x1,y1,x2,y2, rel, d);
+  });
+}
+
+function _rmDrawLine(svg, x1,y1,x2,y2, rel, d){
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+  line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+  line.setAttribute('stroke', rel.color||'#388bfd');
+  line.setAttribute('stroke-width', rel.dir==='none'?'1.5':'2');
+  line.setAttribute('stroke-dasharray', rel.dashed?'6,4':'');
+  if(rel.dir==='to'||rel.dir==='both'){
+    line.setAttribute('marker-end','url(#arrow-'+rel.id+')');
+  }
+  line.style.cursor='pointer';
+  line.style.pointerEvents='stroke';
+  line.addEventListener('click', e=>{ e.stopPropagation(); _rmEditRelPopup(e, rel, d, svg); });
+
+  // 화살표 마커
+  if(rel.dir==='to'||rel.dir==='both'){
+    const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+    const marker=document.createElementNS('http://www.w3.org/2000/svg','marker');
+    marker.setAttribute('id','arrow-'+rel.id); marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','8');
+    marker.setAttribute('refX','6'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d','M0,0 L0,6 L8,3 z'); path.setAttribute('fill',rel.color||'#388bfd');
+    marker.appendChild(path); defs.appendChild(marker); svg.appendChild(defs);
+  }
+
+  // 라벨
+  if(rel.label){
+    const mx=(x1+x2)/2, my=(y1+y2)/2;
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',mx); text.setAttribute('y',my-6);
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('font-size','10'); text.setAttribute('fill',rel.color||'#388bfd');
+    text.setAttribute('pointer-events','none');
+    text.textContent=rel.label;
+    g.appendChild(text);
+  }
+  g.appendChild(line);
+  svg.appendChild(g);
+}
+
+function _rmDrawPreviewLine(svg, x1,y1,x2,y2){
+  let prev=svg.querySelector('#rm-preview-line');
+  if(!prev){ prev=document.createElementNS('http://www.w3.org/2000/svg','line'); prev.id='rm-preview-line'; svg.appendChild(prev); }
+  prev.setAttribute('x1',x1); prev.setAttribute('y1',y1);
+  prev.setAttribute('x2',x2); prev.setAttribute('y2',y2);
+  prev.setAttribute('stroke','var(--ac)'); prev.setAttribute('stroke-width','1.5');
+  prev.setAttribute('stroke-dasharray','4,4'); prev.style.pointerEvents='none';
+}
+
+
+// 관계도 전역 이벤트 단일 등록
+function _rmBindGlobalEvents(){
+  if(_rmGlobalBound) return;
+  _rmGlobalBound = true;
+
+  document.addEventListener('mousemove', e=>{
+    if(!_rmCvWrap) return;
+    // 카드 드래그
+    if(_rmDragCard){
+      const rect=_rmCvWrap.getBoundingClientRect();
+      const nx=Math.max(0,Math.min(rect.width-110,e.clientX-rect.left-_rmDragOffX));
+      const ny=Math.max(0,Math.min(rect.height-120,e.clientY-rect.top-_rmDragOffY));
+      _rmDragCard.x=nx; _rmDragCard.y=ny;
+      const el=document.getElementById('rm-card-'+_rmDragCard.id);
+      if(el){el.style.left=nx+'px';el.style.top=ny+'px';}
+      if(_rmSvg) _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
+    }
+    // 연결선 미리보기
+    if(_rmConnecting && _rmSvg){
+      const rect=_rmCvWrap.getBoundingClientRect();
+      _rmDrawPreviewLine(_rmSvg, _rmConnecting.startX, _rmConnecting.startY, e.clientX-rect.left, e.clientY-rect.top);
+    }
+  });
+
+  document.addEventListener('mouseup', e=>{
+    // 카드 이동 완료
+    if(_rmDragCard && _rmNode){
+      _saveWritingData(_rmNode.id,{chars:[..._rmD_global.chars]});
+      _rmDragCard=null;
+    }
+    // 연결선 완료
+    if(_rmConnecting && _rmCvWrap){
+      const rect=_rmCvWrap.getBoundingClientRect();
+      const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      const target=(_rmD_global.chars||[]).find(ch=>{
+        if(ch.id===_rmConnecting.fromId) return false;
+        return mx>=ch.x&&mx<=ch.x+110&&my>=ch.y&&my<=ch.y+120;
+      });
+      if(target) _rmOpenRelPopupV2(e, _rmConnecting.fromId, target.id, _rmNode, _rmD_global, _rmCvWrap);
+      _rmCancelConnect(_rmNode, _rmD_global);
+    }
+  });
+}
+
+function _rmCancelConnect(node, d){
+  _rmConnecting = null;
+  document.body.style.cursor = '';
+  if(node){
+    const svg = document.getElementById('rm-svg-'+node.id);
+    if(svg) svg.querySelector('#rm-preview-line')?.remove();
+  }
+}
+
+// ── 관계선 추가 팝업 ──
+function _rmOpenRelPopup(e, fromId, toId, node, d, cvWrap){
+  document.querySelector('.rm-rel-popup')?.remove();
+  const pop=document.createElement('div'); pop.className='rm-rel-popup';
+  pop.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--tx)">🔗 관계 추가</div>`;
+
+  const labelInp=document.createElement('input'); labelInp.placeholder='관계 설명 (예: 진짜 사랑하는 사이)'; labelInp.style.width='100%';
+
+  const dirSel=document.createElement('select'); dirSel.style.width='100%';
+  [['to','→ 단방향'],['both','↔ 양방향'],['none','─ 연결선만']].forEach(([v,l])=>{ const o=document.createElement('option');o.value=v;o.textContent=l;dirSel.appendChild(o); });
+
+  const dashedChk=document.createElement('input'); dashedChk.type='checkbox';
+  const dashedLbl=document.createElement('label'); dashedLbl.style.fontSize='11px'; dashedLbl.textContent='점선';
+
+  const colorRow=document.createElement('div'); colorRow.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
+  let selColor=RM_REL_COLORS[0];
+  RM_REL_COLORS.forEach(col=>{
+    const sw=document.createElement('div');
+    sw.style.cssText=`width:22px;height:22px;border-radius:50%;background:${col};cursor:pointer;border:2px solid transparent`;
+    sw.onclick=()=>{ colorRow.querySelectorAll('div').forEach(s=>s.style.borderColor='transparent'); sw.style.borderColor='var(--tx)'; selColor=col; };
+    colorRow.appendChild(sw);
+  });
+  colorRow.firstChild.style.borderColor='var(--tx)';
+
+  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end';
+  const okBtn=document.createElement('button'); okBtn.className='wt-btn'; okBtn.style.cssText='background:var(--ac);color:#fff'; okBtn.textContent='추가';
+  const cancelBtn=document.createElement('button'); cancelBtn.className='wt-btn'; cancelBtn.textContent='취소';
+  cancelBtn.onclick=()=>pop.remove();
+  okBtn.onclick=()=>{
+    const rel={id:'rel'+Date.now(), from:fromId, to:toId, label:labelInp.value.trim(), color:selColor, dir:dirSel.value, dashed:dashedChk.checked};
+    d.rels.push(rel);
+    _saveWritingData(node.id,{rels:[...d.rels]});
+    _rmDrawAllLinesV2(document.getElementById('rm-svg-'+node.id), d, cvWrap);
+    pop.remove();
+  };
+  btnRow.append(cancelBtn,okBtn);
+
+  const dashedRow=document.createElement('div'); dashedRow.style.cssText='display:flex;align-items:center;gap:6px';
+  dashedRow.append(dashedChk, dashedLbl);
+
+  pop.append(pop.firstChild, labelInp, dirSel, dashedRow, colorRow, btnRow);
+  document.body.appendChild(pop);
+  pop.style.left=Math.min(e.clientX,window.innerWidth-240)+'px';
+  pop.style.top=Math.min(e.clientY,window.innerHeight-240)+'px';
+  labelInp.focus();
+  setTimeout(()=>document.addEventListener('click',function h(ev){if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}},100));
+}
+
+// ── 관계선 편집/삭제 팝업 ──
+function _rmEditRelPopup(e, rel, d, svg){
+  document.querySelector('.rm-rel-popup')?.remove();
+  const pop=document.createElement('div'); pop.className='rm-rel-popup';
+  pop.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--tx)">✏️ 관계 편집</div>`;
+
+  const labelInp=document.createElement('input'); labelInp.value=rel.label||''; labelInp.placeholder='관계 설명';
+  const dirSel=document.createElement('select');
+  [['to','→ 단방향'],['both','↔ 양방향'],['none','─ 연결선만']].forEach(([v,l])=>{ const o=document.createElement('option');o.value=v;o.textContent=l;if(v===rel.dir)o.selected=true;dirSel.appendChild(o); });
+  const dashedChk=document.createElement('input'); dashedChk.type='checkbox'; dashedChk.checked=rel.dashed||false;
+  const dashedLbl=document.createElement('label'); dashedLbl.style.fontSize='11px'; dashedLbl.textContent='점선';
+  const dashedRow=document.createElement('div'); dashedRow.style.cssText='display:flex;align-items:center;gap:6px'; dashedRow.append(dashedChk,dashedLbl);
+
+  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end';
+  const delBtn=document.createElement('button'); delBtn.className='wt-btn'; delBtn.style.color='var(--rd)'; delBtn.textContent='삭제';
+  const okBtn=document.createElement('button'); okBtn.className='wt-btn'; okBtn.style.cssText='background:var(--ac);color:#fff'; okBtn.textContent='저장';
+  const cancelBtn=document.createElement('button'); cancelBtn.className='wt-btn'; cancelBtn.textContent='취소';
+  delBtn.onclick=()=>{
+    d.rels=d.rels.filter(r=>r.id!==rel.id);
+    _saveWritingData(_rmNode.id,{rels:[...d.rels]});
+    _rmDrawAllLines(svg,d); pop.remove();
+  };
+  okBtn.onclick=()=>{
+    rel.label=labelInp.value.trim(); rel.dir=dirSel.value; rel.dashed=dashedChk.checked;
+    _saveWritingData(_rmNode.id,{rels:[...d.rels]});
+    _rmDrawAllLines(svg,d); pop.remove();
+  };
+  cancelBtn.onclick=()=>pop.remove();
+  btnRow.append(delBtn,cancelBtn,okBtn);
+
+  pop.append(pop.firstChild,labelInp,dirSel,dashedRow,btnRow);
+  document.body.appendChild(pop);
+  pop.style.left=Math.min(e.clientX,window.innerWidth-240)+'px';
+  pop.style.top=Math.min(e.clientY,window.innerHeight-240)+'px';
+  labelInp.focus();
+  setTimeout(()=>document.addEventListener('click',function h(ev){if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}},100));
+}
+
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  C단계: 관계도 강화 — 선 종류 다양화 + 우클릭 메뉴 + 범례
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 관계선 스타일 정의
+const RM_LINE_STYLES = [
+  { id:'solid',    label:'실선',      dashArray:'',          strokeWidth:2 },
+  { id:'dashed',   label:'점선',      dashArray:'8,4',       strokeWidth:2 },
+  { id:'thick',    label:'굵은 실선', dashArray:'',          strokeWidth:4 },
+  { id:'dashdot',  label:'파선(경계)',dashArray:'10,3,2,3',  strokeWidth:2 },
+  { id:'wave',     label:'물결선',    dashArray:'',          strokeWidth:2, wave:true },
+  { id:'cross',    label:'단절(X)',   dashArray:'6,4',       strokeWidth:2, cross:true },
+];
+
+// _rmDrawLine 전체 교체 (선 스타일 완전 지원)
+function _rmDrawLineSt(svg, x1,y1,x2,y2, rel, d){
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  const style = RM_LINE_STYLES.find(s=>s.id===rel.lineStyle) || RM_LINE_STYLES[0];
+  const color = rel.color || '#388bfd';
+  const sw = style.strokeWidth;
+
+  // 마커 ID
+  const markerId = 'arrow-'+rel.id;
+  const markerIdB = 'arrowB-'+rel.id;
+
+  // defs (화살표)
+  const mkMarker=(id,col)=>{
+    const m=document.createElementNS('http://www.w3.org/2000/svg','marker');
+    m.setAttribute('id',id); m.setAttribute('markerWidth','8'); m.setAttribute('markerHeight','8');
+    m.setAttribute('refX','6'); m.setAttribute('refY','3'); m.setAttribute('orient','auto');
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M0,0 L0,6 L8,3 z'); p.setAttribute('fill',col);
+    m.appendChild(p); return m;
+  };
+
+  if(rel.dir==='to'||rel.dir==='both'){
+    const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+    defs.appendChild(mkMarker(markerId,color));
+    if(rel.dir==='both') defs.appendChild(mkMarker(markerIdB,color));
+    svg.appendChild(defs);
+  }
+
+  // 물결선: SVG path로 그리기
+  if(style.wave){
+    const dx=x2-x1, dy=y2-y1;
+    const len=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(3,Math.floor(len/20));
+    let pts=[];
+    for(let i=0;i<=steps;i++){
+      const t=i/steps;
+      const bx=x1+dx*t, by=y1+dy*t;
+      const perp=6*Math.sin(t*Math.PI*steps*0.5);
+      const nx=-dy/len*perp, ny=dx/len*perp;
+      pts.push(`${i===0?'M':'L'}${(bx+nx).toFixed(1)},${(by+ny).toFixed(1)}`);
+    }
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',pts.join(' '));
+    path.setAttribute('stroke',color); path.setAttribute('stroke-width',sw);
+    path.setAttribute('fill','none');
+    if(rel.dir==='to') path.setAttribute('marker-end',`url(#${markerId})`);
+    if(rel.dir==='both'){ path.setAttribute('marker-end',`url(#${markerId})`); path.setAttribute('marker-start',`url(#${markerIdB})`); }
+    path.style.cursor='pointer'; path.style.pointerEvents='stroke';
+    path.addEventListener('click',e=>{e.stopPropagation();_rmEditRelPopup(e,rel,d,svg);});
+    g.appendChild(path);
+  } else {
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('stroke',color); line.setAttribute('stroke-width',sw);
+    if(style.dashArray) line.setAttribute('stroke-dasharray',style.dashArray);
+    if(rel.dir==='to') line.setAttribute('marker-end',`url(#${markerId})`);
+    if(rel.dir==='both'){ line.setAttribute('marker-end',`url(#${markerId})`); line.setAttribute('marker-start',`url(#${markerIdB})`); }
+    line.style.cursor='pointer'; line.style.pointerEvents='stroke';
+    line.addEventListener('click',e=>{e.stopPropagation();_rmEditRelPopup(e,rel,d,svg);});
+    g.appendChild(line);
+
+    // X 표시 (단절)
+    if(style.cross){
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      const xSize=8;
+      [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy],i)=>{
+        if(i%2===0){
+          const xl=document.createElementNS('http://www.w3.org/2000/svg','line');
+          xl.setAttribute('x1',mx-xSize*sx); xl.setAttribute('y1',my-xSize*sy);
+          xl.setAttribute('x2',mx+xSize*sx); xl.setAttribute('y2',my+xSize*sy);
+          xl.setAttribute('stroke',color); xl.setAttribute('stroke-width',sw+1);
+          xl.style.pointerEvents='none';
+          g.appendChild(xl);
+        }
+      });
+    }
+  }
+
+  // 라벨
+  if(rel.label){
+    const mx=(x1+x2)/2, my=(y1+y2)/2;
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const textEl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    textEl.setAttribute('x',mx); textEl.setAttribute('y',my-8);
+    textEl.setAttribute('text-anchor','middle');
+    textEl.setAttribute('font-size','10'); textEl.setAttribute('fill',color);
+    textEl.setAttribute('pointer-events','none');
+    textEl.textContent=rel.label;
+    g.appendChild(textEl);
+  }
+  svg.appendChild(g);
+}
+
+// 범례 렌더
+function _rmRenderLegend(cvWrap, d){
+  cvWrap.querySelector('.rm-legend')?.remove();
+  const rels = d.rels || [];
+  if(!rels.length) return;
+  const legend=document.createElement('div'); legend.className='rm-legend';
+  const title=document.createElement('div'); title.className='rm-legend-title'; title.textContent='🔗 관계 범례';
+  legend.appendChild(title);
+  // 중복 없이 라벨 기준으로 표시
+  const seen=new Set();
+  rels.forEach(rel=>{
+    const key=(rel.label||'')+'|'+(rel.color||'')+'|'+(rel.lineStyle||'');
+    if(seen.has(key)) return; seen.add(key);
+    const style=RM_LINE_STYLES.find(s=>s.id===rel.lineStyle)||RM_LINE_STYLES[0];
+    const item=document.createElement('div'); item.className='rm-legend-item';
+    const lineSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    lineSvg.setAttribute('width','32'); lineSvg.setAttribute('height','6');
+    lineSvg.style.overflow='visible';
+    const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1','0'); ln.setAttribute('y1','3'); ln.setAttribute('x2','32'); ln.setAttribute('y2','3');
+    ln.setAttribute('stroke',rel.color||'#388bfd'); ln.setAttribute('stroke-width',style.strokeWidth||2);
+    if(style.dashArray) ln.setAttribute('stroke-dasharray',style.dashArray);
+    lineSvg.appendChild(ln);
+    const lbl=document.createElement('span'); lbl.style.cssText='font-size:10px;color:var(--tx2)';
+    lbl.textContent=rel.label||style.label;
+    item.append(lineSvg,lbl); legend.appendChild(item);
+  });
+  cvWrap.appendChild(legend);
+}
+
+// 카드 우클릭 메뉴
+function _rmCardContextMenu(e, ch, node, d, cvWrap, svg){
+  e.preventDefault(); e.stopPropagation();
+  showCtx(e,[
+    {l:'🔗 이 캐릭터의 관계선 보기', a:()=>{
+      // 이 캐릭터와 연결된 관계선만 하이라이트
+      const _svg=_rmSvg;if(_svg)_svg.querySelectorAll('g').forEach(g=>{
+        const rel=d.rels.find(r=>r.from===ch.id||r.to===ch.id);
+        g.style.opacity = rel ? '1':'0.25';
+      });
+      setTimeout(()=>(_rmSvg)&&_rmSvg.querySelectorAll('g').forEach(g=>g.style.opacity='1'),2000);
+    }},
+    'sep',
+    {l:'🗑 캐릭터 제거', d:true, a:()=>{
+      d.chars=d.chars.filter(c=>c.id!==ch.id);
+      d.rels=d.rels.filter(r=>r.from!==ch.id&&r.to!==ch.id);
+      _saveWritingData(node.id,{chars:[...d.chars],rels:[...d.rels]});
+      const cont=document.getElementById('pub-writing-content');
+      if(cont){cont.innerHTML='';renderToolsRM(node,cont);}
+    }},
+  ]);
+}
+
+// 관계 추가 팝업 업그레이드 (lineStyle 선택 추가)
+function _rmOpenRelPopupV2(e, fromId, toId, node, d, cvWrap){
+  document.querySelector('.rm-rel-popup')?.remove();
+  const pop=document.createElement('div'); pop.className='rm-rel-popup';
+
+  const title=document.createElement('div'); title.style.cssText='font-size:12px;font-weight:700;color:var(--tx)'; title.textContent='🔗 관계 추가';
+  const labelInp=document.createElement('input'); labelInp.placeholder='관계 설명 (예: 진짜 사랑하는 사이)';
+
+  // 선 스타일 선택
+  const styleRow=document.createElement('div'); styleRow.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
+  let selStyle='solid';
+  RM_LINE_STYLES.forEach(st=>{
+    const btn=document.createElement('button'); btn.className='wt-btn';
+    btn.style.cssText=`font-size:10px;padding:2px 7px;${st.id===selStyle?'background:var(--ac);color:#fff;':''}`;
+    btn.textContent=st.label;
+    btn.onclick=()=>{
+      selStyle=st.id;
+      styleRow.querySelectorAll('button').forEach(b=>{ b.style.background=''; b.style.color=''; });
+      btn.style.background='var(--ac)'; btn.style.color='#fff';
+    };
+    styleRow.appendChild(btn);
+  });
+
+  const dirSel=document.createElement('select');
+  [['to','→ 단방향'],['both','↔ 양방향'],['none','─ 연결선만']].forEach(([v,l])=>{
+    const o=document.createElement('option');o.value=v;o.textContent=l;dirSel.appendChild(o);
+  });
+
+  // 색상 팔레트
+  const colorRow=document.createElement('div'); colorRow.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
+  let selColor=RM_REL_COLORS[0];
+  RM_REL_COLORS.forEach(col=>{
+    const sw=document.createElement('div');
+    sw.style.cssText=`width:20px;height:20px;border-radius:50%;background:${col};cursor:pointer;border:2px solid transparent`;
+    sw.onclick=()=>{colorRow.querySelectorAll('div').forEach(s=>s.style.borderColor='transparent');sw.style.borderColor='var(--tx)';selColor=col;};
+    colorRow.appendChild(sw);
+  });
+  colorRow.firstChild.style.borderColor='var(--tx)';
+
+  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end';
+  const okBtn=document.createElement('button'); okBtn.className='wt-btn'; okBtn.style.cssText='background:var(--ac);color:#fff'; okBtn.textContent='추가';
+  const cancelBtn=document.createElement('button'); cancelBtn.className='wt-btn'; cancelBtn.textContent='취소';
+  cancelBtn.onclick=()=>pop.remove();
+  okBtn.onclick=()=>{
+    const rel={id:'rel'+Date.now(),from:fromId,to:toId,label:labelInp.value.trim(),color:selColor,dir:dirSel.value,lineStyle:selStyle};
+    d.rels.push(rel);
+    _saveWritingData(node.id,{rels:[...d.rels]});
+    if(_rmSvg) _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
+    pop.remove();
+  };
+  btnRow.append(cancelBtn,okBtn);
+
+  const mkLbl=(t)=>{ const l=document.createElement('div'); l.style.cssText='font-size:10px;color:var(--tx3);margin-bottom:2px'; l.textContent=t; return l; };
+  pop.append(title, mkLbl('관계 설명'), labelInp, mkLbl('선 스타일'), styleRow, mkLbl('방향'), dirSel, mkLbl('색상'), colorRow, btnRow);
+  document.body.appendChild(pop);
+  pop.style.left=Math.min(e.clientX,window.innerWidth-240)+'px';
+  pop.style.top=Math.min(e.clientY,window.innerHeight-280)+'px';
+  labelInp.focus();
+  setTimeout(()=>document.addEventListener('click',function h(ev){if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}},100));
+}
+
+// 관계선 편집 팝업 업그레이드
+function _rmEditRelPopupV2(e, rel, d, svg, cvWrap){
+  document.querySelector('.rm-rel-popup')?.remove();
+  const pop=document.createElement('div'); pop.className='rm-rel-popup';
+  const title=document.createElement('div'); title.style.cssText='font-size:12px;font-weight:700;color:var(--tx)'; title.textContent='✏️ 관계 편집';
+
+  const labelInp=document.createElement('input'); labelInp.value=rel.label||''; labelInp.placeholder='관계 설명';
+
+  // 선 스타일
+  const styleRow=document.createElement('div'); styleRow.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
+  let selStyle=rel.lineStyle||'solid';
+  RM_LINE_STYLES.forEach(st=>{
+    const btn=document.createElement('button'); btn.className='wt-btn';
+    btn.style.cssText=`font-size:10px;padding:2px 7px;${st.id===selStyle?'background:var(--ac);color:#fff;':''}`;
+    btn.textContent=st.label;
+    btn.onclick=()=>{
+      selStyle=st.id;
+      styleRow.querySelectorAll('button').forEach(b=>{b.style.background='';b.style.color='';});
+      btn.style.background='var(--ac)'; btn.style.color='#fff';
+    };
+    styleRow.appendChild(btn);
+  });
+
+  const dirSel=document.createElement('select');
+  [['to','→ 단방향'],['both','↔ 양방향'],['none','─ 연결선만']].forEach(([v,l])=>{
+    const o=document.createElement('option');o.value=v;o.textContent=l;if(v===rel.dir)o.selected=true;dirSel.appendChild(o);
+  });
+
+  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end';
+  const delBtn=document.createElement('button'); delBtn.className='wt-btn'; delBtn.style.color='var(--rd)'; delBtn.textContent='삭제';
+  const okBtn=document.createElement('button'); okBtn.className='wt-btn'; okBtn.style.cssText='background:var(--ac);color:#fff'; okBtn.textContent='저장';
+  const cancelBtn=document.createElement('button'); cancelBtn.className='wt-btn'; cancelBtn.textContent='취소';
+  delBtn.onclick=()=>{
+    d.rels=d.rels.filter(r=>r.id!==rel.id);
+    _saveWritingData(_rmNode.id,{rels:[...d.rels]});
+    _rmDrawAllLinesV2(svg,d,cvWrap); pop.remove();
+  };
+  okBtn.onclick=()=>{
+    rel.label=labelInp.value.trim(); rel.dir=dirSel.value; rel.lineStyle=selStyle;
+    _saveWritingData(_rmNode.id,{rels:[...d.rels]});
+    _rmDrawAllLinesV2(svg,d,cvWrap); pop.remove();
+  };
+  cancelBtn.onclick=()=>pop.remove();
+  btnRow.append(delBtn,cancelBtn,okBtn);
+
+  const mkLbl=(t)=>{ const l=document.createElement('div'); l.style.cssText='font-size:10px;color:var(--tx3);margin-bottom:2px'; l.textContent=t; return l; };
+  pop.append(title, mkLbl('관계 설명'), labelInp, mkLbl('선 스타일'), styleRow, mkLbl('방향'), dirSel, btnRow);
+  document.body.appendChild(pop);
+  pop.style.left=Math.min(e.clientX,window.innerWidth-240)+'px';
+  pop.style.top=Math.min(e.clientY,window.innerHeight-240)+'px';
+  labelInp.focus();
+  setTimeout(()=>document.addEventListener('click',function h(ev){if(!pop.contains(ev.target)){pop.remove();document.removeEventListener('click',h);}},100));
+}
+
+// _rmDrawAllLines V2 (선 스타일 지원 + 범례)
+function _rmDrawAllLinesV2(svg, d, cvWrap){
+  if(!svg) return;
+  Array.from(svg.children).forEach(el=>{if(!el.id||!el.id.startsWith('rm-prev'))el.remove();});
+  (d.rels||[]).forEach(rel=>{
+    const from=d.chars.find(c=>c.id===rel.from);
+    const to=d.chars.find(c=>c.id===rel.to);
+    if(!from||!to) return;
+    _rmDrawLineSt(svg,from.x+55,from.y+60,to.x+55,to.y+60,rel,d);
+  });
+  if(cvWrap) _rmRenderLegend(cvWrap,d);
+}
+
+
+// ────────────────────────────────────
+//  5. 용어사전 (GS)
+// ────────────────────────────────────
+
+
+function renderToolsGS(node, container){
+  container.innerHTML = '';
+  const d = _gsInit(node);
+
+  // 툴바
+  const tb = document.createElement('div');
+  tb.className = 'writing-toolbar';
+  tb.setAttribute('data-type','WGS');
+  const tbTitle = document.createElement('span');
+  tbTitle.className = 'writing-toolbar-title';
+  tbTitle.textContent = '📚 용어 사전';
+  const hint = document.createElement('span');
+  hint.style.cssText = 'font-size:10px;color:var(--tx3)';
+  hint.textContent = '탭 더블클릭으로 이름 변경 • 행 우클릭으로 삭제';
+  tb.append(tbTitle, hint);
+  container.appendChild(tb);
+
+  // 본문
+  const wrap = document.createElement('div');
+  wrap.className = 'gs-container';
+
+  // 탭 바
+  const tabBar = document.createElement('div');
+  tabBar.className = 'gs-tab-bar';
+  tabBar.id = 'gs-tabbar-'+node.id;
+  _gsRenderTabs(tabBar, node, d, wrap);
+
+  // 탭 추가 버튼
+  const addTabBtn = document.createElement('button');
+  addTabBtn.className = 'gs-tab-add';
+  addTabBtn.textContent = '＋';
+  addTabBtn.title = '새 탭 추가';
+  addTabBtn.onclick = ()=>{
+    const name = '탭'+(d.tabs.length+1);
+    const newTab = {id:'tab'+Date.now(), name, rows:[]};
+    d.tabs.push(newTab);
+    d.activeTab = newTab.id;
+    _saveWritingData(node.id, {tabs:[...d.tabs], activeTab:d.activeTab});
+    renderToolsGS(node, container);
+  };
+  tabBar.appendChild(addTabBtn);
+  wrap.appendChild(tabBar);
+
+  // 본문 테이블 영역
+  const body = document.createElement('div');
+  body.className = 'gs-body';
+  body.id = 'gs-body-'+node.id;
+  _gsRenderTable(body, node, d);
+  wrap.appendChild(body);
+
+  container.appendChild(wrap);
+}
+
+
+
+// ────────────────────────────────────
+//  6. 무드보드 (MB)
+// ────────────────────────────────────
+
+function renderToolsMB(node, container){
+  container.innerHTML='';
+  _mbNode=node;
+  if(!node.data) node.data={};
+  if(!node.data.pins) node.data.pins=[];
+  _mbD=node.data;
+
+  // 툴바
+  const tb=document.createElement('div');
+  tb.className='writing-toolbar';
+  tb.setAttribute('data-type','WMB');
+  const tbTitle=document.createElement('span');
+  tbTitle.className='writing-toolbar-title';
+  tbTitle.textContent='🖼 무드보드';
+  tb.appendChild(tbTitle);
+  container.appendChild(tb);
+
+  // 서브 툴바
+  const sub=document.createElement('div');
+  sub.className='mb-toolbar-sub';
+
+  const uploadBtn=document.createElement('button');
+  uploadBtn.className='wt-btn';
+  uploadBtn.innerHTML='＋ 이미지 추가';
+  uploadBtn.onclick=()=>_mbUpload(node, board);
+
+  const clearBtn=document.createElement('button');
+  clearBtn.className='wt-btn';
+  clearBtn.style.color='var(--rd)';
+  clearBtn.textContent='🗑 전체 지우기';
+  clearBtn.onclick=()=>{
+    if(!confirm('무드보드를 모두 지우시겠습니까?')) return;
+    node.data.pins=[];
+    _saveWritingData(node.id,{pins:[]});
+    board.querySelectorAll('.mb-pin').forEach(p=>p.remove());
+  };
+
+  const hint=document.createElement('span');
+  hint.style.cssText='font-size:10px;color:var(--tx3);margin-left:auto';
+  hint.textContent='드래그로 이동 • 이미지 클릭 확대 • 캡션 직접 입력';
+
+  sub.append(uploadBtn, clearBtn, hint);
+  container.appendChild(sub);
+
+  // 보드 캔버스
+  const board=document.createElement('div');
+  board.className='mb-board';
+  board.id='mb-board-'+node.id;
+
+  // 드롭존 (파일 드래그 앤 드롭)
+  board.addEventListener('dragover',e=>{e.preventDefault();board.style.outline='2px dashed var(--ac)';});
+  board.addEventListener('dragleave',()=>{board.style.outline='';});
+  board.addEventListener('drop',e=>{
+    board.style.outline='';
+    const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
+    if(!files.length) return;
+    e.preventDefault();
+    const rect=board.getBoundingClientRect();
+    files.forEach((file,i)=>{
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        const pin={
+          id:'pin'+Date.now()+i,
+          src:ev.target.result,
+          x:Math.max(10,(e.clientX-rect.left-60)+i*20),
+          y:Math.max(10,(e.clientY-rect.top-60)+i*20),
+          w:160, caption:''
+        };
+        node.data.pins.push(pin);
+        _saveWritingData(node.id,{pins:[...node.data.pins]});
+        board.appendChild(_mbCreatePin(pin,node,board));
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // 기존 핀 렌더
+  (node.data.pins||[]).forEach(pin=>board.appendChild(_mbCreatePin(pin,node,board)));
+
+  const zoomHint=document.createElement('div');
+  zoomHint.className='mb-zoom-hint';
+  zoomHint.textContent='이미지를 클릭하면 크게 볼 수 있습니다';
+  board.appendChild(zoomHint);
+
+  // 전역 드래그 핸들러 — 누적 방지 위해 이전 것 제거 후 재등록
+  if(window._mbMoveH) document.removeEventListener('pointermove',window._mbMoveH);
+  if(window._mbUpH)   document.removeEventListener('pointerup',  window._mbUpH);
+
+  window._mbMoveH=e=>{
+    // 5px 넘으면 드래그 확정 (클릭과 구분)
+    if(window._mbPending&&!_mbDragPin){
+      if(Math.abs(e.clientX-window._mbPending.sx)>5||Math.abs(e.clientY-window._mbPending.sy)>5){
+        _mbDragPin=window._mbPending.el;
+        _mbDragOffX=window._mbPending.ox;_mbDragOffY=window._mbPending.oy;
+        _mbNode=window._mbPending.node;_mbD=window._mbPending.node.data;
+        window._mbPending=null;
+      }
+    }
+    if(!_mbDragPin)return;
+    e.preventDefault();
+    const boardEl=_mbDragPin.closest('.mb-board');
+    if(!boardEl)return;
+    const rect=boardEl.getBoundingClientRect();
+    const nx=Math.max(0,Math.min(rect.width-_mbDragPin.offsetWidth,e.clientX-rect.left-_mbDragOffX));
+    const ny=Math.max(0,Math.min(rect.height-_mbDragPin.offsetHeight,e.clientY-rect.top-_mbDragOffY));
+    _mbDragPin.style.left=nx+'px';_mbDragPin.style.top=ny+'px';
+  };
+  window._mbUpH=()=>{
+    window._mbPending=null;
+    if(!_mbDragPin)return;
+    const pin=_mbNode&&_mbD&&_mbD.pins.find(p=>p.id===_mbDragPin.dataset.id);
+    if(pin){
+      pin.x=parseFloat(_mbDragPin.style.left);pin.y=parseFloat(_mbDragPin.style.top);
+      _saveWritingData(_mbNode.id,{pins:[..._mbD.pins]});
+    }
+    _mbDragPin=null;
+  };
+  document.addEventListener('pointermove',window._mbMoveH,{passive:false});
+  document.addEventListener('pointerup',  window._mbUpH);
+
+  container.appendChild(board);
+}
+
+
+// 기존 핀들과 겹치지 않는 위치 계산
+
 
 // ────────────────────────────────────
 //  7. 타임라인 (TL)
