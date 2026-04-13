@@ -1467,9 +1467,11 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
           <button class="icobtn" onclick="writingOpenTrash()" title="휴지통" id="writing-trash-btn">🗑</button>
         </div>
       </div>
-      <div class="treewrap" id="writing-tree" style="flex:1;overflow-y:auto;min-height:0"></div>
-      <!-- 트래커 (작품 선택 시 표시) -->
-      <div id="writing-tracker-wrap" style="display:flex;flex-direction:column;flex-shrink:0"></div>
+      <div class="treewrap" id="writing-tree" style="flex:1;overflow-y:auto;min-height:80px"></div>
+      <!-- 트래커 resize 핸들 + 트래커 영역 -->
+      <div id="writing-tracker-resize" style="height:5px;cursor:ns-resize;background:var(--bdr);flex-shrink:0;transition:background .15s;display:none"
+           onmouseenter="this.style.background='var(--ac)'" onmouseleave="this.style.background='var(--bdr)'"></div>
+      <div id="writing-tracker-wrap" style="display:flex;flex-direction:column;flex-shrink:0;height:220px;min-height:60px;overflow:hidden"></div>
     </div>
 
     <!-- 우측: 에디터 영역 -->
@@ -3422,6 +3424,34 @@ function writingBuildTracker(wrap, workId){
   const w = wNodes().find(n=>n.id===workId);
   if(!w) return;
 
+  // resize 핸들 활성화 + 드래그 리사이즈
+  const resizeH = document.getElementById('writing-tracker-resize');
+  if(resizeH){
+    resizeH.style.display = 'block';
+    if(!resizeH._bound){
+      resizeH._bound = true;
+      let _drag=false, _sy=0, _sh=0;
+      resizeH.addEventListener('mousedown', e=>{
+        e.preventDefault(); _drag=true; _sy=e.clientY; _sh=wrap.offsetHeight;
+        document.body.style.cursor='ns-resize'; document.body.style.userSelect='none';
+      });
+      document.addEventListener('mousemove', e=>{
+        if(!_drag) return;
+        const dy = _sy - e.clientY; // 위로 드래그 = 커짐
+        const nh = Math.max(60, Math.min(500, _sh+dy));
+        wrap.style.height = nh+'px';
+        if(w) w._trkH = nh;
+      });
+      document.addEventListener('mouseup', ()=>{
+        if(!_drag) return; _drag=false;
+        document.body.style.cursor=''; document.body.style.userSelect='';
+        if(w){w._trkH=wrap.offsetHeight; dsave();}
+      });
+    }
+    // 저장된 높이 복원
+    if(w._trkH) wrap.style.height = w._trkH+'px';
+  }
+
   const container = document.createElement('div');
   container.className = 'wt-trk-wrap';
 
@@ -3610,6 +3640,12 @@ function writingOpenChapter(workId,chId){
   document.getElementById('writing-empty-state').style.display='none';
   document.getElementById('writing-editor-wrap').style.display='flex';
 
+  // 분할보기 ON: 우측 패널에 이 회차 자동 로드
+  if(_writingSplitMode){
+    const _w2 = wNodes().find(n=>n.id===workId);
+    _splitLoadCh(wNodes().find(n=>n.id===chId), _w2);
+  }
+
   // 타이틀 입력
   const titleInp=document.getElementById('writing-ch-title-inp');
   if(titleInp){titleInp.value=ch.title||'';titleInp.oninput=()=>{ch.title=titleInp.value;writingRenderTree();writingUpdateProgress(workId);clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);};}
@@ -3619,10 +3655,13 @@ function writingOpenChapter(workId,chId){
   if(prevBtn){prevBtn.disabled=ci<=0;prevBtn.onclick=()=>ci>0&&writingOpenChapter(workId,chs[ci-1].id);}
   if(nextBtn){nextBtn.disabled=ci>=chs.length-1;nextBtn.onclick=()=>ci<chs.length-1&&writingOpenChapter(workId,chs[ci+1].id);}
 
-  // MBEditor 초기화 (기존 것 교체)
-  const ce1=document.getElementById('writing-ce1');
-  const tb1=document.getElementById('writing-tb1');
-  if(ce1)ce1.innerHTML='';if(tb1)tb1.innerHTML='';
+  // MBEditor 초기화 — 요소 자체를 교체하여 이벤트 리스너 완전 제거
+  {
+    const _oc=document.getElementById('writing-ce1');
+    const _ot=document.getElementById('writing-tb1');
+    if(_oc){const n=document.createElement('div');n.id='writing-ce1';n.className='mbedit';n.style.cssText=_oc.style.cssText;n.spellcheck=true;_oc.parentNode.replaceChild(n,_oc);}
+    if(_ot){const n=document.createElement('div');n.id='writing-tb1';n.className='mbtb';_ot.parentNode.replaceChild(n,_ot);}
+  }
 
   _writingEditor=new MBEditor('writing-tb1','writing-ce1','이곳에 집필을 시작하세요...',html=>{
     ch.content=html;
@@ -3804,12 +3843,20 @@ function writingSplitOpenMenu(e){
     menu.appendChild(mkItem('📅', `${y}년 ${m}월 스케줄`, ()=>{ _splitLoadSched(y,m); menu.style.display='none'; }));
   });
 
-  // ── 작품도구 노드 ──
-  const toolNodes = (S.toolNodes||[]).filter(n=>['SY','WS','IM'].includes(n.type));
-  if(toolNodes.length){
-    menu.appendChild(mkGroup('🛠 작품도구'));
-    toolNodes.forEach(n=>{
-      menu.appendChild(mkItem('📋', n.name||n.type, ()=>{ _splitLoadTool(n); menu.style.display='none'; }));
+  // ── 작품도구 노드 (전체 표시, 작품별 그룹) ──
+  const allToolNodes = S.toolNodes||[];
+  if(allToolNodes.length){
+    // 작품별로 그룹화
+    const toolWorkIds = [...new Set(allToolNodes.map(n=>n.workId))];
+    const TOOL_ICONS = {SY:'📖',WS:'🌍',CS:'👤',RM:'🕸',GS:'📚',MB:'📌',TL:'📅',TRT:'🎬',IM:'💡'};
+    toolWorkIds.forEach(wid=>{
+      const wk = wNodes().find(n=>n.id===wid);
+      const wNodes2 = allToolNodes.filter(n=>n.workId===wid);
+      menu.appendChild(mkGroup('🛠 작품도구'+(wk?' - '+wk.name:'')));
+      wNodes2.forEach(n=>{
+        const icon = TOOL_ICONS[n.type]||'📋';
+        menu.appendChild(mkItem(icon, n.name||n.type, ()=>{ _splitLoadTool(n); menu.style.display='none'; }));
+      });
     });
   }
 
@@ -3877,13 +3924,46 @@ function _splitLoadSched(y, m){
 // 작품도구 노드 로드
 function _splitLoadTool(node){
   _splitSelDocType='tool'; _splitSelDocId=node.id;
-  const title = document.getElementById('writing-pane2-title');
-  if(title) title.textContent = `🛠 ${node.name}`;
+  const TOOL_LABELS = {SY:'📖 시놉시스',WS:'🌍 세계관/배경',CS:'👤 캐릭터 시트',RM:'🕸 인물 관계도',GS:'📚 용어사전',MB:'📌 무드보드',TL:'📅 타임라인',TRT:'🎬 트리트먼트',IM:'💡 아이디어 메모'};
+  const titleEl = document.getElementById('writing-pane2-title');
+  if(titleEl) titleEl.textContent = (TOOL_LABELS[node.type]||'🛠 작품도구') + ' — ' + node.name;
   const ce2 = document.getElementById('writing-ce2');
   if(!ce2) return;
   ce2.contentEditable = 'false';
-  const content = node.data?.content || node.data?.body || '';
-  ce2.innerHTML = content ? content : `<div style="color:var(--tx3);font-size:12px">${node.name} — 내용 없음</div>`;
+  const d = node.data || {};
+
+  // 타입별 콘텐츠 추출
+  let html = `<div style="padding:16px 20px;font-family:inherit">`;
+  html += `<div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--ac)">${TOOL_LABELS[node.type]||node.type}: ${node.name}</div>`;
+
+  if(node.type==='SY'){
+    const rows = [['제목',d.title],['작가',d.author],['장르',d.genre],['연령가',d.age],['분량 목표',d.targetLen],['플랫폼',d.platform],['소개',d.intro],['키워드',d.keyword],['집필 계획',d.plan]];
+    rows.forEach(([k,v])=>{ if(v) html+=`<div style="margin-bottom:8px"><b style="font-size:11px;color:var(--tx3)">${k}</b><div style="font-size:12px;color:var(--tx);white-space:pre-wrap;margin-top:2px">${v}</div></div>`; });
+  } else if(node.type==='WS'){
+    // WS는 섹션별 데이터
+    Object.entries(d).forEach(([k,v])=>{ if(k==='sections'||(typeof v!=='string')) return; if(v) html+=`<div style="margin-bottom:8px"><b style="font-size:11px;color:var(--tx3)">${k}</b><div style="font-size:12px;color:var(--tx);white-space:pre-wrap;margin-top:2px">${v}</div></div>`; });
+    if(d.sections) d.sections.forEach(sec=>{ if(sec.content) html+=`<div style="margin-bottom:8px"><b style="font-size:11px;color:var(--tx3)">${sec.title||'섹션'}</b><div style="font-size:12px;color:var(--tx);white-space:pre-wrap;margin-top:2px">${sec.content}</div></div>`; });
+  } else if(node.type==='CS'){
+    const crows=[['이름',d.name],['나이',d.age],['성별',d.gender],['직업',d.job],['외모',d.appearance],['성격',d.personality],['배경',d.background],['목표',d.goal],['요약',d.summary]];
+    crows.forEach(([k,v])=>{ if(v) html+=`<div style="margin-bottom:8px"><b style="font-size:11px;color:var(--tx3)">${k}</b><div style="font-size:12px;color:var(--tx);white-space:pre-wrap;margin-top:2px">${v}</div></div>`; });
+  } else if(node.type==='TL'){
+    (d.events||[]).forEach(ev=>{ html+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:6px;background:var(--surf2);border-radius:4px"><span style="font-size:11px;color:var(--ac);white-space:nowrap;min-width:60px">${ev.date||''}</span><div style="font-size:12px;color:var(--tx)"><b>${ev.title||''}</b>${ev.body?'<br><span style="color:var(--tx2)">'+ev.body+'</span>':''}</div></div>`; });
+    if(!(d.events||[]).length) html+='<div style="color:var(--tx3);font-size:12px">이벤트 없음</div>';
+  } else if(node.type==='IM'){
+    (d.notes||[]).forEach(note=>{ html+=`<div style="padding:8px;background:var(--yw,#ffd);border-radius:6px;margin-bottom:6px;font-size:12px;color:#333">${note.text||note.content||''}</div>`; });
+    if(d.content) html+=`<div style="font-size:12px;color:var(--tx);white-space:pre-wrap">${d.content}</div>`;
+  } else if(node.type==='TRT'){
+    const trows=[['제목',d.title],['시간대',d.time],['장소',d.place],['인물',d.characters],['내용',d.body||d.content],['메모',d.memo]];
+    trows.forEach(([k,v])=>{ if(v) html+=`<div style="margin-bottom:8px"><b style="font-size:11px;color:var(--tx3)">${k}</b><div style="font-size:12px;color:var(--tx);white-space:pre-wrap;margin-top:2px">${v}</div></div>`; });
+  } else {
+    // 범용: 문자열 필드 모두 표시
+    let hasContent=false;
+    Object.entries(d).forEach(([k,v])=>{ if(typeof v==='string'&&v.trim()){hasContent=true;html+=`<div style="margin-bottom:8px"><b style="font-size:11px;color:var(--tx3)">${k}</b><div style="font-size:12px;color:var(--tx);white-space:pre-wrap;margin-top:2px">${v}</div></div>`;} });
+    if(!hasContent) html+=`<div style="color:var(--tx3);font-size:12px">내용 없음 — 작품도구 탭에서 내용을 입력하세요</div>`;
+  }
+
+  html += '</div>';
+  ce2.innerHTML = html;
 }
 
 // ── 맞춤법 검사 ──
