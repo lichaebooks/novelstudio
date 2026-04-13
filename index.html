@@ -6919,11 +6919,16 @@ function _rmDrawAllLinesV2(svg, d, cvWrap){
     const to   = d.chars.find(c=>c.id===rel.to);
     if(!from||!to) return;
 
-    // 카드 중심점
+    // 카드 실제 중심점
     const cx1 = from.x+55, cy1 = from.y+60;
     const cx2 = to.x+55,   cy2 = to.y+60;
 
-    // 평행선 offset — 중심점에 먼저 적용 후 테두리 계산
+    // ① 실제 중심점 기준으로 테두리 교차점 계산
+    const hw=55, hh=60;
+    const [ex1,ey1] = _rmCardEdgePt(cx2,cy2, cx1,cy1, hw,hh);
+    const [ex2,ey2] = _rmCardEdgePt(cx1,cy1, cx2,cy2, hw,hh);
+
+    // ② 같은 두 카드 사이 선이 여러 개면 수직 offset 계산
     const key = [rel.from,rel.to].sort().join('__');
     const pairRels = pairMap[key];
     const idx = pairRels.indexOf(rel);
@@ -6939,14 +6944,8 @@ function _rmDrawAllLinesV2(svg, d, cvWrap){
       oy = (dx/len)  * offset;
     }
 
-    // offset 적용된 중심점으로 테두리 교차점 계산
-    const ocx1=cx1+ox, ocy1=cy1+oy;
-    const ocx2=cx2+ox, ocy2=cy2+oy;
-    const hw=55, hh=60;
-    const [x1,y1] = _rmCardEdgePt(ocx2,ocy2, ocx1,ocy1, hw,hh);
-    const [x2,y2] = _rmCardEdgePt(ocx1,ocy1, ocx2,ocy2, hw,hh);
-
-    _rmDrawLineSt(svg, x1, y1, x2, y2, rel, d);
+    // ③ 테두리 교차점에 수직 offset만 더해서 평행선 완성
+    _rmDrawLineSt(svg, ex1+ox, ey1+oy, ex2+ox, ey2+oy, rel, d);
   });
 
   if(cvWrap) _rmRenderLegend(cvWrap,d);
