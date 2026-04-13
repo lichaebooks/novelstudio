@@ -4896,6 +4896,7 @@ let _rmCvWrap = null;
 let _rmSvg = null;
 let _rmD_global = null;
 let _rmGlobalBound = false;
+let _rmRafId = null; // 드래그 중 rAF 스로틀용
 
 const RM_REL_COLORS = ['#388bfd','#3fb950','#f85149','#d29922','#bc8cff','#ff7b72','#56d364','#58a6ff'];
 
@@ -6465,7 +6466,13 @@ function _rmBindGlobalEvents(){
       _rmDragCard.x=nx; _rmDragCard.y=ny;
       const el=document.getElementById('rm-card-'+_rmDragCard.id);
       if(el){el.style.left=nx+'px';el.style.top=ny+'px';}
-      if(_rmSvg) _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
+      // rAF로 스로틀 — 프레임당 1회만 선 재렌더
+      if(_rmSvg && !_rmRafId){
+        _rmRafId = requestAnimationFrame(()=>{
+          _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
+          _rmRafId = null;
+        });
+      }
     }
     // 연결선 미리보기
     if(_rmConnecting && _rmSvg){
@@ -6477,6 +6484,9 @@ function _rmBindGlobalEvents(){
   document.addEventListener('mouseup', e=>{
     // 카드 이동 완료
     if(_rmDragCard && _rmNode){
+      // 진행 중인 rAF 취소 후 최종 위치로 한 번 확정 렌더
+      if(_rmRafId){ cancelAnimationFrame(_rmRafId); _rmRafId=null; }
+      if(_rmSvg) _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
       _saveWritingData(_rmNode.id,{chars:[..._rmD_global.chars]});
       _rmDragCard=null;
     }
