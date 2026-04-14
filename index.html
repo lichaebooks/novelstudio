@@ -3657,7 +3657,7 @@ function writingRenderTree(){
         const wcEl=document.createElement('span');wcEl.className='wt-ch-wc';wcEl.textContent=charsOf(ch)+'자';
         chItem.append(dragH,chkbox,numEl,titleEl,wcEl);
 
-        chItem.onclick=()=>writingOpenChapter(w.id,ch.id);
+        chItem.onclick=()=>writingHandleChapterClick(w.id,ch.id);
         chItem.addEventListener('contextmenu',e=>{
           e.preventDefault();
           showCtx(e,[
@@ -3936,11 +3936,8 @@ function writingOpenChapter(workId,chId){
   document.getElementById('writing-empty-state').style.display='none';
   document.getElementById('writing-editor-wrap').style.display='flex';
 
-  // 분할보기 ON: 우측 패널에 이 회차 자동 로드
-  if(_writingSplitMode){
-    const _w2 = wNodes().find(n=>n.id===workId);
-    _splitLoadCh(wNodes().find(n=>n.id===chId), _w2);
-  }
+  // 분할보기에서는 좌측 편집 문서와 우측 참조 문서를 분리한다.
+  // 따라서 좌측 회차를 열 때 우측 패널에 같은 회차를 자동 로드하지 않는다.
 
   // 타이틀 입력
   const titleInp=document.getElementById('writing-ch-title-inp');
@@ -4090,6 +4087,35 @@ function writingToggleSplit(){
   pane2.style.display = _writingSplitMode ? 'flex' : 'none';
   const btn = document.getElementById('writing-split-btn');
   if(btn) btn.textContent = _writingSplitMode ? '분할 닫기' : '분할 보기';
+
+  if(!_writingSplitMode){
+    _splitSelDocType = null;
+    _splitSelDocId = null;
+    const title = document.getElementById('writing-pane2-title');
+    if(title) title.textContent = '가져오기';
+    const ce2 = document.getElementById('writing-ce2');
+    if(ce2){
+      ce2.contentEditable = 'false';
+      ce2.innerHTML = '';
+      ce2._splitHandler && ce2.removeEventListener('input', ce2._splitHandler);
+      ce2._splitHandler = null;
+    }
+  }
+}
+
+function writingHandleChapterClick(workId, chId){
+  const work = wNodes().find(n=>n.id===workId);
+  const ch = wNodes().find(n=>n.id===chId);
+  if(!ch) return;
+
+  if(_writingSplitMode && _writingSelCh && chId !== _writingSelCh){
+    const pane2 = document.getElementById('writing-pane2');
+    if(pane2) pane2.style.display = 'flex';
+    _splitLoadCh(ch, work);
+    return;
+  }
+
+  writingOpenChapter(workId, chId);
 }
 
 // 가져오기 드롭다운 메뉴
@@ -4101,30 +4127,6 @@ function writingSplitOpenMenu(e){
   menu.innerHTML = '';
   const mkGroup = (t)=>{ const d=document.createElement('div'); d.style.cssText='padding:5px 10px;font-size:10px;font-weight:700;color:var(--tx3);border-top:1px solid var(--bdr);margin-top:2px'; d.textContent=t; return d; };
   const mkItem  = (icon, label, onclick)=>{ const d=document.createElement('div'); d.style.cssText='padding:7px 14px;font-size:12px;color:var(--tx2);cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:6px'; d.innerHTML=`<span>${icon}</span><span>${label}</span>`; d.onmouseenter=()=>d.style.background='var(--surf2)'; d.onmouseleave=()=>d.style.background=''; d.onclick=onclick; return d; };
-
-  // ── 집필 회차 (다른 작품) ──
-  const otherWorks = wWorks().filter(w=> w.id !== _writingSelWork);
-  if(otherWorks.length){
-    menu.appendChild(mkGroup('✍️ 집필 회차'));
-    otherWorks.forEach(w=>{
-      const chs = wChapters(w.id);
-      chs.forEach((ch,ci)=>{
-        menu.appendChild(mkItem('📄', `[${w.name}] ${ci+1}화 ${ch.title||''}`, ()=>{ _splitLoadCh(ch, w); menu.style.display='none'; }));
-      });
-    });
-  }
-
-  // ── 현재 작품의 다른 회차 ──
-  if(_writingSelWork){
-    const sameChs = wChapters(_writingSelWork).filter(c=>c.id!==_writingSelCh);
-    if(sameChs.length){
-      const w = wNodes().find(n=>n.id===_writingSelWork);
-      menu.appendChild(mkGroup('📖 현재 작품의 다른 회차'));
-      sameChs.forEach((ch,ci)=>{
-        menu.appendChild(mkItem('📄', `${ci+1}화 ${ch.title||'(제목 없음)'}`, ()=>{ _splitLoadCh(ch, w); menu.style.display='none'; }));
-      });
-    }
-  }
 
   // ── 스케줄 ──
   menu.appendChild(mkGroup('📅 스케줄'));
@@ -4151,6 +4153,12 @@ function writingSplitOpenMenu(e){
       });
     });
   }
+
+  menu.appendChild(mkGroup('🤖 작품분석'));
+  const analysisItem=document.createElement('div');
+  analysisItem.style.cssText='padding:7px 14px;font-size:12px;color:var(--tx3);border-radius:6px;display:flex;align-items:center;gap:6px;opacity:.75;cursor:default';
+  analysisItem.innerHTML='<span>🕒</span><span>아직 구현 전</span>';
+  menu.appendChild(analysisItem);
 
   // 위치 계산
   const btn = document.getElementById('writing-xpanel-btn');
