@@ -2041,6 +2041,9 @@ async function load(){
     S.writingNodes= data.writingNodes || [];
     S._lastWritingWork = data.lastWritingWork || null;
     S._lastWritingCh   = data.lastWritingCh   || null;
+    // 양방향 초기 동기화
+    syncWorksToWriting();
+    syncWritingToWorks();
     S.toolNodes   = data.toolNodes    || [];
     // ── 데이터 마이그레이션: 구버전 toolNodes (id 필드 없음) 처리 ──
     S.toolNodes.forEach((n,i)=>{
@@ -2673,6 +2676,44 @@ function renderSched(){
 }
 
 // 통합 작품 목록: 설정탭 S.works + 집필탭 wWorks() 합산 (중복 제거)
+
+// ── 작품 데이터 단일 소스 동기화
+// S.writingNodes(t='W') ← S.works 반영 (설정탭 → 집필탭)
+function syncWorksToWriting(){
+  if(!S.writingNodes) S.writingNodes=[];
+  (S.works||[]).forEach(sw=>{
+    const existing = S.writingNodes.find(n=>n.t==='W'&&n.id===sw.id);
+    if(!existing){
+      // 집필탭에 없으면 추가
+      const o = wWorks().reduce((m,w)=>Math.max(m,w.o),-1)+1;
+      S.writingNodes.push({id:sw.id,t:'W',name:sw.name,color:sw.color,genre:sw.genre||'',o,open:true,goal:0,logs:[]});
+    } else {
+      // 이름/색상 동기화
+      existing.name = sw.name;
+      existing.color = sw.color;
+    }
+  });
+}
+// S.works ← S.writingNodes(t='W') 반영 (집필탭 → 설정탭)
+function syncWritingToWorks(){
+  if(!S.works) S.works=[];
+  wWorks().forEach(wn=>{
+    const existing = S.works.find(sw=>sw.id===wn.id);
+    if(!existing){
+      S.works.push({id:wn.id,name:wn.name,color:wn.color,genre:wn.genre||'',platform:'',status:'writing'});
+    } else {
+      existing.name = wn.name;
+      existing.color = wn.color;
+    }
+  });
+  // 집필탭에서 삭제된 작품은 S.works에서도 제거
+  S.works = S.works.filter(sw=>wWorks().find(wn=>wn.id===sw.id));
+}
+// 전체 갱신 헬퍼
+function refreshAllTabs(){
+  renderHome(); renderSched(); renderArchive(); renderToolsTree(); writingRenderTree(); renderWorks();
+}
+
 function allWorksForTracker(){
   const fromWriting=wWorks().map(w=>({id:w.id,name:w.name,color:w.color}));
   const fromSettings=S.works.filter(w=>!fromWriting.find(x=>x.id===w.id)).map(w=>({id:w.id,name:w.name,color:w.color}));
@@ -3121,15 +3162,19 @@ function renderWorks(){
 
 function addWork(){
   S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
-  dsave();renderWorks();renderSched();renderArchive();renderHome();
-  renderToolsTree();writingRenderTree();
+  syncWorksToWriting();
+  dsave(); refreshAllTabs();
   toast('작품이 추가되었습니다.');
 }
 
 function removeWork(i){
   if(!confirm(`"${S.works[i].name}" 삭제하시겠습니까?`))return;
-  S.works.splice(i,1);dsave();renderWorks();renderSched();renderArchive();renderHome();
-  renderToolsTree();writingRenderTree();
+  const removedId = S.works[i].id;
+  S.works.splice(i,1);
+  // 집필탭 노드도 soft delete
+  const wn = S.writingNodes&&S.writingNodes.find(n=>n.id===removedId&&n.t==='W');
+  if(wn){ wn.deleted=true; wn.deletedAt=Date.now(); }
+  dsave(); refreshAllTabs();
 }
 
 // (통계는 홈 탭에서 renderHome()이 처리)
@@ -4158,12 +4203,11 @@ function writingAddWork(){
   const color=colors[S.writingNodes.filter(n=>n.t==='W').length%colors.length];
   const o=wWorks().reduce((m,w)=>Math.max(m,w.o),-1)+1;
   const work={id:uid(),t:'W',name,color,o,open:true,goal:0,logs:[]};
-  S.writingNodes.push(work);dsave();
-  writingRenderTree();
+  S.writingNodes.push(work);
+  // 설정탭 S.works에도 동기화
+  syncWritingToWorks();
+  dsave(); refreshAllTabs();
   writingShowChList(work.id);
-  renderHome();
-  // 작품도구 트리도 갱신
-  if(document.getElementById('ptools')?.classList.contains('on')) renderToolsTree();
   toast(`"${name}" 작품이 추가됐습니다.`);
 }
 
@@ -4181,7 +4225,7 @@ function writingAddChapterTo(workId){
 function writingRenameWork(workId){
   const w=wNodes().find(n=>n.id===workId);if(!w)return;
   const name=prompt('새 작품명:',w.name);if(!name)return;
-  w.name=name;dsave();writingRenderTree();renderHome();
+  w.name=name;syncWritingToWorks();dsave();refreshAllTabs();
 }
 
 function writingChangeColor(workId){
@@ -4197,7 +4241,7 @@ function writingDeleteWork(workId){
   // 해당 작품 및 회차 모두 소프트 삭제
   S.writingNodes=S.writingNodes.filter(n=>n.id!==workId&&n.workId!==workId);
   if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';}
-  dsave();writingRenderTree();renderHome();renderToolsTree();toast(`"${w.name}" 삭제됨`);
+  syncWritingToWorks();dsave();refreshAllTabs();toast(`"${w.name}" 삭제됨`);
 }
 
 function writingRenameChapter(workId,chId){
