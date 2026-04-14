@@ -2732,10 +2732,11 @@ function renderNewTracker(){
     goalInp.type = 'number'; goalInp.min = '0'; goalInp.placeholder = '자수 입력';
     goalInp.value = goals[w.id] || '';
     goalInp.addEventListener('input', () => {
-      goals[w.id] = parseInt(goalInp.value) || '';
+      goals[w.id] = goalInp.value ? parseInt(goalInp.value, 10) || 0 : '';
       dsave();
-      renderNewTracker();
     });
+    goalInp.addEventListener('change', () => renderNewTracker());
+    goalInp.addEventListener('blur', () => renderNewTracker());
     goalInp.addEventListener('keydown', e => e.stopPropagation());
     goalRow.append(goalLbl, goalInp);
     card.appendChild(goalRow);
@@ -3804,7 +3805,9 @@ function writingRenderTracker(body, workId){
   goalInp.className = 'wt-trk-goal-inp';
   goalInp.type='number'; goalInp.min='0';
   goalInp.value = w.goal||''; goalInp.placeholder='목표 자수';
-  goalInp.addEventListener('input',()=>{ w.goal=parseInt(goalInp.value)||0; dsave(); writingRenderTracker(body,workId); });
+  goalInp.addEventListener('input',()=>{ w.goal = goalInp.value ? (parseInt(goalInp.value,10) || 0) : 0; dsave(); });
+  goalInp.addEventListener('change',()=>writingRenderTracker(body,workId));
+  goalInp.addEventListener('blur',()=>writingRenderTracker(body,workId));
   goalInp.addEventListener('keydown',e=>e.stopPropagation());
   goalRow.append(goalLbl, goalInp);
   body.appendChild(goalRow);
@@ -5936,10 +5939,11 @@ function _wedRenderTracker(body, node, d){
   goalInp.placeholder = '목표 자수';
   goalInp.min = '0';
   goalInp.addEventListener('input', ()=>{
-    d.goal = parseInt(goalInp.value) || 0;
+    d.goal = goalInp.value ? (parseInt(goalInp.value, 10) || 0) : 0;
     _saveWritingData(node.id, {goal: d.goal});
-    _wedRenderTracker(body, node, d);
   });
+  goalInp.addEventListener('change', ()=>_wedRenderTracker(body, node, d));
+  goalInp.addEventListener('blur', ()=>_wedRenderTracker(body, node, d));
   goalInp.addEventListener('keydown', e=>e.stopPropagation());
   goalRow.append(goalLbl, goalInp);
   body.appendChild(goalRow);
