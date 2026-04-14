@@ -1330,6 +1330,12 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .wt-donut-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .wt-donut-legend-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx2)}
 .wt-donut-legend-pct{margin-left:auto;font-weight:700;color:var(--tx);flex-shrink:0}
+/* ── 요약 통계 바 */
+.wt-summary-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.wt-summary-cell{padding:8px 6px;text-align:center;border-right:1px solid var(--bdr2)}
+.wt-summary-cell:last-child{border-right:none}
+.wt-summary-val{font-size:12px;font-weight:800;color:var(--ac);white-space:nowrap}
+.wt-summary-lbl{font-size:9px;color:var(--tx3);margin-top:2px}
 /* ── 트래커 작품 카드 */
 .wt-trk-card{padding:10px 12px;border-bottom:1px solid var(--bdr2)}
 .wt-trk-card:last-child{border-bottom:none}
@@ -2394,6 +2400,34 @@ function getMonthTotal(y, m, workId){
   return vals.length ? Math.max(...vals) : 0;
 }
 
+// ── 글쓴 날 계산 (wc 스냅샷에서 전날 대비 증가한 날 카운트)
+function getWritingDays(y, m, workId){
+  const wc = getWcSnap(y, m);
+  const workWc = wc[workId] || {};
+  const entries = Object.entries(workWc).sort(([a],[b])=>a.localeCompare(b));
+  let days = 0;
+  for(let i = 0; i < entries.length; i++){
+    const cur = parseInt(entries[i][1]) || 0;
+    const prev = i > 0 ? (parseInt(entries[i-1][1]) || 0) : 0;
+    if(cur - prev > 0) days++;
+  }
+  return days;
+}
+// 전체 작품 합산 글쓴 날 (날짜 기준 — 어느 작품이든 쓴 날)
+function getTotalWritingDays(y, m){
+  const wc = getWcSnap(y, m);
+  const dateSet = new Set();
+  works_for_days: for(const [wid, dates] of Object.entries(wc)){
+    const entries = Object.entries(dates).sort(([a],[b])=>a.localeCompare(b));
+    for(let i = 0; i < entries.length; i++){
+      const cur = parseInt(entries[i][1]) || 0;
+      const prev = i > 0 ? (parseInt(entries[i-1][1]) || 0) : 0;
+      if(cur - prev > 0) dateSet.add(entries[i][0]);
+    }
+  }
+  return dateSet.size;
+}
+
 // ── 글자수 스냅샷 헬퍼
 function getWcSnap(y,m){
   const k=mkey(y,m);
@@ -2738,6 +2772,37 @@ function renderNewTracker(){
     });
     donutWrap.appendChild(legend);
     body.appendChild(donutWrap);
+  }
+
+  // ── 요약 통계 바 (도넛 차트 아래)
+  const grandTotal2 = allTotals.reduce((s,t)=>s+t.value, 0);
+  {
+    const wsnap = getWcSnap(y, m);
+    // 전체 글쓴 날 계산
+    const dateSet = new Set();
+    Object.entries(wsnap).forEach(([wid, dates])=>{
+      const entries = Object.entries(dates).sort(([a],[b])=>a.localeCompare(b));
+      for(let i=0; i<entries.length; i++){
+        const cur = parseInt(entries[i][1])||0;
+        const prev = i>0 ? (parseInt(entries[i-1][1])||0) : 0;
+        if(cur-prev>0) dateSet.add(entries[i][0]);
+      }
+    });
+    const writingDays = dateSet.size;
+    const avg = writingDays > 0 ? Math.round(grandTotal2 / writingDays) : 0;
+
+    const summBar = document.createElement('div');
+    summBar.className = 'wt-summary-bar';
+    const mkSumCell = (val, lbl) => {
+      const cell = document.createElement('div'); cell.className = 'wt-summary-cell';
+      const v = document.createElement('div'); v.className = 'wt-summary-val'; v.textContent = val;
+      const l = document.createElement('div'); l.className = 'wt-summary-lbl'; l.textContent = lbl;
+      cell.append(v, l); return cell;
+    };
+    summBar.appendChild(mkSumCell(grandTotal2.toLocaleString()+'자', '이번달 총'));
+    summBar.appendChild(mkSumCell(writingDays+'일', '글쓴 날'));
+    summBar.appendChild(mkSumCell(avg > 0 ? avg.toLocaleString()+'자' : '—', '일평균'));
+    body.appendChild(summBar);
   }
 
   works.forEach(w => {
