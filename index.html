@@ -2266,7 +2266,7 @@ function renderHome(){
   const hour=now.getHours();
   const greeting=hour<6?'새벽에도 집필 중이신':hour<12?'좋은 아침이에요':hour<18?'좋은 오후예요':'좋은 저녁이에요';
 
-  const totalWorks=wWorks().length;
+  const totalWorks=allWorksForTracker().length;
   const totalChapters=(S.writingNodes||[]).filter(n=>n.t==='CH'&&!n.deleted).length;
   const totalChars=(S.writingNodes||[]).filter(n=>n.t==='CH'&&!n.deleted).reduce((s,n)=>s+charsOf(n),0);
   const completedChapters=(S.writingNodes||[]).filter(n=>n.t==='CH'&&!n.deleted&&n.done).length;
@@ -2349,15 +2349,15 @@ function renderHome(){
   ${totalWorks>0?`<div>
     <div class="home-section-title">📚 작품 목록</div>
     <div class="home-recent">
-      ${wWorks().map(w=>{
+      ${allWorksForTracker().map(w=>{
         const chs=(S.writingNodes||[]).filter(n=>n.t==='CH'&&n.workId===w.id&&!n.deleted);
         const done=chs.filter(c=>c.done).length;
         const chars=chs.reduce((s,n)=>s+charsOf(n),0);
-        return`<div class="home-recent-item" onclick="switchTab('writing');setTimeout(()=>{writingShowChList('${w.id}');},50)">
+        return`<div class="home-recent-item" onclick="switchTab('writing');setTimeout(()=>writingOpenWork('${w.id}'),80)">
           <div style="width:12px;height:12px;border-radius:50%;background:${w.color||'var(--ac)'};flex-shrink:0"></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:600;color:var(--tx)">${w.name}</div>
-            <div style="font-size:10px;color:var(--tx3)">${w.genre||'장르 미설정'} · ${chs.length}회차 (완성 ${done}) · ${chars.toLocaleString()}자</div>
+            <div style="font-size:10px;color:var(--tx3)">${chs.length}회차 (완성 ${done}) · ${chars.toLocaleString()}자</div>
           </div>
           <div style="font-size:11px;color:var(--tx3)">→</div>
         </div>`;}).join('')}
@@ -3100,9 +3100,9 @@ function renderWorks(){
   S.works.forEach((w,i)=>{
     const card=document.createElement('div');card.className='work-card';
     card.innerHTML=`
-      <input type="color" value="${w.color||'#388bfd'}" style="width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;padding:0;flex-shrink:0" onchange="S.works[${i}].color=this.value;dsave();renderSched();renderArchive();renderHome()"/>
+      <input type="color" value="${w.color||'#388bfd'}" style="width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;padding:0;flex-shrink:0" onchange="S.works[${i}].color=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
       <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-        <input type="text" class="sinput" value="${w.name}" placeholder="작품명" style="max-width:none;font-weight:600" oninput="S.works[${i}].name=this.value;dsave();renderSched();renderArchive();renderHome()"/>
+        <input type="text" class="sinput" value="${w.name}" placeholder="작품명" style="max-width:none;font-weight:600" oninput="S.works[${i}].name=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <input type="text" class="sinput" value="${w.genre||''}" placeholder="장르" style="max-width:100px;font-size:11px" oninput="S.works[${i}].genre=this.value;dsave()"/>
           <input type="text" class="sinput" value="${w.platform||''}" placeholder="연재 플랫폼" style="max-width:120px;font-size:11px" oninput="S.works[${i}].platform=this.value;dsave()"/>
@@ -3122,14 +3122,14 @@ function renderWorks(){
 function addWork(){
   S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
   dsave();renderWorks();renderSched();renderArchive();renderHome();
-  renderToolsTree();
+  renderToolsTree();writingRenderTree();
   toast('작품이 추가되었습니다.');
 }
 
 function removeWork(i){
   if(!confirm(`"${S.works[i].name}" 삭제하시겠습니까?`))return;
   S.works.splice(i,1);dsave();renderWorks();renderSched();renderArchive();renderHome();
-  renderToolsTree();
+  renderToolsTree();writingRenderTree();
 }
 
 // (통계는 홈 탭에서 renderHome()이 처리)
@@ -3838,6 +3838,21 @@ function charsOf(ch){return ((ch.content||'').replace(/<[^>]*>/g,'').replace(/\s
 // ── 회차 목록 패널 ──
 function writingShowChList(workId){
   _writingSelWork=workId;
+}
+
+// 해당 작품을 집필탭에서 열고 첫 회차 자동 선택
+function writingOpenWork(workId){
+  const w = wNodes().find(n=>n.id===workId);
+  if(!w) return;
+  // 작품 펼치기
+  w.open = true; dsave();
+  _writingSelWork = workId;
+  writingRenderTree();
+  // 첫 회차 자동 선택
+  const chs = wChapters(workId);
+  if(chs.length > 0){
+    writingOpenChapter(workId, chs[0].id);
+  }
 }
 
 function writingUpdateProgress(workId){
