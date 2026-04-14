@@ -1575,7 +1575,10 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
     </div>
     <div class="schedbody">
       <div class="schedmain" id="sched-main"></div>
-      <div class="tracker" id="sched-tracker">
+      <!-- 트래커 resize 핸들 -->
+      <div id="sched-tracker-resize" style="width:5px;cursor:ew-resize;background:var(--bdr);flex-shrink:0;transition:background .15s;position:relative;z-index:10"
+           onmouseenter="this.style.background='var(--ac)'" onmouseleave="this.style.background='var(--bdr)'"></div>
+      <div class="tracker" id="sched-tracker" style="width:260px;min-width:160px;max-width:500px">
         <div class="trktitle">
           📊 작품별 진행 트래커
           <button class="icobtn" onclick="renderTracker()" title="새로고침" style="font-size:12px">🔄</button>
@@ -2051,6 +2054,7 @@ async function enterApp(){
   loadTheme();
   startClock();
   initResponsiveTabs();
+  initSchedTrackerResize();
   renderHome();
   renderSettings();
   renderSched();
@@ -2395,6 +2399,27 @@ function setCell(y,m,wi,ch,di,val){
   dsave();
 }
 
+// ── 트래커 패널 좌우 resize
+function initSchedTrackerResize(){
+  const handle = document.getElementById('sched-tracker-resize');
+  const tracker = document.getElementById('sched-tracker');
+  if(!handle || !tracker) return;
+  let _drag=false, _sx=0, _sw=0;
+  handle.addEventListener('mousedown', e=>{
+    e.preventDefault(); _drag=true; _sx=e.clientX; _sw=tracker.offsetWidth;
+    document.body.style.cursor='ew-resize'; document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!_drag) return;
+    const nw = Math.max(160, Math.min(500, _sw - (e.clientX - _sx)));
+    tracker.style.width = nw+'px';
+  });
+  document.addEventListener('mouseup', ()=>{
+    if(!_drag) return; _drag=false;
+    document.body.style.cursor=''; document.body.style.userSelect='';
+  });
+}
+
 function chMonth(d){S.sy=S.sm+d>12?(S.sy+1):(S.sm+d<1?(S.sy-1):S.sy);S.sm=S.sm+d>12?1:(S.sm+d<1?12:S.sm+d);renderSched();}
 
 // ── 마감일 칩 바 렌더
@@ -2524,13 +2549,14 @@ function renderSched(){
         } else if(ch==='송고·마감'){
           cell.contentEditable='true';
           cell.spellcheck=false;
+          cell.style.cssText='white-space:nowrap;overflow:hidden;display:flex;align-items:center;flex-wrap:nowrap';
           // 마감일 배지
           const dueDls=Object.entries(dls).filter(([wid,day])=>Number(day)===d);
           if(dueDls.length>0){
             cell.classList.add('scell-deadline-active');
-            const badge=document.createElement('div');
+            const badge=document.createElement('span');
             badge.contentEditable='false';
-            badge.style.cssText='font-size:9px;color:#ef4444;background:rgba(239,68,68,.1);border-radius:3px;padding:1px 4px;margin-bottom:2px;pointer-events:none;user-select:none;display:inline-block';
+            badge.style.cssText='font-size:9px;color:#ef4444;background:rgba(239,68,68,.1);border-radius:3px;padding:1px 4px;margin-right:3px;pointer-events:none;user-select:none;white-space:nowrap;flex-shrink:0';
             // workId → 작품명 변환
             const names=dueDls.map(([wid])=>{
               const w=(wWorks?wWorks():[]).find(x=>x.id===wid)||allWorksForTracker().find(x=>x.id===wid);
@@ -2538,7 +2564,6 @@ function renderSched(){
             }).join(' · ');
             badge.textContent=names+' 마감';
             cell.appendChild(badge);
-            cell.appendChild(document.createElement('br'));
           }
           const existing=getCell(y,m,wi,ch,di);
           if(existing) cell.appendChild(document.createTextNode(existing));
@@ -3151,8 +3176,8 @@ async function gdPull(){
   gdBar('☁️ Drive에서 불러오는 중...','ing',0);
   try{
     const f=await gdFindFile(token,GD_FNAME);if(!f){gdBar('Drive에 저장된 데이터가 없습니다.','err');return;}
-    const url=`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`;const text=await gdApiCall('GET',url,token);
-    const d=JSON.parse(text);
+    const url=`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`;const raw=await gdApiCall('GET',url,token);
+    const d=typeof raw==='string'?JSON.parse(raw):raw;
     if(!confirm('Drive 데이터를 불러옵니다. 현재 데이터를 덮어쓸까요?'))return;
     if(d.works)S.works=d.works;if(d.scheds)S.scheds=d.scheds;if(d.archives)S.archives=d.archives;
     if(d.profile)S.profile=d.profile;if(d.writingNodes)S.writingNodes=d.writingNodes;if(d.toolNodes)S.toolNodes=d.toolNodes;
