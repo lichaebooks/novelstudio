@@ -676,14 +676,14 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .mnavbtn:hover{border-color:var(--tx3);color:var(--tx)}
 .schedbody{flex:1;display:flex;overflow:hidden;min-height:0}
 .schedmain{flex:1;overflow:auto;padding:0}
-.weeksec{border-bottom:1px solid var(--bdr)}
-.wkhdr{display:grid;grid-template-columns:52px repeat(5,1fr);background:var(--surf2);border-bottom:1px solid var(--bdr)}
+.weeksec{border-bottom:1px solid var(--bdr);min-width:400px}
+.wkhdr{display:grid;grid-template-columns:68px repeat(5,1fr);background:var(--surf2);border-bottom:1px solid var(--bdr)}
 .wkhdrcell{padding:6px 8px;font-size:11px;font-weight:700;color:var(--tx3);border-right:1px solid var(--bdr);display:flex;flex-direction:column;gap:2px}
 .wkhdrcell:last-child{border-right:none}
 .wkdate{font-size:10px;font-weight:400;color:var(--tx3)}
-.crow{display:grid;grid-template-columns:52px repeat(5,1fr);border-bottom:1px solid var(--bdr2)}
+.crow{display:grid;grid-template-columns:68px repeat(5,1fr);border-bottom:1px solid var(--bdr2)}
 .crow:last-child{border-bottom:none}
-.clabel{padding:4px 8px;font-size:10px;font-weight:600;color:var(--tx3);border-right:1px solid var(--bdr);background:var(--surf);display:flex;align-items:center}
+.clabel{padding:4px 6px;font-size:10px;font-weight:600;color:var(--tx3);border-right:1px solid var(--bdr);background:var(--surf);display:flex;align-items:center;white-space:nowrap;width:68px;min-width:68px;overflow:hidden}
 .scell{padding:4px 6px;min-height:32px;font-size:11px;border-right:1px solid var(--bdr2);outline:none;color:var(--tx);background:var(--bg);line-height:1.5}
 .scell:last-child{border-right:none}
 .scell:focus{background:rgba(56,139,253,.06);box-shadow:inset 0 0 0 1.5px var(--ac);position:relative;z-index:1}
@@ -1304,14 +1304,14 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .mnavbtn:hover{border-color:var(--tx3);color:var(--tx)}
 .schedbody{flex:1;display:flex;overflow:hidden;min-height:0}
 .schedmain{flex:1;overflow:auto;padding:0}
-.weeksec{border-bottom:1px solid var(--bdr)}
-.wkhdr{display:grid;grid-template-columns:52px repeat(5,1fr);background:var(--surf2);border-bottom:1px solid var(--bdr)}
+.weeksec{border-bottom:1px solid var(--bdr);min-width:400px}
+.wkhdr{display:grid;grid-template-columns:68px repeat(5,1fr);background:var(--surf2);border-bottom:1px solid var(--bdr)}
 .wkhdrcell{padding:6px 8px;font-size:11px;font-weight:700;color:var(--tx3);border-right:1px solid var(--bdr);display:flex;flex-direction:column;gap:2px}
 .wkhdrcell:last-child{border-right:none}
 .wkdate{font-size:10px;font-weight:400;color:var(--tx3)}
-.crow{display:grid;grid-template-columns:52px repeat(5,1fr);border-bottom:1px solid var(--bdr2)}
+.crow{display:grid;grid-template-columns:68px repeat(5,1fr);border-bottom:1px solid var(--bdr2)}
 .crow:last-child{border-bottom:none}
-.clabel{padding:4px 8px;font-size:10px;font-weight:600;color:var(--tx3);border-right:1px solid var(--bdr);background:var(--surf);display:flex;align-items:center}
+.clabel{padding:4px 6px;font-size:10px;font-weight:600;color:var(--tx3);border-right:1px solid var(--bdr);background:var(--surf);display:flex;align-items:center;white-space:nowrap;width:68px;min-width:68px;overflow:hidden}
 .scell{padding:4px 6px;min-height:32px;font-size:11px;border-right:1px solid var(--bdr2);outline:none;color:var(--tx);background:var(--bg);line-height:1.5}
 .scell:last-child{border-right:none}
 .scell:focus{background:rgba(56,139,253,.06);box-shadow:inset 0 0 0 1.5px var(--ac);position:relative;z-index:1}
@@ -3181,8 +3181,10 @@ async function gdPull(){
     if(!confirm('Drive 데이터를 불러옵니다. 현재 데이터를 덮어쓸까요?'))return;
     if(d.works)S.works=d.works;if(d.scheds)S.scheds=d.scheds;if(d.archives)S.archives=d.archives;
     if(d.profile)S.profile=d.profile;if(d.writingNodes)S.writingNodes=d.writingNodes;if(d.toolNodes)S.toolNodes=d.toolNodes;
-    await save();_gdDirty=false;renderSettings();renderHome();renderSched();renderArchive();
-    gdBar('✅ Drive 데이터 불러오기 완료!','ok');toast('Drive 데이터를 불러왔습니다.');
+    await save();_gdDirty=false;
+    renderSettings();renderHome();renderSched();renderArchive();
+    initWritingTab();renderToolsTree();
+    gdBar('✅ Drive 데이터 불러오기 완료!','ok');
   }catch(e){gdBar('❌ 불러오기 실패: '+e.message,'err');}
 }
 
