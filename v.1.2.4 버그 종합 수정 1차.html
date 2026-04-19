@@ -2596,12 +2596,12 @@ function _renderHomeLeft(){
 // ── 집필 스트릭 계산
 // ── 홈 할 일 관리
 function homeTodoAdd(){
-  // 인라인 입력 폼 토글
-  const addArea=document.getElementById('hm-todo-inline-add');
-  if(addArea){
-    addArea.style.display=addArea.style.display==='none'?'flex':'none';
-    if(addArea.style.display!=='none') addArea.querySelector('.hm-todo-inp')?.focus();
-  }
+  const text=prompt('할 일을 입력하세요:','');if(!text||!text.trim())return;
+  const tags=['집필','교정','작품도구','기타'];
+  const tag=prompt('태그 선택 (집필/교정/작품도구/기타):','집필');
+  if(!S.profile.todos) S.profile.todos=[];
+  S.profile.todos.push({id:uid(),text:text.trim(),done:false,tag:tags.includes(tag)?tag:'기타',createdAt:Date.now()});
+  dsave();_renderHomeRight();
 }
 function homeTodoToggle(id){
   const t=(S.profile.todos||[]).find(x=>x.id===id);if(!t)return;
@@ -2713,44 +2713,8 @@ function _renderHomeRight(){
       item.append(chk,txt,tag,del);sec2.appendChild(item);
     });
   }
-  // 인라인 추가 폼
-  const addArea=document.createElement('div');
-  addArea.id='hm-todo-inline-add';
-  addArea.style.cssText='display:none;flex-direction:column;gap:6px;padding:8px 14px;border-top:1px solid var(--bdr2);background:var(--surf2)';
-
-  const inpRow=document.createElement('div');inpRow.style.cssText='display:flex;gap:6px;align-items:center';
-  const todoInp=document.createElement('input');todoInp.type='text';todoInp.className='hm-todo-inp';
-  todoInp.placeholder='할 일 입력...';
-  todoInp.style.cssText='flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:4px 8px;font-size:12px;color:var(--tx);outline:none;font-family:inherit';
-  todoInp.addEventListener('focus',()=>todoInp.style.borderColor='var(--ac)');
-  todoInp.addEventListener('blur',()=>todoInp.style.borderColor='var(--bdr)');
-
-  const tagSel=document.createElement('select');
-  tagSel.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:3px 5px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;flex-shrink:0';
-  ['집필','교정','작품도구','기타'].forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;tagSel.appendChild(o);});
-
-  const okBtn=document.createElement('button');okBtn.style.cssText='background:var(--ac);color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;flex-shrink:0';okBtn.textContent='추가';
-  const cancelBtn=document.createElement('button');cancelBtn.style.cssText='background:none;border:1px solid var(--bdr);border-radius:5px;padding:4px 8px;font-size:11px;color:var(--tx2);cursor:pointer;flex-shrink:0';cancelBtn.textContent='취소';
-
-  const doAdd=()=>{
-    const text=todoInp.value.trim();if(!text)return;
-    if(!S.profile.todos)S.profile.todos=[];
-    S.profile.todos.push({id:uid(),text,done:false,tag:tagSel.value,createdAt:Date.now()});
-    dsave();todoInp.value='';addArea.style.display='none';_renderHomeRight();
-  };
-  okBtn.onclick=doAdd;
-  cancelBtn.onclick=()=>{addArea.style.display='none';todoInp.value='';};
-  todoInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doAdd();}if(e.key==='Escape')cancelBtn.onclick();});
-  inpRow.append(todoInp,tagSel,okBtn,cancelBtn);
-  addArea.appendChild(inpRow);
-  sec2.appendChild(addArea);
-
   const todoAddRow=document.createElement('div');todoAddRow.className='hm-todo-add';
-  todoAddRow.innerHTML='<span>＋</span> 할 일 추가';
-  todoAddRow.onclick=()=>{
-    addArea.style.display=addArea.style.display==='none'||!addArea.style.display?'flex':'none';
-    if(addArea.style.display!=='none') todoInp.focus();
-  };
+  todoAddRow.innerHTML='<span>＋</span> 할 일 추가';todoAddRow.onclick=()=>homeTodoAdd();
   sec2.appendChild(todoAddRow);right.appendChild(sec2);
 
   // ── 다가오는 마감
@@ -4266,7 +4230,6 @@ class MBEditor{
 let _writingEditor=null;   // 현재 활성 MBEditor
 let _writingSplitMode=false;
 let _writingSelWork=null;  // 선택된 작품 id
-let _workDragId=null;      // 드래그 중인 작품 id
 let _writingSelCh=null;    // 선택된 회차 id
 let _writingSaveTimer=null;
 let _ttsUtterance=null;
@@ -4304,18 +4267,16 @@ function writingRenderTree(){
     // ── 작품 드래그앤드롭 순서 변경
     item.draggable=true;
     item.addEventListener('dragstart',e=>{
-      _workDragId=w.id;
       e.dataTransfer.setData('text/plain',w.id);
       e.dataTransfer.effectAllowed='move';
       setTimeout(()=>item.classList.add('dragging'),0);
     });
     item.addEventListener('dragend',()=>{
-      _workDragId=null;
       item.classList.remove('dragging');
       tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));
     });
     item.addEventListener('dragover',e=>{
-      const srcId=_workDragId||'';
+      const srcId=e.dataTransfer.getData('text/plain')||'';
       if(!srcId||srcId===w.id)return;
       e.preventDefault();
       tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));
@@ -4324,8 +4285,7 @@ function writingRenderTree(){
     });
     item.addEventListener('drop',e=>{
       e.preventDefault();
-      const srcId=_workDragId||e.dataTransfer.getData('text/plain');
-      _workDragId=null;
+      const srcId=e.dataTransfer.getData('text/plain');
       if(!srcId||srcId===w.id)return;
       const arr=wWorks();
       const src=arr.find(x=>x.id===srcId);
@@ -5333,18 +5293,16 @@ function renderToolsTree(){
     // ── 작품 드래그앤드롭 순서 변경
     workItem.draggable = true;
     workItem.addEventListener('dragstart', e=>{
-      _workDragId=work.id;
       e.dataTransfer.setData('text/plain', work.id);
       e.dataTransfer.effectAllowed = 'move';
       setTimeout(()=>workItem.classList.add('dragging'), 0);
     });
     workItem.addEventListener('dragend', ()=>{
-      _workDragId=null;
       workItem.classList.remove('dragging');
       tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));
     });
     workItem.addEventListener('dragover', e=>{
-      const srcId = _workDragId||'';
+      const srcId = e.dataTransfer.getData('text/plain')||'';
       if(!srcId||srcId===work.id) return;
       e.preventDefault();
       tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));
@@ -5353,8 +5311,7 @@ function renderToolsTree(){
     });
     workItem.addEventListener('drop', e=>{
       e.preventDefault();
-      const srcId = _workDragId||e.dataTransfer.getData('text/plain');
-      _workDragId=null;
+      const srcId = e.dataTransfer.getData('text/plain');
       if(!srcId||srcId===work.id) return;
       const arr = wWorks();
       const src = arr.find(x=>x.id===srcId);
@@ -6209,86 +6166,7 @@ function renderToolsCS(node, container){
   _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d);
   right.appendChild(catsWrap);
 
-  // ── 하단 통합 커스텀 항목 추가 버튼
-  const customWrap = document.createElement('div');
-  customWrap.style.cssText='padding:10px 10px 6px;border-top:1px solid var(--bdr)';
-
-  const customToggleBtn = document.createElement('button');
-  customToggleBtn.className='wt-btn';
-  customToggleBtn.style.cssText='width:100%;font-size:11px;justify-content:center';
-  customToggleBtn.textContent='＋ 커스텀 항목 추가';
-  customWrap.appendChild(customToggleBtn);
-
-  // 인라인 폼 (초기 숨김)
-  const customForm = document.createElement('div');
-  customForm.style.cssText='display:none;flex-direction:column;gap:6px;margin-top:8px';
-
-  // 탭 선택
-  const catSel = document.createElement('select');
-  catSel.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;width:100%';
-  tpl.forEach(cat=>{
-    const o=document.createElement('option'); o.value=cat.cat; o.textContent=cat.cat; catSel.appendChild(o);
-  });
-  const newCatOpt=document.createElement('option'); newCatOpt.value='__new__'; newCatOpt.textContent='＋ 새 탭 만들기'; catSel.appendChild(newCatOpt);
-
-  // 새 탭 이름 입력 (새 탭 선택 시만 표시)
-  const newCatInp = document.createElement('input');
-  newCatInp.type='text'; newCatInp.placeholder='새 탭 이름...';
-  newCatInp.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;width:100%;display:none;box-sizing:border-box';
-  catSel.addEventListener('change',()=>{
-    newCatInp.style.display=catSel.value==='__new__'?'block':'none';
-  });
-
-  // 항목 이름 입력
-  const itemInp = document.createElement('input');
-  itemInp.type='text'; itemInp.placeholder='항목 이름...';
-  itemInp.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;width:100%;box-sizing:border-box';
-  itemInp.addEventListener('focus',()=>itemInp.style.borderColor='var(--ac)');
-  itemInp.addEventListener('blur',()=>itemInp.style.borderColor='var(--bdr)');
-
-  // 버튼 행
-  const btnRow = document.createElement('div');
-  btnRow.style.cssText='display:flex;gap:6px';
-  const confirmBtn = document.createElement('button');
-  confirmBtn.className='wt-btn'; confirmBtn.style.cssText='flex:1;background:var(--ac);color:#fff;justify-content:center;font-size:11px';
-  confirmBtn.textContent='추가';
-  const cancelBtn2 = document.createElement('button');
-  cancelBtn2.className='wt-btn'; cancelBtn2.style.cssText='font-size:11px';
-  cancelBtn2.textContent='취소';
-
-  const doCustomAdd = ()=>{
-    const label=itemInp.value.trim(); if(!label) return;
-    let catName=catSel.value;
-    if(catName==='__new__'){
-      catName=newCatInp.value.trim(); if(!catName) return;
-      tpl.push({cat:catName, desc:'', items:[]});
-    }
-    const cat=tpl.find(x=>x.cat===catName);
-    if(!cat) return;
-    cat.items.push({id:'c_'+Date.now(), label, on:true, custom:true});
-    _csSaveTemplate(itemId, tpl);
-    customForm.style.display='none'; customToggleBtn.textContent='＋ 커스텀 항목 추가';
-    itemInp.value=''; newCatInp.value='';
-    _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d);
-    const left=document.getElementById('cs-left-'+node.id);
-    if(left) _csRenderActiveFields(left, node, node.data||{}, tpl);
-  };
-  confirmBtn.onclick=doCustomAdd;
-  itemInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doCustomAdd();}});
-  cancelBtn2.onclick=()=>{customForm.style.display='none'; customToggleBtn.textContent='＋ 커스텀 항목 추가';};
-  btnRow.append(confirmBtn, cancelBtn2);
-
-  customForm.append(catSel, newCatInp, itemInp, btnRow);
-  customWrap.appendChild(customForm);
-
-  customToggleBtn.onclick=()=>{
-    const isOpen=customForm.style.display!=='none';
-    customForm.style.display=isOpen?'none':'flex';
-    customToggleBtn.textContent=isOpen?'＋ 커스텀 항목 추가':'▲ 닫기';
-    if(!isOpen) itemInp.focus();
-  };
-
-  right.appendChild(customWrap);
+  // 커스텀 항목 추가는 각 카테고리 내 인라인으로 처리
 
   cs.appendChild(right);
   container.appendChild(cs);
@@ -6396,6 +6274,32 @@ function _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d){
       }
       catDiv.appendChild(row);
     });
+
+    // 카테고리 하단에 인라인 새 항목 추가 버튼
+    const addRow = document.createElement('div');
+    addRow.style.cssText='display:flex;align-items:center;gap:4px;padding:4px 0 2px';
+    const addInp = document.createElement('input');
+    addInp.type='text'; addInp.placeholder='새 항목 이름...';
+    addInp.style.cssText='flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:4px;padding:2px 6px;font-size:10px;color:var(--tx);outline:none;font-family:inherit';
+    addInp.addEventListener('focus',()=>addInp.style.borderColor='var(--ac)');
+    addInp.addEventListener('blur',()=>addInp.style.borderColor='var(--bdr)');
+    const addConfirm = document.createElement('button');
+    addConfirm.textContent='＋'; addConfirm.title='항목 추가 (Enter)';
+    addConfirm.style.cssText='background:var(--ac);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer;flex-shrink:0';
+    const doAdd = ()=>{
+      const label=addInp.value.trim();
+      if(!label) return;
+      catObj.items.push({id:'c_'+Date.now(), label, on:true, custom:true});
+      _csSaveTemplate(itemId, tpl);
+      addInp.value='';
+      _csRenderTraitPanel(catsWrap, node, container, itemId, tpl, d);
+      const left=document.getElementById('cs-left-'+node.id);
+      if(left) _csRenderActiveFields(left, node, node.data||{}, tpl);
+    };
+    addConfirm.onclick=doAdd;
+    addInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doAdd();}});
+    addRow.append(addInp, addConfirm);
+    catDiv.appendChild(addRow);
 
     catsWrap.appendChild(catDiv);
   });
