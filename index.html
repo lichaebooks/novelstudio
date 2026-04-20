@@ -3653,7 +3653,7 @@ function settlePlatformColor(p){
 function settleFmt(n){
   if(!n||n===0) return '—';
   if(n>=100000000) return (n/100000000).toFixed(1)+'억';
-  if(n>=10000) return Math.round(n/10000)+'만';
+  if(n>=100000) return (n/10000).toFixed(1)+'만';
   return n.toLocaleString()+'원';
 }
 function settleYearTotal(workId, year){
@@ -3725,51 +3725,24 @@ function renderSettleSide(){
   const y=_settleYear;
   const works=S.settle.works||[];
   list.innerHTML='';
-
   if(!works.length){
     list.innerHTML='<div style="padding:20px 12px;font-size:11px;color:var(--tx3);text-align:center;line-height:1.7">작품을 추가하면<br>여기에 목록이 나타납니다</div>';
     return;
   }
-
-  // 작품명으로 그룹핑
-  const groupMap={};
   works.forEach(wk=>{
-    const wn=wk.workName||'(이름 없음)';
-    if(!groupMap[wn]) groupMap[wn]={name:wn,open:true,items:[]};
-    groupMap[wn].items.push(wk);
-  });
-
-  Object.values(groupMap).forEach(g=>{
-    const grpDiv=document.createElement('div'); grpDiv.className='settle-work-group';
-    const lbl=document.createElement('div'); lbl.className='settle-work-label';
-    const arrow=document.createElement('span'); arrow.className='settle-work-arrow open'; arrow.textContent='▶';
-    const nm=document.createElement('span'); nm.style.cssText='flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px'; nm.textContent=g.name;
-    lbl.append(arrow,nm);
-    lbl.onclick=()=>{
-      g.open=!g.open;
-      arrow.className='settle-work-arrow'+(g.open?' open':'');
-      grpDiv.querySelectorAll('.settle-contract-item').forEach(el=>el.style.display=g.open?'':'none');
-    };
-    grpDiv.appendChild(lbl);
-
-    g.items.forEach(wk=>{
-      const item=document.createElement('div');
-      item.className='settle-contract-item'+(wk.id===_settleSelId?' sel':'');
-      const dot=document.createElement('span');
-      dot.className='settle-contract-dot';
-      dot.style.background='var(--ac)';
-      const name=document.createElement('span');
-      name.className='settle-contract-name';
-      name.textContent=wk.publisher||'출판사 미입력';
-      const total=settleYearTotal(wk.id,y);
-      const amt=document.createElement('span');
-      amt.className='settle-work-amt';
-      amt.textContent=total>0?settleFmt(total):'';
-      item.append(dot,name,amt);
-      item.onclick=()=>{ _settleSelId=wk.id; renderSettleSide(); renderSettleMain(); };
-      grpDiv.appendChild(item);
-    });
-    list.appendChild(grpDiv);
+    const item=document.createElement('div');
+    item.className='settle-contract-item'+(wk.id===_settleSelId?' sel':'');
+    item.style.paddingLeft='12px';
+    const dot=document.createElement('span');
+    dot.className='settle-contract-dot'; dot.style.background='var(--ac)';
+    const name=document.createElement('span');
+    name.className='settle-contract-name'; name.textContent=wk.workName||'(이름 없음)';
+    const total=settleYearTotal(wk.id,y);
+    const amt=document.createElement('span');
+    amt.className='settle-work-amt'; amt.textContent=total>0?settleFmt(total):'';
+    item.append(dot,name,amt);
+    item.onclick=()=>{ _settleSelId=wk.id; renderSettleSide(); renderSettleMain(); };
+    list.appendChild(item);
   });
 }
 
@@ -4080,7 +4053,7 @@ function renderSettlePlatforms(){
     const dot=document.createElement('span'); dot.style.cssText='width:8px;height:8px;border-radius:50%;background:'+settlePlatformColor(p)+';display:inline-block;margin-right:3px';
     const nm=document.createElement('span'); nm.textContent=p;
     const del=document.createElement('button'); del.className='settle-platform-del'; del.textContent='✕';
-    del.onclick=()=>{ if(!confirm('"'+p+'" 플랫폼을 삭제하시겠습니까?')) return; S.settle.platforms.splice(i,1); dsave(); renderSettlePlatforms(); };
+    del.onclick=()=>{ if(!confirm('"'+p+'" 플랫폼을 삭제하시겠습니까?')) return; S.settle.platforms.splice(i,1); dsave(); renderSettlePlatforms(); if(_settleSelId) renderSettleMain(); };
     chip.append(dot,nm,del); list.appendChild(chip);
   });
   const addBtn=document.createElement('button'); addBtn.className='settle-platform-add-btn'; addBtn.textContent='＋ 추가';
@@ -4089,8 +4062,23 @@ function renderSettlePlatforms(){
     const inp=document.createElement('input'); inp.className='settle-platform-inp'; inp.placeholder='플랫폼명';
     const finish=()=>{
       const v=inp.value.trim();
-      if(v&&!S.settle.platforms.includes(v)){ S.settle.platforms.push(v); dsave(); }
-      renderSettlePlatforms();
+      if(v&&!S.settle.platforms.includes(v)){
+        S.settle.platforms.push(v);
+        // 현재 열린 작품의 income에 새 플랫폼 행 추가
+        if(_settleSelId){
+          const wk=(S.settle.works||[]).find(w=>w.id===_settleSelId);
+          if(wk&&wk.income){
+            Object.keys(wk.income).forEach(yr=>{
+              if(!wk.income[yr][v]) wk.income[yr][v]=Array(12).fill(0);
+            });
+          }
+        }
+        dsave();
+        renderSettlePlatforms();
+        if(_settleSelId) renderSettleMain();
+      } else {
+        renderSettlePlatforms();
+      }
     };
     inp.onkeydown=e=>{ if(e.key==='Enter')finish(); if(e.key==='Escape')renderSettlePlatforms(); };
     inp.onblur=()=>setTimeout(finish,150);
@@ -4457,7 +4445,7 @@ function _makeSettleDonut(data, total, size=130){
     const ix2=cx+r*Math.cos(angle), iy2=cy+r*Math.sin(angle);
     return `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R} 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} L${ix2.toFixed(1)},${iy2.toFixed(1)} A${r},${r} 0 ${large},0 ${ix1.toFixed(1)},${iy1.toFixed(1)} Z" fill="${d.color}" opacity="0.9"/>`;
   }).join('');
-  const totalLbl = total>=10000?Math.round(total/10000)+'만':total.toLocaleString();
+  const totalLbl = settleFmt(total)!=='—'?settleFmt(total):total.toLocaleString()+'원';
   return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
   ${paths}
   <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="9" fill="var(--tx3)">총수익</text>
