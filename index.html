@@ -870,10 +870,10 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 /* ── 타임라인 ── */
 .tl-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .tl-body{flex:1;overflow-y:auto;padding:20px 28px}
-.tl-list{display:flex;flex-direction:column;gap:0;position:relative;padding-left:110px}
-.tl-list::before{content:'';position:absolute;left:82px;top:0;bottom:0;width:2px;background:var(--bdr)}
+.tl-list{display:flex;flex-direction:column;gap:0;position:relative;padding-left:32px}
+.tl-list::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:var(--bdr)}
 .tl-item{position:relative;margin-bottom:12px}
-.tl-item::before{content:'';position:absolute;left:-20px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--ac);border:2px solid var(--surf);z-index:1}
+.tl-item::before{content:'';position:absolute;left:-22px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--ac);border:2px solid var(--surf);z-index:1}
 .tl-item.dragging{opacity:.4}
 .tl-item.drag-over-top{border-top:2px solid var(--ac)}
 .tl-item.drag-over-bottom{border-bottom:2px solid var(--ac)}
@@ -1863,6 +1863,15 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
 /* 기본: 집필 모바일 토글 버튼 숨김 */
 #writing-mobile-toggle{display:none;}
+
+/* ── 섹션 접기/펼치기 */
+.ssec-body{transition:max-height .25s ease,opacity .2s;overflow:hidden;max-height:2000px;opacity:1}
+.ssec.collapsed .ssec-body{max-height:0!important;opacity:0;pointer-events:none}
+.ssec-toggle{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 4px;margin-left:auto;line-height:1;flex-shrink:0;transition:transform .2s}
+.ssec.collapsed .ssec-toggle{transform:rotate(-90deg)}
+.ssec-drag-handle{cursor:grab;color:var(--tx3);font-size:14px;margin-right:4px;flex-shrink:0}
+
+.profile-field-lbl{font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:3px}
 </style>
 </head>
 <body>
@@ -2240,15 +2249,17 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
             <div class="profile-pen" id="profile-pen-display" style="font-size:15px;font-weight:700;color:var(--tx)">필명 미설정</div>
           </div>
         </div>
-        <div class="srow"><span class="slabel">필명</span><input class="sinput" id="profile-pen" placeholder="필명" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">이메일</span><input class="sinput" id="profile-email" type="email" placeholder="비즈니스 이메일" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">주요 장르</span><input class="sinput" id="profile-genre" placeholder="예: 로맨스판타지, BL" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">SNS/블로그</span><input class="sinput" id="profile-sns" placeholder="링크 또는 아이디" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">소개</span><textarea class="sinput" id="profile-bio" placeholder="작가 소개 한 줄" rows="2" style="max-width:100%;resize:vertical" oninput="saveProfile()"></textarea></div>
-        <div class="srow"><span class="slabel">주요 플랫폼</span><input class="sinput" id="profile-platform" placeholder="예: 리디, 카카오페이지" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">데뷔일</span><input class="sinput" id="profile-debut" type="date" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">일일 목표 글자수</span><input class="sinput" id="profile-daily-goal" type="number" placeholder="예: 3000" oninput="saveProfile()"/></div>
-        <div class="srow"><span class="slabel">집필 스타일</span><input class="sinput" id="profile-style" placeholder="예: 퇴고형, 초고형" oninput="saveProfile()"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:4px">
+          <div><div class="profile-field-lbl">필명</div><input class="sinput" id="profile-pen" placeholder="필명" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">이메일</div><input class="sinput" id="profile-email" type="email" placeholder="비즈니스 이메일" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">주요 장르</div><input class="sinput" id="profile-genre" placeholder="예: 로맨스판타지, BL" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">주요 플랫폼</div><input class="sinput" id="profile-platform" placeholder="예: 리디, 카카오페이지" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">데뷔일</div><input class="sinput" id="profile-debut" type="date" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">일일 목표 글자수</div><input class="sinput" id="profile-daily-goal" type="number" placeholder="예: 3000" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">SNS/블로그</div><input class="sinput" id="profile-sns" placeholder="링크 또는 아이디" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+          <div><div class="profile-field-lbl">집필 스타일</div><input class="sinput" id="profile-style" placeholder="예: 퇴고형, 초고형" oninput="saveProfile()" style="width:100%;max-width:none"/></div>
+        </div>
+        <div><div class="profile-field-lbl">소개</div><textarea class="sinput" id="profile-bio" placeholder="작가 소개 한 줄" rows="2" style="width:100%;max-width:none;resize:vertical" oninput="saveProfile()"></textarea></div>
       </div>
 
       <!-- 작품 관리 -->
@@ -2299,9 +2310,21 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
         <!-- 커스텀 알림 -->
         <div style="margin-top:14px">
-          <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:8px">🔔 커스텀 알림 <span style="font-size:10px;font-weight:400;color:var(--tx3)">원하는 시각에 알림을 추가하세요</span></div>
+          <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:10px">🔔 커스텀 알림</div>
           <div id="custom-alarms-list"></div>
-          <button class="btn" onclick="customAlarmAdd()" style="font-size:11px;margin-top:6px">＋ 알림 추가</button>
+          <!-- 인라인 추가 폼 -->
+          <div id="custom-alarm-add-form" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:10px 12px;margin-top:8px">
+            <div style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:8px">＋ 새 알림 추가</div>
+            <div class="srow" style="margin-bottom:6px">
+              <span class="slabel">알림 이름</span>
+              <input class="sinput" id="new-alarm-label" placeholder="예: 집필 시작 시간" style="flex:1;max-width:none"/>
+            </div>
+            <div class="srow" style="margin-bottom:8px">
+              <span class="slabel">알림 시각</span>
+              <input class="sinput" id="new-alarm-time" type="time" style="max-width:120px"/>
+            </div>
+            <button class="btn btng" onclick="customAlarmAddInline()" style="font-size:11px;padding:4px 14px">추가</button>
+          </div>
         </div>
 
         <!-- 뽀모도로 강화 -->
@@ -5231,30 +5254,55 @@ function renderCustomAlarms(){
   const list=document.getElementById('custom-alarms-list'); if(!list) return;
   const alarms=_getCustomAlarms();
   list.innerHTML='';
-  if(!alarms.length){
-    list.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:4px 0">추가된 커스텀 알림 없음</div>';
-    return;
-  }
   alarms.forEach((al,i)=>{
-    const item=document.createElement('div'); item.className='custom-alarm-item';
-    const chk=document.createElement('input'); chk.type='checkbox'; chk.checked=al.on!==false;
-    chk.style.cursor='pointer'; chk.onchange=()=>{ al.on=chk.checked; dsave(); };
-    const lbl=document.createElement('div'); lbl.className='custom-alarm-lbl'; lbl.textContent=al.label||'알림';
-    const time=document.createElement('div'); time.className='custom-alarm-time'; time.textContent=al.time||'';
-    const editBtn=document.createElement('button'); editBtn.className='custom-alarm-del'; editBtn.textContent='✏️'; editBtn.title='수정';
-    editBtn.onclick=()=>customAlarmEdit(i);
-    const delBtn=document.createElement('button'); delBtn.className='custom-alarm-del'; delBtn.textContent='✕'; delBtn.title='삭제';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='margin-bottom:10px';
+    // 라벨 + 편집/삭제 버튼 행
+    const hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:6px';
+    const icon=document.createElement('span'); icon.textContent='🔔';
+    icon.style.cssText='font-size:14px';
+    const lblEl=document.createElement('div');
+    lblEl.style.cssText='font-size:12px;font-weight:600;color:var(--tx);flex:1';
+    lblEl.textContent=al.label||'알림';
+    const delBtn=document.createElement('button');
+    delBtn.style.cssText='background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:2px 5px';
+    delBtn.textContent='✕'; delBtn.title='삭제';
     delBtn.onclick=()=>{ if(!confirm('"'+al.label+'" 알림을 삭제하시겠습니까?'))return; S.profile.customAlarms.splice(i,1); dsave(); renderCustomAlarms(); };
-    item.append(chk,lbl,time,editBtn,delBtn); list.appendChild(item);
+    hdr.append(icon,lblEl,delBtn);
+    // 시각 + 사용 체크박스 행
+    const row=document.createElement('div'); row.className='srow';
+    const timeLbl=document.createElement('span'); timeLbl.className='slabel'; timeLbl.textContent='알림 시각';
+    const timeInp=document.createElement('input'); timeInp.type='time';
+    timeInp.className='sinput'; timeInp.style.maxWidth='120px';
+    timeInp.value=al.time||'';
+    timeInp.onchange=()=>{ al.time=timeInp.value; dsave(); };
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.checked=al.on!==false;
+    chk.style.cssText='cursor:pointer;margin-left:12px;width:15px;height:15px';
+    chk.onchange=()=>{ al.on=chk.checked; dsave(); };
+    const chkLbl=document.createElement('label');
+    chkLbl.style.cssText='font-size:12px;color:var(--tx2);cursor:pointer;margin-left:4px';
+    chkLbl.textContent='사용';
+    row.append(timeLbl,timeInp,chk,chkLbl);
+    wrap.append(hdr,row);
+    list.appendChild(wrap);
   });
 }
 
-function customAlarmAdd(){
-  const label=prompt('알림 이름:',''); if(!label||!label.trim()) return;
-  const time=prompt('알림 시각 (예: 22:00):',''); if(!time) return;
+function customAlarmAdd(){} // 하위호환
+function customAlarmAddInline(){
+  const labelInp=document.getElementById('new-alarm-label');
+  const timeInp=document.getElementById('new-alarm-time');
+  if(!labelInp||!timeInp) return;
+  const label=labelInp.value.trim();
+  const time=timeInp.value;
+  if(!label){labelInp.focus();toast('알림 이름을 입력하세요.',true);return;}
+  if(!time){timeInp.focus();toast('알림 시각을 선택하세요.',true);return;}
   if(!S.profile.customAlarms) S.profile.customAlarms=[];
-  S.profile.customAlarms.push({id:uid(), label:label.trim(), time, on:true});
+  S.profile.customAlarms.push({id:uid(), label, time, on:true});
   dsave(); renderCustomAlarms();
+  labelInp.value=''; timeInp.value='';
+  toast('알림이 추가됐습니다.');
 }
 
 function customAlarmEdit(i){
@@ -5754,26 +5802,68 @@ async function updateStorageInfo(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SETTINGS — RENDER ALL
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function initSectionCollapse(){
+  const container = document.getElementById('settings-body');
+  if(!container) return;
+  container.querySelectorAll('.ssec').forEach(sec=>{
+    const title = sec.querySelector('.sstitle');
+    if(!title) return;
+    // 기존 토글 버튼 중복 방지
+    if(sec.querySelector('.ssec-toggle')) return;
+    // body 래퍼 생성
+    const body = document.createElement('div');
+    body.className = 'ssec-body';
+    // sstitle 제외 나머지 자식들을 body로 이동
+    [...sec.children].forEach(ch=>{ if(ch!==title) body.appendChild(ch); });
+    sec.appendChild(body);
+    // 토글 버튼 삽입
+    const btn = document.createElement('button');
+    btn.className = 'ssec-toggle';
+    btn.title = '접기/펼치기';
+    btn.textContent = '▼';
+    title.appendChild(btn);
+    // 저장된 상태 복원
+    const sid = sec.dataset.sec||'';
+    if((S.profile.collapsedSecs||[]).includes(sid)) sec.classList.add('collapsed');
+    btn.onclick = (e)=>{
+      e.stopPropagation();
+      sec.classList.toggle('collapsed');
+      const collapsed=[...container.querySelectorAll('.ssec.collapsed')].map(s=>s.dataset.sec).filter(Boolean);
+      S.profile.collapsedSecs = collapsed;
+      dsave();
+    };
+  });
+}
 function initSettingsDrag(){
   const container = document.getElementById('settings-body');
   if(!container) return;
   let _secDragEl = null;
+  let _fromHandle = false;
+
   container.querySelectorAll('.ssec').forEach(sec=>{
     const handle = sec.querySelector('.ssec-drag-handle');
     if(!handle) return;
-    sec.draggable = true;
+    // draggable은 기본 false, handle mousedown 시만 활성화
+    sec.draggable = false;
+    handle.addEventListener('mousedown', ()=>{ sec.draggable=true; _fromHandle=true; });
+    handle.addEventListener('touchstart', ()=>{ sec.draggable=true; _fromHandle=true; }, {passive:true});
+    document.addEventListener('mouseup', ()=>{ sec.draggable=false; _fromHandle=false; });
+
     sec.addEventListener('dragstart', e=>{
-      if(!e.target.closest('.ssec-drag-handle')){ e.preventDefault(); return; }
+      if(!_fromHandle){ e.preventDefault(); return; }
       _secDragEl = sec;
       e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain','');
       setTimeout(()=>sec.classList.add('dragging'), 0);
     });
     sec.addEventListener('dragend', ()=>{
       _secDragEl = null;
+      _fromHandle = false;
+      sec.draggable = false;
       sec.classList.remove('dragging');
       container.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
-      // 순서 저장
-      const order = [...container.querySelectorAll('.ssec')].map(el=>el.dataset.sec).filter(Boolean);
+      const order=[...container.querySelectorAll('.ssec')].map(el=>el.dataset.sec).filter(Boolean);
       S.profile.settingSecOrder = order;
       dsave();
     });
@@ -5787,11 +5877,7 @@ function initSettingsDrag(){
       e.preventDefault();
       if(!_secDragEl||_secDragEl===sec) return;
       const rect = sec.getBoundingClientRect();
-      if(e.clientY < rect.top + rect.height/2){
-        container.insertBefore(_secDragEl, sec);
-      } else {
-        container.insertBefore(_secDragEl, sec.nextSibling);
-      }
+      container.insertBefore(_secDragEl, e.clientY < rect.top+rect.height/2 ? sec : sec.nextSibling);
       sec.classList.remove('drag-over');
     });
   });
@@ -5803,8 +5889,8 @@ function applySectionOrder(){
   const container = document.getElementById('settings-body');
   if(!container) return;
   order.forEach(secId=>{
-    const el = container2.querySelector(`.ssec[data-sec="${secId}"]`);
-    if(el) container2.appendChild(el);
+    const el = container.querySelector(`.ssec[data-sec="${secId}"]`);
+    if(el) container.appendChild(el);
   });
 }
 
@@ -5822,7 +5908,7 @@ function renderSettings(){
   if(pwLbl) pwLbl.textContent=pwDisabled?'비활성화됨 (비밀번호 없이 바로 입장)':'활성화됨';
   if(pwHint){pwHint.textContent=pwDisabled?'⚠ 현재 비밀번호 잠금이 꺼져 있습니다':'끄면 다음 접속 시 비밀번호 없이 바로 입장';pwHint.style.color=pwDisabled?'var(--yw)':'var(--tx3)';}
   if(pwSec) pwSec.style.opacity=pwDisabled?'0.4':'1';
-  setTimeout(()=>{ applySectionOrder(); initSettingsDrag(); pomoInit(); }, 50);
+  setTimeout(()=>{ applySectionOrder(); initSettingsDrag(); initSectionCollapse(); pomoInit(); }, 50);
   buildThemeGrid();
   loadEditorDefaults();
   renderAlarmStatus();
@@ -7152,23 +7238,36 @@ function _ttsShowPanel(){
     const text=(ch.content||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
     if(!text){toast('읽을 내용이 없습니다.',true);return;}
     _ttsSelVoice = voiceSel.value || _ttsSelVoice;
+
+    // iOS 호환: 먼저 cancel() 후 speak()
+    window.speechSynthesis.cancel();
+
     _ttsUtterance = new SpeechSynthesisUtterance(text);
     _ttsUtterance.lang = 'ko-KR';
     _ttsUtterance.rate = parseFloat(rateInp.value);
     _ttsUtterance.pitch = parseFloat(pitchInp.value);
     // 선택된 목소리 적용
     const voices = window.speechSynthesis.getVoices();
-    const selVoice = voices.find(v => v.name === _ttsSelVoice);
-    if(selVoice) _ttsUtterance.voice = selVoice;
+    if(voices.length > 0){
+      const selVoice = voices.find(v => v.name === _ttsSelVoice)
+        || voices.find(v => v.lang && v.lang.startsWith('ko'))
+        || voices[0];
+      if(selVoice) _ttsUtterance.voice = selVoice;
+    }
+    _ttsUtterance.onstart = () => { _ttsPlaying = true; };
     _ttsUtterance.onend = () => {
       _ttsPlaying=false;
       const btn=document.getElementById('writing-tts-btn');if(btn)btn.textContent='🔊 TTS';
     };
-    _ttsUtterance.onerror = () => {
+    _ttsUtterance.onerror = (e) => {
       _ttsPlaying=false;
-      toast('TTS 오류가 발생했습니다.',true);
       const btn=document.getElementById('writing-tts-btn');if(btn)btn.textContent='🔊 TTS';
+      // interrupted는 정상 중단 (사용자가 멈춤)이므로 오류 표시 안 함
+      if(e.error === 'interrupted' || e.error === 'canceled') return;
+      toast('TTS 오류: ' + (e.error||'지원하지 않는 환경일 수 있습니다.'), true);
     };
+    // iOS: paused 상태일 수 있으므로 resume 후 speak
+    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
     window.speechSynthesis.speak(_ttsUtterance);
     _ttsPlaying = true;
     const btn = document.getElementById('writing-tts-btn'); if(btn) btn.textContent='⏹ 정지';
