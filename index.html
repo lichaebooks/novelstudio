@@ -269,6 +269,10 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .settings-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:0}
 .ssec{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:18px 20px;margin-bottom:16px}
 .sstitle{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ssec.dragging{opacity:.4}
+.ssec.drag-over{box-shadow:0 -3px 0 var(--ac)}
+.ssec-drag-handle{cursor:grab;color:var(--tx3);font-size:14px;margin-right:4px;flex-shrink:0}
+.ssec-drag-handle:active{cursor:grabbing}
 .srow{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .slabel{font-size:12px;color:var(--tx2);min-width:110px;flex-shrink:0}
 .sinput{background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r);padding:6px 10px;color:var(--tx);font-size:12px;outline:none;font-family:inherit;max-width:280px;width:100%}
@@ -508,6 +512,9 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .tools-sheet-node{display:flex;align-items:center;padding:3px 6px;cursor:pointer;border-radius:var(--r);margin:0 3px 1px;gap:3px;user-select:none;transition:background .1s}
 .tools-sheet-node:hover{background:var(--surf2)}
 .tools-sheet-node.sel{background:rgba(56,139,253,.12);color:var(--ac);font-weight:600}
+.tools-sheet-node.dragging{opacity:.3}
+.tools-sheet-node.drag-over-above{box-shadow:0 -2px 0 var(--ac)}
+.tools-sheet-node.drag-over-below{box-shadow:0 2px 0 var(--ac)}
 .tools-type-badge{display:inline-block;font-size:9px;padding:1px 5px;border-radius:8px;background:var(--ac);color:#fff;margin-left:4px;vertical-align:middle;opacity:.8}
 
 /* 시놉시스 태그 */
@@ -1613,7 +1620,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .settle-grid-cell:last-child{border-right:none;background:rgba(56,139,253,.05)}
 .settle-grid-inp{width:100%;background:transparent;border:none;outline:none;font-size:11px;color:var(--tx);text-align:right;padding:4px 4px;font-family:inherit;box-sizing:border-box}
 .settle-grid-inp:focus{background:rgba(56,139,253,.07)}
-.settle-grid-total{font-size:11px;font-weight:800;color:var(--ac);text-align:right;padding:6px 6px;display:flex;align-items:center;justify-content:flex-end}
+.settle-grid-total{font-size:11px;font-weight:800;color:var(--ac);text-align:right;padding:4px 6px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:1px;line-height:1.3;overflow:hidden}
 .settle-grid-advance{font-size:10px;padding:4px 8px;border-top:1px solid var(--bdr2);color:var(--tx3);text-align:right;display:flex;justify-content:space-between;align-items:center}
 .settle-grid-advance b{color:var(--gn)}
 .settle-grid-advance.negative b{color:var(--rd)}
@@ -1647,6 +1654,49 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .settle-hbar-track{flex:1;height:14px;background:var(--surf2);border-radius:7px;overflow:hidden;position:relative}
 .settle-hbar-fill{height:100%;border-radius:7px;transition:width .4s}
 .settle-hbar-val{font-size:10px;color:var(--tx3);width:48px;flex-shrink:0;text-align:right}
+
+/* ━━━ 뽀모도로 강화 (D단계) ━━━ */
+/* 플로팅 패널 */
+#float-pomo{position:fixed;bottom:80px;right:20px;width:300px;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:8999;display:none;flex-direction:column;overflow:hidden}
+#float-pomo.open{display:flex}
+.pomo-hdr{padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:6px;cursor:move;user-select:none;flex-shrink:0}
+.pomo-hdr-title{font-size:11px;font-weight:700;color:var(--tx2);flex:1}
+.pomo-hdr button{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 5px;border-radius:3px}
+.pomo-hdr button:hover{background:var(--surf3);color:var(--tx)}
+/* 타이머 공통 */
+.pomo-body{padding:14px}
+.pomo-mode-label{text-align:center;font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.pomo-cycle-dots{display:flex;justify-content:center;gap:5px;margin-bottom:10px}
+.pomo-cycle-dot{width:9px;height:9px;border-radius:50%;background:var(--surf3)}
+.pomo-cycle-dot.done{background:var(--ac)}
+.pomo-cycle-dot.current{background:var(--ac);box-shadow:0 0 0 2px rgba(56,139,253,.3)}
+.pomo-display2{font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;padding:8px 0;letter-spacing:2px;color:var(--tx)}
+.pomo-btns{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
+.pomo-btn{border:1px solid var(--bdr);background:var(--surf2);border-radius:8px;padding:6px 16px;font-size:12px;cursor:pointer;color:var(--tx2);font-family:inherit;transition:all .15s}
+.pomo-btn:hover{border-color:var(--ac);color:var(--ac)}
+.pomo-btn.primary{background:var(--gn);border-color:var(--gn);color:#fff;font-weight:700}
+.pomo-btn.primary:hover{opacity:.88}
+.pomo-btn.primary.pause{background:var(--yw);border-color:var(--yw);color:#1a1a1a}
+.pomo-btn.stop{border-color:var(--rd);color:var(--rd)}
+.pomo-btn.stop:hover{background:rgba(248,81,73,.1)}
+/* 통계 토글 */
+.pomo-stats-toggle{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--surf2);border-radius:6px;cursor:pointer;margin-bottom:0;font-size:11px;color:var(--tx2);border:1px solid var(--bdr)}
+.pomo-stats-toggle:hover{background:var(--surf3)}
+.pomo-stats-body{padding:8px 0;display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--tx2)}
+.pomo-stats-row{display:flex;justify-content:space-between;padding:2px 0}
+.pomo-stats-row b{color:var(--ac)}
+/* 설정 내 뽀모도로 */
+.pomo-settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.pomo-setting-field{display:flex;flex-direction:column;gap:3px}
+.pomo-setting-lbl{font-size:10px;font-weight:700;color:var(--tx3)}
+.pomo-setting-inp{background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:4px 8px;font-size:12px;color:var(--tx);outline:none;font-family:inherit;width:100%;box-sizing:border-box}
+.pomo-setting-inp:focus{border-color:var(--ac)}
+/* 커스텀 알림 */
+.custom-alarm-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surf);border:1px solid var(--bdr);border-radius:7px;margin-bottom:5px}
+.custom-alarm-lbl{flex:1;font-size:12px;color:var(--tx)}
+.custom-alarm-time{font-size:11px;color:var(--ac);font-weight:700;width:50px;text-align:right;flex-shrink:0}
+.custom-alarm-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:1px 5px}
+.custom-alarm-del:hover{color:var(--rd)}
 </style>
 </head>
 <body>
@@ -1686,7 +1736,6 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
     <button class="tbtn"    id="tb-archive"  onclick="switchTab('archive')">📁 자료실</button>
     <button class="tbtn"    id="tb-tools"    onclick="switchTab('tools')">🛠 작품도구</button>
     <button class="tbtn"    id="tb-settle"   onclick="switchTab('settle')">💰 정산관리</button>
-    <button class="tbtn"    id="tb-analysis" onclick="switchTab('analysis')">🤖 작품분석</button>
     <button class="tbtn"    id="tb-settings" onclick="switchTab('settings')">⚙️ 설정</button>
   </div>
   <div class="tab-overflow-menu" id="overflow-menu"></div>
@@ -1724,6 +1773,15 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
   <div class="panel on" id="phome" style="overflow-y:auto">
     <div class="home-body" id="home-body"></div>
   </div>
+
+<!-- 뽀모도로 플로팅 패널 -->
+<div id="float-pomo">
+  <div class="pomo-hdr" id="float-pomo-hdr">
+    <span class="pomo-hdr-title">⏱ 뽀모도로</span>
+    <button onclick="toggleFloatPomo(false)" title="닫기">✕</button>
+  </div>
+  <div id="float-pomo-body" class="pomo-body"></div>
+</div>
 
   <!-- ── WRITING ── -->
   <div class="panel" id="pwriting" style="flex-direction:row">
@@ -1997,41 +2055,34 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
     </div>
   </div>
 
-  <!-- ── ANALYSIS ── -->
-  <div class="panel" id="panalysis">
-    <div class="tab-placeholder">
-      <div class="tab-placeholder-icon">🤖</div>
-      <div class="tab-placeholder-title">작품분석 탭</div>
-      <div class="tab-placeholder-desc">8단계에서 구현됩니다.<br>AI API 연동 · 작품/회차 선택 → 분석</div>
-      <div class="tab-placeholder-badge">8단계</div>
-    </div>
-  </div>
-
   <!-- ── SETTINGS ── -->
   <div class="panel" id="psettings">
     <div class="settings-body" id="settings-body">
 
       <!-- 작가 프로필 -->
-      <div class="ssec">
-        <div class="sstitle">👤 작가 프로필</div>
+      <div class="ssec" data-sec="works">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 👤 작가 프로필</div>
         <div class="profile-card">
           <div class="profile-avatar" id="profile-avatar" onclick="profileUploadAvatar()" title="클릭하여 이미지 변경">✍️</div>
           <div class="profile-info">
-            <div class="profile-name" id="profile-name-display">이름 미설정</div>
-            <div class="profile-pen" id="profile-pen-display">필명 미설정</div>
+            <div class="profile-name" id="profile-name-display" style="display:none"></div>
+            <div class="profile-pen" id="profile-pen-display" style="font-size:15px;font-weight:700;color:var(--tx)">필명 미설정</div>
           </div>
         </div>
-        <div class="srow"><span class="slabel">이름</span><input class="sinput" id="profile-name" placeholder="본명" oninput="saveProfile()"/></div>
         <div class="srow"><span class="slabel">필명</span><input class="sinput" id="profile-pen" placeholder="필명" oninput="saveProfile()"/></div>
         <div class="srow"><span class="slabel">이메일</span><input class="sinput" id="profile-email" type="email" placeholder="비즈니스 이메일" oninput="saveProfile()"/></div>
         <div class="srow"><span class="slabel">주요 장르</span><input class="sinput" id="profile-genre" placeholder="예: 로맨스판타지, BL" oninput="saveProfile()"/></div>
         <div class="srow"><span class="slabel">SNS/블로그</span><input class="sinput" id="profile-sns" placeholder="링크 또는 아이디" oninput="saveProfile()"/></div>
         <div class="srow"><span class="slabel">소개</span><textarea class="sinput" id="profile-bio" placeholder="작가 소개 한 줄" rows="2" style="max-width:100%;resize:vertical" oninput="saveProfile()"></textarea></div>
+        <div class="srow"><span class="slabel">주요 플랫폼</span><input class="sinput" id="profile-platform" placeholder="예: 리디, 카카오페이지" oninput="saveProfile()"/></div>
+        <div class="srow"><span class="slabel">데뷔일</span><input class="sinput" id="profile-debut" type="date" oninput="saveProfile()"/></div>
+        <div class="srow"><span class="slabel">일일 목표 글자수</span><input class="sinput" id="profile-daily-goal" type="number" placeholder="예: 3000" oninput="saveProfile()"/></div>
+        <div class="srow"><span class="slabel">집필 스타일</span><input class="sinput" id="profile-style" placeholder="예: 퇴고형, 초고형" oninput="saveProfile()"/></div>
       </div>
 
       <!-- 작품 관리 -->
-      <div class="ssec">
-        <div class="sstitle">📚 작품 관리 <span style="font-size:11px;color:var(--tx3);font-weight:400">(스케줄 트래커 · 자료실 자동 연동)</span></div>
+      <div class="ssec" data-sec="alarm">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 📚 작품 관리 <span style="font-size:11px;color:var(--tx3);font-weight:400">(스케줄 트래커 · 자료실 자동 연동)</span></div>
         <div style="font-size:11px;color:var(--tx3);background:var(--surf2);padding:8px 12px;border-radius:6px;border-left:3px solid var(--ac);margin-bottom:10px;line-height:1.7">
           💡 여기서 추가/삭제한 작품은 <b>스케줄 탭 트래커</b>와 <b>자료실 탭</b>에 자동 반영됩니다.
         </div>
@@ -2040,8 +2091,8 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 알림 설정/뽀모도로 -->
-      <div class="ssec">
-        <div class="sstitle">🔔 알림 설정/뽀모도로</div>
+      <div class="ssec" data-sec="profile">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 🔔 알림 설정/뽀모도로</div>
 
         <!-- 알림 권한 -->
         <div style="background:var(--surf2);border-radius:8px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--bdr)">
@@ -2075,31 +2126,30 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
           </div>
         </div>
 
-        <!-- 뽀모도로 -->
-        <div style="background:var(--surf2);border-radius:8px;border:1px solid var(--bdr);padding:16px">
-          <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:12px">⏱ 뽀모도로 타이머</div>
-          <div class="pomo-display" id="pomo-display">00:25:00</div>
-          <div class="pomo-presets">
-            <button class="pomo-preset active" onclick="pomoSet(25,this)">25분</button>
-            <button class="pomo-preset" onclick="pomoSet(30,this)">30분</button>
-            <button class="pomo-preset" onclick="pomoSet(45,this)">45분</button>
-            <button class="pomo-preset" onclick="pomoSet(60,this)">60분</button>
-            <button class="pomo-preset" onclick="pomoSet(90,this)">90분</button>
-            <button class="pomo-preset" onclick="pomoSet(120,this)">120분</button>
-          </div>
-          <button class="pomo-start" id="pomo-start-btn" onclick="pomoToggle()">▶ 시작하기</button>
+        <!-- 커스텀 알림 -->
+        <div style="margin-top:14px">
+          <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:8px">🔔 커스텀 알림 <span style="font-size:10px;font-weight:400;color:var(--tx3)">원하는 시각에 알림을 추가하세요</span></div>
+          <div id="custom-alarms-list"></div>
+          <button class="btn" onclick="customAlarmAdd()" style="font-size:11px;margin-top:6px">＋ 알림 추가</button>
+        </div>
+
+        <!-- 뽀모도로 강화 -->
+        <div style="background:var(--surf2);border-radius:8px;border:1px solid var(--bdr);padding:14px;margin-top:14px">
+          <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:10px">⏱ 뽀모도로 <span style="font-size:10px;color:var(--tx3);font-weight:400">(Ctrl+P로 플로팅 호출)</span></div>
+          <!-- 타이머 표시 영역 (플로팅과 공용 함수 사용) -->
+          <div id="pomo-settings-widget"></div>
         </div>
       </div>
 
       <!-- 테마 -->
-      <div class="ssec">
-        <div class="sstitle">🎨 테마</div>
+      <div class="ssec" data-sec="theme">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 🎨 테마</div>
         <div class="theme-grid" id="theme-grid"></div>
       </div>
 
       <!-- Google Drive -->
-      <div class="ssec">
-        <div class="sstitle">☁️ Google Drive 동기화</div>
+      <div class="ssec" data-sec="gdrive">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> ☁️ Google Drive 동기화</div>
         <div id="gd-status-bar" style="padding:10px 12px;border-radius:6px;border:1px solid var(--bdr);background:var(--surf2);margin-bottom:14px;font-size:12px;color:var(--tx3)">🔄 상태 확인 중...</div>
         <div style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.8;background:var(--surf2);padding:12px;border-radius:6px;border-left:3px solid var(--ac)">
           <b>최초 1회 설정:</b><br/>
@@ -2126,7 +2176,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
       <!-- 로컬 백업 -->
       <div class="ssec">
-        <div class="sstitle">📦 로컬 백업 / 초기화</div>
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 📦 로컬 백업 / 초기화</div>
         <div style="margin-bottom:12px">
           <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:8px">저장 공간 현황 <button class="btn btng" onclick="updateStorageInfo()" style="font-size:11px;padding:3px 8px;margin-left:8px">새로고침</button></div>
           <div id="storage-info" style="background:var(--surf2);border-radius:6px;padding:10px;border:1px solid var(--bdr);font-size:11px;color:var(--tx3)">로딩 중...</div>
@@ -2148,7 +2198,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 에디터 기본 설정 -->
-      <div class="ssec">
+      <div class="ssec" data-sec="shortcut">
         <div class="sstitle">✏️ 에디터 기본 설정</div>
         <div class="srow">
           <span class="slabel">기본 글꼴</span>
@@ -2186,6 +2236,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;font-size:12px">
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+K</code><span style="color:var(--tx2)">전체 검색</span></div>
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+M</code><span style="color:var(--tx2)">플로팅 메모</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+P</code><span style="color:var(--tx2)">플로팅 뽀모도로</span></div>
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+S</code><span style="color:var(--tx2)">Drive 저장</span></div>
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+B</code><span style="color:var(--tx2)">굵게</span></div>
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+I</code><span style="color:var(--tx2)">기울임</span></div>
@@ -2355,6 +2406,10 @@ async function load(){
     S.profile     = data.profile      || {};
     // 홈화면 신규 데이터 초기화
     if(!S.profile.activityLog) S.profile.activityLog = [];
+    if(!S.profile.settingSecOrder) S.profile.settingSecOrder = [];
+    if(!S.profile.pomoSettings) S.profile.pomoSettings = {};
+    if(!S.profile.pomoStats) S.profile.pomoStats = {};
+    if(!S.profile.customAlarms) S.profile.customAlarms = [];
     if(!S.profile.todos)       S.profile.todos = [];
     if(S.profile.homeMemo === undefined) S.profile.homeMemo = '';
     S.writingNodes= data.writingNodes || [];
@@ -2455,9 +2510,9 @@ async function changePw(){
 const TAB_PANELS={
   home:'phome',writing:'pwriting',schedule:'pschedule',
   archive:'parchive',tools:'ptools',settle:'psettle',
-  analysis:'panalysis',settings:'psettings',
+  settings:'psettings',
 };
-const TAB_ORDER=['home','writing','schedule','archive','tools','settle','analysis','settings'];
+const TAB_ORDER=['home','writing','schedule','archive','tools','settle','settings'];
 
 function switchTab(t){
   S.curTab=t;
@@ -2649,6 +2704,15 @@ function renderHome(){
     </div>
     <div class="hm-quick-btn" onclick="switchTab('archive')">
       <span class="hm-quick-btn-icon">📁</span>자료실
+    </div>
+    <div class="hm-quick-btn" onclick="switchTab('tools')">
+      <span class="hm-quick-btn-icon">🛠️</span>작품도구
+    </div>
+    <div class="hm-quick-btn" onclick="switchTab('settle')">
+      <span class="hm-quick-btn-icon">💰</span>정산관리
+    </div>
+    <div class="hm-quick-btn" onclick="switchTab('settings')">
+      <span class="hm-quick-btn-icon">⚙️</span>설정
     </div>
   </div>
 
@@ -3668,8 +3732,14 @@ function settleYearTotal(workId, year){
       total=yd.reduce((s,v)=>s+(parseInt(v)||0),0);
     }
   }
-  // 선인세도 수익 — 연간 합계에 포함
-  total += parseInt(wk.advance)||0;
+  // 선인세: 수령 연도와 일치할 때만 합산
+  const advYear = wk.advanceYear || null;
+  // advanceYear 미설정이면 현재 연도에 포함, 설정됐으면 해당 연도에만 포함
+  const _advAmt = parseInt(wk.advance)||0;
+  if(_advAmt > 0){
+    const _advYr = parseInt(wk.advanceYear)||0;
+    if(!_advYr || _advYr === parseInt(year)) total += _advAmt;
+  }
   return total;
 }
 // 특정 연도 특정 월의 작품 전 플랫폼 합계
@@ -3773,7 +3843,6 @@ function renderSettleMain(){
   const fields=[
     {key:'publisher',label:'출판사',type:'text',ph:'출판사명'},
     {key:'settleDay',label:'정산일',type:'text',ph:'예: 14일, 말일'},
-    {key:'advance',label:'선인세 (원)',type:'number',ph:'0'},
     {key:'memo',label:'메모',type:'text',ph:'기타 메모'},
   ];
   const fieldGrid=document.createElement('div'); fieldGrid.className='settle-info-fields';
@@ -3784,9 +3853,31 @@ function renderSettleMain(){
     el.className='settle-field-inp'; el.placeholder=f.ph||'';
     el.value=wk[f.key]||'';
     let _t;
-    el.oninput=()=>{ wk[f.key]=(f.type==='number'?parseInt(el.value)||0:el.value); clearTimeout(_t); _t=setTimeout(()=>{ dsave(); renderSettleSide(); renderSettleTopbar(); },600); };
+    el.oninput=()=>{ wk[f.key]=el.value; clearTimeout(_t); _t=setTimeout(()=>{ dsave(); renderSettleSide(); renderSettleTopbar(); },600); };
     wrap.append(lbl,el); fieldGrid.appendChild(wrap);
   });
+
+  // 선인세 + 수령 연도 — 한 줄에 나란히
+  const advRow2=document.createElement('div'); advRow2.style.cssText='display:flex;gap:10px;align-items:flex-end';
+  // 선인세 금액
+  const advWrap=document.createElement('div'); advWrap.className='settle-field'; advWrap.style.flex='1';
+  const advLbl=document.createElement('div'); advLbl.className='settle-field-lbl'; advLbl.textContent='선인세 (원)';
+  const advInp=document.createElement('input'); advInp.type='number'; advInp.className='settle-field-inp';
+  advInp.placeholder='0'; advInp.value=wk.advance||0;
+  let _advT;
+  advInp.oninput=()=>{ wk.advance=parseInt(advInp.value)||0; clearTimeout(_advT); _advT=setTimeout(()=>{ dsave(); renderSettleSide(); renderSettleTopbar(); renderSettleMain(); },600); };
+  advWrap.append(advLbl,advInp);
+  // 수령 연도
+  const yrWrap=document.createElement('div'); yrWrap.className='settle-field'; yrWrap.style.flex='1';
+  const yrLbl=document.createElement('div'); yrLbl.className='settle-field-lbl'; yrLbl.textContent='선인세 수령 연도';
+  const yrInp=document.createElement('input'); yrInp.type='number'; yrInp.className='settle-field-inp';
+  yrInp.placeholder='예: 2024'; yrInp.min='2000'; yrInp.max='2099';
+  yrInp.value=wk.advanceYear||'';
+  let _yrT;
+  yrInp.oninput=()=>{ wk.advanceYear=parseInt(yrInp.value)||0; clearTimeout(_yrT); _yrT=setTimeout(()=>{ dsave(); renderSettleSide(); renderSettleTopbar(); renderSettleMain(); },600); };
+  yrWrap.append(yrLbl,yrInp);
+  advRow2.append(advWrap,yrWrap);
+  fieldGrid.appendChild(advRow2);
   card.appendChild(fieldGrid);
   main.appendChild(card);
 
@@ -3948,17 +4039,20 @@ function _renderSettleGrid(wrap,wk,year){
     advLbl.innerHTML='<span style="font-size:11px">💰</span>선인세';
     advRow.appendChild(advLbl);
     // 선인세는 1월 칸에 표시 (실제 수령 시점 기록용)
-    months.forEach((_,mi)=>{
-      const cell=document.createElement('div'); cell.className='settle-grid-cell';
-      if(mi===0){
-        const el=document.createElement('div');
-        el.style.cssText='text-align:right;padding:6px 4px;font-size:11px;font-weight:700;color:var(--ac)';
-        el.textContent=adv2.toLocaleString();
-        el.title='선인세 (수익에 합산됨)';
-        cell.appendChild(el);
-      }
-      advRow.appendChild(cell);
-    });
+    // 선인세 행 — 12칸 병합, 수령연도 표시 (편집은 info card에서)
+    const advMergeCell=document.createElement('div');
+    advMergeCell.style.cssText='grid-column:2 / span 12;display:flex;align-items:center;padding:4px 10px;gap:8px;border-right:1px solid var(--bdr2);border-top:1px solid var(--bdr2)';
+    const advYrBadge=document.createElement('span');
+    advYrBadge.style.cssText='font-size:10px;color:var(--tx3);background:var(--surf2);padding:1px 6px;border-radius:4px';
+    const yrVal=parseInt(wk.advanceYear)||0;
+    advYrBadge.textContent=yrVal ? yrVal+'년 수령' : '수령연도 미입력';
+    const advAmtLbl=document.createElement('span');
+    advAmtLbl.style.cssText='font-size:11px;font-weight:700;color:var(--ac);margin-left:auto';
+    advAmtLbl.textContent=adv2.toLocaleString()+'원';
+    advMergeCell.append(advYrBadge,advAmtLbl);
+    advRow.style.display='grid';
+    advRow.style.gridTemplateColumns='80px 1fr 80px';
+    advRow.appendChild(advMergeCell);
     const advTotal=document.createElement('div'); advTotal.className='settle-grid-cell';
     const advTotalEl=document.createElement('div'); advTotalEl.className='settle-grid-total';
     advTotalEl.style.color='var(--ac)';
@@ -4736,18 +4830,23 @@ async function archiveRmFile(id){
 //  SETTINGS — PROFILE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function saveProfile(){
-  S.profile.name=document.getElementById('profile-name')?.value||'';
   S.profile.pen=document.getElementById('profile-pen')?.value||'';
   S.profile.email=document.getElementById('profile-email')?.value||'';
   S.profile.genre=document.getElementById('profile-genre')?.value||'';
   S.profile.sns=document.getElementById('profile-sns')?.value||'';
   S.profile.bio=document.getElementById('profile-bio')?.value||'';
+  S.profile.platform=document.getElementById('profile-platform')?.value||'';
+  S.profile.debut=document.getElementById('profile-debut')?.value||'';
+  S.profile.dailyGoal=parseInt(document.getElementById('profile-daily-goal')?.value)||0;
+  S.profile.style=document.getElementById('profile-style')?.value||'';
   dsave();
   // Update display
   const nd=document.getElementById('profile-name-display');
   const pd=document.getElementById('profile-pen-display');
-  if(nd)nd.textContent=S.profile.name||'이름 미설정';
+  if(nd)nd.textContent='';
   if(pd)pd.textContent=S.profile.pen?`✍️ ${S.profile.pen}`:'필명 미설정';
+  const dg=document.getElementById('profile-daily-goal');
+  if(dg)dg.value=S.profile.dailyGoal||'';
 }
 
 function profileUploadAvatar(){
@@ -4763,15 +4862,17 @@ function profileUploadAvatar(){
 }
 
 function loadProfile(){
-  const fields=['name','pen','email','genre','sns','bio'];
+  const fields=['pen','email','genre','sns','bio','platform','debut','style'];
   fields.forEach(k=>{
     const el=document.getElementById('profile-'+k);
     if(el)el.value=S.profile[k]||'';
   });
   const nd=document.getElementById('profile-name-display');
   const pd=document.getElementById('profile-pen-display');
-  if(nd)nd.textContent=S.profile.name||'이름 미설정';
+  if(nd)nd.textContent='';
   if(pd)pd.textContent=S.profile.pen?`✍️ ${S.profile.pen}`:'필명 미설정';
+  const dg=document.getElementById('profile-daily-goal');
+  if(dg)dg.value=S.profile.dailyGoal||'';
   const av=document.getElementById('profile-avatar');
   if(av&&S.profile.avatar)av.innerHTML=`<img src="${S.profile.avatar}"/>`;
 }
@@ -4879,7 +4980,61 @@ function sendNotification(title,body){
   }
 }
 
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  커스텀 알림
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function _getCustomAlarms(){ return S.profile.customAlarms||[]; }
+
+function renderCustomAlarms(){
+  const list=document.getElementById('custom-alarms-list'); if(!list) return;
+  const alarms=_getCustomAlarms();
+  list.innerHTML='';
+  if(!alarms.length){
+    list.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:4px 0">추가된 커스텀 알림 없음</div>';
+    return;
+  }
+  alarms.forEach((al,i)=>{
+    const item=document.createElement('div'); item.className='custom-alarm-item';
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.checked=al.on!==false;
+    chk.style.cursor='pointer'; chk.onchange=()=>{ al.on=chk.checked; dsave(); };
+    const lbl=document.createElement('div'); lbl.className='custom-alarm-lbl'; lbl.textContent=al.label||'알림';
+    const time=document.createElement('div'); time.className='custom-alarm-time'; time.textContent=al.time||'';
+    const editBtn=document.createElement('button'); editBtn.className='custom-alarm-del'; editBtn.textContent='✏️'; editBtn.title='수정';
+    editBtn.onclick=()=>customAlarmEdit(i);
+    const delBtn=document.createElement('button'); delBtn.className='custom-alarm-del'; delBtn.textContent='✕'; delBtn.title='삭제';
+    delBtn.onclick=()=>{ if(!confirm('"'+al.label+'" 알림을 삭제하시겠습니까?'))return; S.profile.customAlarms.splice(i,1); dsave(); renderCustomAlarms(); };
+    item.append(chk,lbl,time,editBtn,delBtn); list.appendChild(item);
+  });
+}
+
+function customAlarmAdd(){
+  const label=prompt('알림 이름:',''); if(!label||!label.trim()) return;
+  const time=prompt('알림 시각 (예: 22:00):',''); if(!time) return;
+  if(!S.profile.customAlarms) S.profile.customAlarms=[];
+  S.profile.customAlarms.push({id:uid(), label:label.trim(), time, on:true});
+  dsave(); renderCustomAlarms();
+}
+
+function customAlarmEdit(i){
+  const al=_getCustomAlarms()[i]; if(!al) return;
+  const label=prompt('알림 이름:', al.label); if(label===null) return;
+  const time=prompt('알림 시각:', al.time); if(time===null) return;
+  al.label=label.trim()||al.label; al.time=time;
+  dsave(); renderCustomAlarms();
+}
+
+// 커스텀 알림 체크 (checkAlarms에 연동)
+function checkCustomAlarms(){
+  const now=new Date();
+  const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  _getCustomAlarms().filter(al=>al.on!==false&&al.time===hm).forEach(al=>{
+    sendNotification('🔔 '+al.label, al.time+' 알림');
+  });
+}
+
 function checkAlarms(){
+  checkCustomAlarms();
   if(!_alarmCfg.serial?.on)return;
   const now=new Date();
   const today=now.toISOString().slice(0,10);
@@ -4894,47 +5049,333 @@ function checkAlarms(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  POMODORO
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let _pomoMin=25, _pomoSec=0, _pomoTotal=25*60, _pomoRemain=25*60, _pomoTimer=null, _pomoRunning=false;
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  뽀모도로 강화 (D단계)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-function pomoSet(min,btn){
-  if(_pomoRunning)return;
-  _pomoMin=min;_pomoTotal=min*60;_pomoRemain=min*60;
-  document.querySelectorAll('.pomo-preset').forEach(b=>b.classList.remove('active'));
-  btn?.classList.add('active');
-  pomoDisplay();
+// 상태
+const POMO = {
+  // 설정
+  focusMin: 25, shortMin: 5, longMin: 15, longAfter: 4,
+  sound: 'bell',
+  // 런타임
+  mode: 'focus', // focus | short | long
+  cycle: 0,      // 현재 몇 번째 집중 (0-based)
+  remain: 0,
+  total: 0,
+  running: false,
+  timer: null,
+  // 통계
+  todaySessions: 0,
+  todayMin: 0,
+  todayDate: '',
+  weekData: [], // [{date,sessions,min}]
+};
+
+function _pomoLoadSettings(){
+  const s = S.profile.pomoSettings||{};
+  POMO.focusMin  = s.focusMin  || 25;
+  POMO.shortMin  = s.shortMin  || 5;
+  POMO.longMin   = s.longMin   || 15;
+  POMO.longAfter = s.longAfter || 4;
+  POMO.sound     = s.sound     || 'bell';
+}
+function _pomoSaveSettings(){
+  S.profile.pomoSettings = {
+    focusMin: POMO.focusMin, shortMin: POMO.shortMin,
+    longMin: POMO.longMin, longAfter: POMO.longAfter, sound: POMO.sound
+  };
+  dsave();
+}
+function _pomoLoadStats(){
+  const today = new Date().toLocaleDateString('ko-KR');
+  const st = S.profile.pomoStats||{};
+  if(st.date === today){
+    POMO.todaySessions = st.sessions||0;
+    POMO.todayMin      = st.min||0;
+  } else {
+    POMO.todaySessions = 0; POMO.todayMin = 0;
+  }
+  POMO.todayDate = today;
+  POMO.weekData = st.weekData||[];
+}
+function _pomoSaveStats(){
+  if(!S.profile.pomoStats) S.profile.pomoStats={};
+  S.profile.pomoStats.date     = POMO.todayDate;
+  S.profile.pomoStats.sessions = POMO.todaySessions;
+  S.profile.pomoStats.min      = POMO.todayMin;
+  S.profile.pomoStats.weekData = POMO.weekData;
+  dsave();
 }
 
-function pomoDisplay(){
-  const h=Math.floor(_pomoRemain/3600);
-  const m=Math.floor((_pomoRemain%3600)/60);
-  const s=_pomoRemain%60;
-  const el=document.getElementById('pomo-display');
-  if(el)el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+// 뽀모도로 주간 바 차트 SVG
+function _pomoWeekChart(){
+  // 오늘 포함 최근 7일 데이터 구성
+  const today = new Date();
+  const days = Array.from({length:7},(_,i)=>{
+    const d = new Date(today); d.setDate(today.getDate()-6+i);
+    return d.toLocaleDateString('ko-KR');
+  });
+  const weekMap = {};
+  (POMO.weekData||[]).forEach(d=>{ weekMap[d.date]=d.min||0; });
+  // 오늘 통계 합산
+  weekMap[POMO.todayDate] = (weekMap[POMO.todayDate]||0) + POMO.todayMin;
+  const vals = days.map(d=>weekMap[d]||0);
+  const maxV = Math.max(...vals, 1);
+  const W=240, H=60, pad={l:4,r:4,t:8,b:16};
+  const bw = Math.floor((W-pad.l-pad.r)/7)-3;
+  const dayLabels = ['일','월','화','수','목','금','토'];
+  const bars = vals.map((v,i)=>{
+    const x = pad.l + i*((W-pad.l-pad.r)/7);
+    const bh = Math.max(2, Math.round((v/maxV)*(H-pad.t-pad.b)));
+    const by = H-pad.b-bh;
+    const isToday = days[i]===POMO.todayDate;
+    const col = isToday ? 'var(--ac)' : 'var(--bdr2)';
+    const dow = new Date(today);
+    dow.setDate(today.getDate()-6+i);
+    const dl = dayLabels[dow.getDay()];
+    return `<rect x="${x+1}" y="${by}" width="${bw}" height="${bh}" rx="2" fill="${col}" opacity="${isToday?'1':'0.7'}"/>
+<text x="${x+1+bw/2}" y="${H-2}" text-anchor="middle" font-size="8" fill="${isToday?'var(--ac)':'var(--tx3)'}" font-weight="${isToday?'700':'400'}">${dl}</text>
+${v>0?`<text x="${x+1+bw/2}" y="${by-2}" text-anchor="middle" font-size="7" fill="var(--tx3)">${v}</text>`:''}`;
+  }).join('');
+  return `<div style="font-size:10px;color:var(--tx3);margin-bottom:3px">주간 집중 (분)</div>
+<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;display:block;overflow:visible">
+${bars}
+</svg>`;
+}
+
+function pomoInit(){
+  _pomoLoadSettings(); _pomoLoadStats();
+  POMO.mode='focus'; POMO.cycle=0;
+  POMO.remain=POMO.focusMin*60; POMO.total=POMO.focusMin*60;
+  _pomoRenderAll();
+}
+
+function _pomoModeTotal(){
+  if(POMO.mode==='focus') return POMO.focusMin*60;
+  if(POMO.mode==='short') return POMO.shortMin*60;
+  return POMO.longMin*60;
+}
+function _pomoModeName(){
+  if(POMO.mode==='focus') return '🍅 집중';
+  if(POMO.mode==='short') return '☕ 짧은 휴식';
+  return '🌙 긴 휴식';
+}
+function _pomoFmt(sec){
+  const m=Math.floor(sec/60), s=sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function _pomoRenderTimer(container){
+  container.innerHTML='';
+
+  // 모드 라벨
+  const modeLbl=document.createElement('div'); modeLbl.className='pomo-mode-label';
+  modeLbl.textContent=_pomoModeName(); container.appendChild(modeLbl);
+
+  // 사이클 닷
+  const dots=document.createElement('div'); dots.className='pomo-cycle-dots';
+  for(let i=0;i<POMO.longAfter;i++){
+    const d=document.createElement('div');
+    d.className='pomo-cycle-dot'+(i<POMO.cycle?' done':i===POMO.cycle&&POMO.mode==='focus'?' current':'');
+    dots.appendChild(d);
+  }
+  container.appendChild(dots);
+
+  // 타이머 숫자
+  const disp=document.createElement('div'); disp.className='pomo-display2';
+  disp.id='pomo-disp-'+container.id; disp.textContent=_pomoFmt(POMO.remain);
+  container.appendChild(disp);
+
+  // 버튼
+  const btns=document.createElement('div'); btns.className='pomo-btns';
+  const startBtn=document.createElement('button');
+  startBtn.className='pomo-btn primary'+(POMO.running?' pause':'');
+  startBtn.textContent=POMO.running?'⏸ 일시정지':'▶ 시작';
+  startBtn.onclick=pomoToggle;
+  const resetBtn=document.createElement('button');
+  resetBtn.className='pomo-btn'; resetBtn.textContent='⏹ 리셋'; resetBtn.onclick=pomoReset;
+  const skipBtn=document.createElement('button');
+  skipBtn.className='pomo-btn'; skipBtn.textContent='⏭ 건너뛰기'; skipBtn.onclick=pomoSkip;
+  btns.append(startBtn,resetBtn,skipBtn);
+  container.appendChild(btns);
+
+  // 통계 토글
+  const statsId='pomo-stats-'+container.id;
+  const statsTgl=document.createElement('div'); statsTgl.className='pomo-stats-toggle';
+  statsTgl.innerHTML=`<span>📊 오늘 통계</span><span id="${statsId}-arrow">▶</span>`;
+  const statsBody=document.createElement('div'); statsBody.className='pomo-stats-body';
+  statsBody.id=statsId; statsBody.style.display='none';
+  // 오늘 통계 텍스트
+  statsBody.innerHTML=`
+    <div class="pomo-stats-row"><span>오늘 완료 세션</span><b>${POMO.todaySessions}회</b></div>
+    <div class="pomo-stats-row"><span>오늘 총 집중</span><b>${POMO.todayMin}분</b></div>`;
+  // 주간 바 차트
+  const chartEl=document.createElement('div'); chartEl.style.cssText='margin-top:8px';
+  chartEl.innerHTML=_pomoWeekChart();
+  statsBody.appendChild(chartEl);
+  statsTgl.onclick=()=>{
+    const open=statsBody.style.display!=='none';
+    statsBody.style.display=open?'none':'flex';
+    statsBody.style.flexDirection='column';
+    document.getElementById(statsId+'-arrow').textContent=open?'▶':'▼';
+  };
+  container.append(statsTgl, statsBody);
+}
+
+function _pomoRenderSettings(container){
+  container.innerHTML='';
+  _pomoLoadSettings();
+
+  const grid=document.createElement('div'); grid.className='pomo-settings-grid';
+  const fields=[
+    {lbl:'집중 시간 (분)', key:'focusMin', val:POMO.focusMin},
+    {lbl:'짧은 휴식 (분)', key:'shortMin', val:POMO.shortMin},
+    {lbl:'긴 휴식 (분)', key:'longMin', val:POMO.longMin},
+    {lbl:'긴 휴식 주기 (회)', key:'longAfter', val:POMO.longAfter},
+  ];
+  fields.forEach(f=>{
+    const wrap=document.createElement('div'); wrap.className='pomo-setting-field';
+    const lbl=document.createElement('div'); lbl.className='pomo-setting-lbl'; lbl.textContent=f.lbl;
+    const inp=document.createElement('input'); inp.type='number'; inp.min='1'; inp.max='180';
+    inp.className='pomo-setting-inp'; inp.value=f.val;
+    inp.oninput=()=>{ POMO[f.key]=parseInt(inp.value)||f.val; _pomoSaveSettings(); if(!POMO.running){POMO.remain=_pomoModeTotal(); POMO.total=POMO.remain; _pomoRenderAll();} };
+    wrap.append(lbl,inp); grid.appendChild(wrap);
+  });
+  container.appendChild(grid);
+
+  // 알림음 선택
+  const soundRow=document.createElement('div'); soundRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:var(--tx2)';
+  const soundLbl=document.createElement('span'); soundLbl.textContent='알림음:';
+  const soundSel=document.createElement('select'); soundSel.className='pomo-setting-inp'; soundSel.style.width='auto';
+  [['bell','🔔 벨'],['ding','🎵 딩'],['silent','🔇 무음']].forEach(([v,l])=>{
+    const o=document.createElement('option'); o.value=v; o.textContent=l;
+    if(v===POMO.sound) o.selected=true; soundSel.appendChild(o);
+  });
+  soundSel.onchange=()=>{ POMO.sound=soundSel.value; _pomoSaveSettings(); };
+  soundRow.append(soundLbl,soundSel); container.appendChild(soundRow);
+
+  // 타이머 위젯 임베드
+  const timerWrap=document.createElement('div'); timerWrap.id='pomo-settings-timer';
+  _pomoRenderTimer(timerWrap); container.appendChild(timerWrap);
+}
+
+function _pomoRenderAll(){
+  // 설정탭 위젯
+  const sw=document.getElementById('pomo-settings-widget');
+  if(sw) _pomoRenderSettings(sw);
+  // 플로팅
+  const fw=document.getElementById('float-pomo-body');
+  if(fw&&document.getElementById('float-pomo')?.classList.contains('open')) _pomoRenderTimer(fw);
+  // 타이틀바 업데이트
+  const hdr=document.querySelector('#float-pomo .pomo-hdr-title');
+  if(hdr) hdr.textContent='⏱ '+_pomoFmt(POMO.remain);
 }
 
 function pomoToggle(){
-  if(_pomoRunning){
-    clearInterval(_pomoTimer);_pomoRunning=false;
-    document.getElementById('pomo-start-btn').textContent='▶ 시작하기';
-    document.getElementById('pomo-start-btn').classList.remove('running');
+  if(POMO.running){
+    clearInterval(POMO.timer); POMO.running=false;
   } else {
-    _pomoRunning=true;
-    document.getElementById('pomo-start-btn').textContent='⏸ 일시정지';
-    document.getElementById('pomo-start-btn').classList.add('running');
-    _pomoTimer=setInterval(()=>{
-      if(_pomoRemain<=0){
-        clearInterval(_pomoTimer);_pomoRunning=false;
-        document.getElementById('pomo-start-btn').textContent='▶ 시작하기';
-        document.getElementById('pomo-start-btn').classList.remove('running');
-        _pomoRemain=_pomoTotal;pomoDisplay();
-        sendNotification('⏰ 뽀모도로 완료!',`${_pomoMin}분 집필을 완료했습니다! 잠깐 쉬세요 ☕`);
-        toast('뽀모도로 완료! 잘 하셨어요 🎉');
+    if(POMO.remain<=0){ POMO.remain=_pomoModeTotal(); }
+    POMO.running=true;
+    POMO.timer=setInterval(()=>{
+      if(POMO.remain<=0){
+        clearInterval(POMO.timer); POMO.running=false;
+        _pomoSessionDone();
         return;
       }
-      _pomoRemain--;pomoDisplay();
+      POMO.remain--;
+      // 타이머 숫자만 업데이트 (전체 재렌더 금지)
+      document.querySelectorAll('.pomo-display2').forEach(el=>el.textContent=_pomoFmt(POMO.remain));
+      const hdr=document.querySelector('#float-pomo .pomo-hdr-title');
+      if(hdr) hdr.textContent='⏱ '+_pomoFmt(POMO.remain);
     },1000);
   }
+  _pomoRenderAll();
 }
+
+function pomoReset(){
+  clearInterval(POMO.timer); POMO.running=false;
+  POMO.mode='focus'; POMO.cycle=0;
+  POMO.remain=POMO.focusMin*60; POMO.total=POMO.remain;
+  _pomoRenderAll();
+}
+
+function pomoSkip(){
+  clearInterval(POMO.timer); POMO.running=false;
+  _pomoNextMode();
+  _pomoRenderAll();
+}
+
+function _pomoNextMode(){
+  if(POMO.mode==='focus'){
+    POMO.cycle++;
+    if(POMO.cycle>=POMO.longAfter){
+      POMO.mode='long'; POMO.cycle=0;
+    } else {
+      POMO.mode='short';
+    }
+  } else {
+    POMO.mode='focus';
+  }
+  POMO.remain=_pomoModeTotal(); POMO.total=POMO.remain;
+}
+
+function _pomoSessionDone(){
+  if(POMO.mode==='focus'){
+    POMO.todaySessions++; POMO.todayMin+=POMO.focusMin;
+    // 주간 데이터 업데이트
+    const _wd = POMO.weekData; const _td = POMO.todayDate;
+    const _wi = _wd.findIndex(d=>d.date===_td);
+    if(_wi>=0){ _wd[_wi].sessions=((_wd[_wi].sessions||0)+1); _wd[_wi].min=((_wd[_wi].min||0)+POMO.focusMin); }
+    else { _wd.push({date:_td,sessions:1,min:POMO.focusMin}); }
+    // 8일 이상이면 오래된 것 제거
+    if(_wd.length>7){ POMO.weekData=_wd.slice(-7); }
+    _pomoSaveStats();
+    sendNotification('🍅 집중 완료!', POMO.longAfter+'회 중 '+POMO.cycle+'번째 집중 완료. 잠깐 쉬세요!');
+    toast('집중 세션 완료! 🎉');
+    _pomoPlaySound();
+  } else {
+    sendNotification('☕ 휴식 완료!', '다시 집중할 시간입니다!');
+  }
+  _pomoNextMode();
+  _pomoRenderAll();
+}
+
+function _pomoPlaySound(){
+  if(POMO.sound==='silent') return;
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator(); const gain=ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type=POMO.sound==='ding'?'sine':'triangle';
+    osc.frequency.value=POMO.sound==='ding'?880:440;
+    gain.gain.setValueAtTime(0.3,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.8);
+  }catch(e){}
+}
+
+// 플로팅 토글
+function toggleFloatPomo(force){
+  const el=document.getElementById('float-pomo');
+  if(!el) return;
+  const open=force!==undefined?force:!el.classList.contains('open');
+  el.classList.toggle('open',open);
+  if(open){
+    const body=document.getElementById('float-pomo-body');
+    if(body){ _pomoRenderTimer(body); }
+    // 드래그
+    const hdr=document.getElementById('float-pomo-hdr');
+    if(hdr&&!hdr._dragBound){ hdr._dragBound=true; _bindDragFloat(el,hdr); }
+  }
+}
+
+// 레거시 호환 (설정탭에서 호출되던 기존 함수들)
+function pomoSet(min){if(!POMO.running){POMO.focusMin=min;POMO.remain=min*60;POMO.total=min*60;_pomoRenderAll();}}
+function pomoDisplay(){}
+
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SETTINGS — THEME
@@ -5072,9 +5513,65 @@ async function updateStorageInfo(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SETTINGS — RENDER ALL
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function initSettingsDrag(){
+  const container = document.getElementById('settings-body');
+  if(!container) return;
+  let _secDragEl = null;
+  container.querySelectorAll('.ssec').forEach(sec=>{
+    const handle = sec.querySelector('.ssec-drag-handle');
+    if(!handle) return;
+    sec.draggable = true;
+    sec.addEventListener('dragstart', e=>{
+      if(!e.target.closest('.ssec-drag-handle')){ e.preventDefault(); return; }
+      _secDragEl = sec;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(()=>sec.classList.add('dragging'), 0);
+    });
+    sec.addEventListener('dragend', ()=>{
+      _secDragEl = null;
+      sec.classList.remove('dragging');
+      container.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+      // 순서 저장
+      const order = [...container.querySelectorAll('.ssec')].map(el=>el.dataset.sec).filter(Boolean);
+      S.profile.settingSecOrder = order;
+      dsave();
+    });
+    sec.addEventListener('dragover', e=>{
+      if(!_secDragEl||_secDragEl===sec) return;
+      e.preventDefault();
+      container.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+      sec.classList.add('drag-over');
+    });
+    sec.addEventListener('drop', e=>{
+      e.preventDefault();
+      if(!_secDragEl||_secDragEl===sec) return;
+      const rect = sec.getBoundingClientRect();
+      if(e.clientY < rect.top + rect.height/2){
+        container.insertBefore(_secDragEl, sec);
+      } else {
+        container.insertBefore(_secDragEl, sec.nextSibling);
+      }
+      sec.classList.remove('drag-over');
+    });
+  });
+}
+
+function applySectionOrder(){
+  const order = S.profile.settingSecOrder;
+  if(!order||!order.length) return;
+  const container = document.getElementById('settings-body');
+  if(!container) return;
+  order.forEach(secId=>{
+    const el = container2.querySelector(`.ssec[data-sec="${secId}"]`);
+    if(el) container2.appendChild(el);
+  });
+}
+
 function renderSettings(){
   loadProfile();
   renderWorks();
+  renderCustomAlarms();
+  setTimeout(()=>{ applySectionOrder(); initSettingsDrag(); pomoInit(); }, 50);
   buildThemeGrid();
   loadEditorDefaults();
   renderAlarmStatus();
@@ -5245,6 +5742,7 @@ document.getElementById('float-memo-body')?.addEventListener('input',function(){
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();if(_srchOpen)closeSearch();else openSearch();}
   if((e.ctrlKey||e.metaKey)&&e.key==='m'){e.preventDefault();toggleFloatMemo();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='p'){e.preventDefault();toggleFloatPomo();}
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();gdPush();}
   if(e.key==='Escape'&&_srchOpen)closeSearch();
 });
@@ -5451,6 +5949,7 @@ let _writingEditor=null;   // 현재 활성 MBEditor
 let _writingSplitMode=false;
 let _writingSelWork=null;  // 선택된 작품 id
 let _workDragId=null;      // 드래그 중인 작품 id
+let _sheetDragId=null;     // 드래그 중인 시트 id
 let _writingSelCh=null;    // 선택된 회차 id
 let _writingSaveTimer=null;
 let _ttsUtterance=null;
@@ -6586,6 +7085,48 @@ function renderToolsTree(){
         lbl.textContent = node.name || info.label;
 
         sheetItem.append(ico, lbl);
+
+        // ── 시트 드래그앤드롭 순서 변경
+        sheetItem.draggable = true;
+        sheetItem.addEventListener('dragstart', e=>{
+          _sheetDragId = node.id;
+          e.dataTransfer.setData('text/plain', node.id);
+          e.dataTransfer.effectAllowed = 'move';
+          setTimeout(()=>sheetItem.classList.add('dragging'), 0);
+        });
+        sheetItem.addEventListener('dragend', ()=>{
+          _sheetDragId = null;
+          sheetItem.classList.remove('dragging');
+          tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));
+        });
+        sheetItem.addEventListener('dragover', e=>{
+          const srcId = _sheetDragId||'';
+          if(!srcId||srcId===node.id) return;
+          // 같은 작품 하위 시트만 허용
+          const srcNode = (S.toolNodes||[]).find(n=>n.id===srcId);
+          if(!srcNode||srcNode.workId!==node.workId) return;
+          e.preventDefault();
+          tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));
+          const rect = sheetItem.getBoundingClientRect();
+          sheetItem.classList.add(e.clientY < rect.top+rect.height/2 ? 'drag-over-above' : 'drag-over-below');
+        });
+        sheetItem.addEventListener('drop', e=>{
+          e.preventDefault();
+          const srcId = _sheetDragId||e.dataTransfer.getData('text/plain');
+          _sheetDragId = null;
+          if(!srcId||srcId===node.id) return;
+          const srcNode=(S.toolNodes||[]).find(n=>n.id===srcId);
+          const tgtNode=(S.toolNodes||[]).find(n=>n.id===node.id);
+          if(!srcNode||!tgtNode||srcNode.workId!==tgtNode.workId) return;
+          const arr = _toolsGetSheetNodes(srcNode.workId);
+          const filtered = arr.filter(n=>n.id!==srcId);
+          const ti = filtered.indexOf(tgtNode);
+          const rect = sheetItem.getBoundingClientRect();
+          const ins = e.clientY < rect.top+rect.height/2 ? ti : ti+1;
+          filtered.splice(ins, 0, srcNode);
+          filtered.forEach((n,i)=>n.order=i);
+          dsave(); renderToolsTree();
+        });
 
         // 클릭 → 시트 열기
         sheetItem.addEventListener('click', e => {
