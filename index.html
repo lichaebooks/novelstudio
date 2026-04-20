@@ -592,7 +592,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .rm-rel-popup{position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:14px;min-width:230px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:8px}
 .rm-rel-popup input,.rm-rel-popup select{background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;width:100%}
 .rm-rel-popup input:focus,.rm-rel-popup select:focus{border-color:var(--ac)}
-.rm-legend{position:absolute;bottom:10px;left:10px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;font-size:10px}
+.rm-legend{position:absolute;bottom:10px;left:10px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;font-size:10px;max-width:180px;z-index:10}
 .rm-legend-title{font-weight:700;color:var(--tx2);margin-bottom:5px}
 .rm-legend-item{display:flex;align-items:center;gap:6px;margin-bottom:3px;color:var(--tx3)}
 
@@ -1872,6 +1872,25 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .ssec-drag-handle{cursor:grab;color:var(--tx3);font-size:14px;margin-right:4px;flex-shrink:0}
 
 .profile-field-lbl{font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:3px}
+
+/* 작품도구 탭 모바일 토글 */
+#tools-mobile-toggle{display:none;align-items:center;gap:6px;padding:6px 12px;font-size:11px;background:var(--surf2);border-bottom:1px solid var(--bdr);flex-shrink:0;cursor:pointer;color:var(--tx2);}
+@media(max-width:600px){
+  #tools-mobile-toggle{display:flex!important;}
+  #ptools>.sidebar.mobile-open{max-height:50vh!important;overflow-y:auto;}
+}
+/* CS 우측 패널 토글 버튼 */
+.cs-right-toggle{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 4px;margin-left:auto;}
+.cs-right.collapsed{width:0!important;min-width:0!important;overflow:hidden!important;padding:0!important;border-left:none!important;}
+/* RM 사이드 패널 토글 */
+.rm-side-toggle{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 4px;margin-left:auto;}
+.rm-side.collapsed{width:0!important;min-width:0!important;overflow:hidden!important;}
+/* 범례 모바일에서 접기 */
+@media(max-width:600px){
+  .rm-legend{position:relative!important;bottom:auto!important;left:auto!important;margin:8px;width:calc(100% - 16px)!important;box-sizing:border-box;}
+  .rm-container{flex-direction:column!important;}
+  .rm-side{width:100%!important;max-height:140px;border-left:none!important;border-top:1px solid var(--bdr);}
+}
 </style>
 </head>
 <body>
@@ -2122,8 +2141,13 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
   <!-- ── TOOLS ── -->
   <div class="panel" id="ptools" style="flex-direction:row">
+    <!-- 모바일 토글 -->
+    <div id="tools-mobile-toggle" onclick="toolsToggleMobileSidebar()">
+      <span>🛠️</span>
+      <span id="tools-mobile-toggle-label">작품 목록 열기</span>
+    </div>
     <!-- 좌측: 작품 트리 -->
-    <div class="sidebar" style="width:220px">
+    <div class="sidebar" id="tools-sidebar" style="width:220px">
       <div class="sbhdr">
         <span class="sblabel">작품도구</span>
         <div class="sbacts">
@@ -2313,17 +2337,10 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
           <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:10px">🔔 커스텀 알림</div>
           <div id="custom-alarms-list"></div>
           <!-- 인라인 추가 폼 -->
-          <div id="custom-alarm-add-form" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:10px 12px;margin-top:8px">
-            <div style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:8px">＋ 새 알림 추가</div>
-            <div class="srow" style="margin-bottom:6px">
-              <span class="slabel">알림 이름</span>
-              <input class="sinput" id="new-alarm-label" placeholder="예: 집필 시작 시간" style="flex:1;max-width:none"/>
-            </div>
-            <div class="srow" style="margin-bottom:8px">
-              <span class="slabel">알림 시각</span>
-              <input class="sinput" id="new-alarm-time" type="time" style="max-width:120px"/>
-            </div>
-            <button class="btn btng" onclick="customAlarmAddInline()" style="font-size:11px;padding:4px 14px">추가</button>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <input class="sinput" id="new-alarm-label" placeholder="알림 이름" style="flex:1;min-width:100px;max-width:none"/>
+            <input class="sinput" id="new-alarm-time" type="time" style="width:120px;max-width:120px;flex-shrink:0"/>
+            <button class="btn btng" onclick="customAlarmAddInline()" style="font-size:11px;padding:5px 14px;flex-shrink:0">＋ 추가</button>
           </div>
         </div>
 
@@ -2351,17 +2368,17 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
           2. <b>Google 계정 연결</b> 버튼 클릭 → 로그인<br/>
           3. 이후 상단의 <b>💾 저장</b> / <b>💾 불러오기</b> 버튼으로 동기화
         </div>
-        <div class="srow">
-          <span class="slabel">Client ID</span>
-          <input class="sinput" id="gd_client_id" type="text" placeholder="123456789.apps.googleusercontent.com" oninput="localStorage.setItem('gd_client_id',this.value)" style="max-width:380px;font-size:11px"/>
+        <div style="margin-bottom:10px">
+          <div class="profile-field-lbl">Client ID</div>
+          <input class="sinput" id="gd_client_id" type="text" placeholder="123456789.apps.googleusercontent.com" oninput="localStorage.setItem('gd_client_id',this.value)" style="width:100%;max-width:none;font-size:11px"/>
         </div>
-        <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
           <button class="btn" id="gd-connect-btn" onclick="gdConnect()" style="background:var(--ac);color:#fff;border-color:var(--ac)">🔗 Google 계정 연결</button>
           <button class="btn btng" id="gd-push-btn" onclick="gdPush()">💾 Drive에 저장</button>
           <button class="btn purple" id="gd-pull-btn" onclick="gdPull()" style="background:rgba(188,140,255,.12);border-color:var(--pu);color:var(--pu)">💾 Drive에서 불러오기</button>
           <button class="btn" id="gd-disconnect-btn" onclick="gdDisconnect()" style="display:none">연결 해제</button>
         </div>
-        <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
           <input id="gd-auto-chk" type="checkbox" onchange="gdToggleAuto(this.checked)" style="cursor:pointer"/>
           <label for="gd-auto-chk" style="font-size:12px;color:var(--tx2);cursor:pointer">변경 시 자동으로 Drive에 저장</label>
         </div>
@@ -2369,7 +2386,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 로컬 백업 -->
-      <div class="ssec">
+      <div class="ssec" data-sec="backup">
         <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 📦 로컬 백업 / 초기화</div>
         <div style="margin-bottom:12px">
           <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:8px">저장 공간 현황 <button class="btn btng" onclick="updateStorageInfo()" style="font-size:11px;padding:3px 8px;margin-left:8px">새로고침</button></div>
@@ -2383,8 +2400,8 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 비밀번호 관리 -->
-      <div class="ssec">
-        <div class="sstitle">🔒 비밀번호 관리</div>
+      <div class="ssec" data-sec="pw">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 🔒 비밀번호 관리</div>
 
         <!-- 비밀번호 사용 여부 토글 -->
         <div class="srow" style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bdr)">
@@ -2406,41 +2423,43 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 에디터 기본 설정 -->
-      <div class="ssec" data-sec="shortcut">
-        <div class="sstitle">✏️ 에디터 기본 설정</div>
-        <div class="srow">
-          <span class="slabel">기본 글꼴</span>
-          <select class="sinput" id="def-font" onchange="saveEditorDefaults()" style="max-width:200px">
-            <option value="Malgun Gothic">맑은 고딕</option>
-            <option value="NanumGothic">나눔고딕</option>
-            <option value="NanumMyeongjo">나눔명조</option>
-            <option value="Dotum">돋움</option>
-            <option value="Georgia">Georgia</option>
-          </select>
-        </div>
-        <div class="srow">
-          <span class="slabel">기본 크기</span>
-          <select class="sinput" id="def-size" onchange="saveEditorDefaults()" style="max-width:100px">
-            <option value="13">13pt</option>
-            <option value="14" selected>14pt</option>
-            <option value="15">15pt</option>
-            <option value="16">16pt</option>
-          </select>
-        </div>
-        <div class="srow">
-          <span class="slabel">자동저장 딜레이</span>
-          <select class="sinput" id="def-autosave" onchange="saveEditorDefaults()" style="max-width:140px">
-            <option value="400">0.4초 (즉시)</option>
-            <option value="800" selected>0.8초</option>
-            <option value="1500">1.5초</option>
-            <option value="3000">3초</option>
-          </select>
+      <div class="ssec" data-sec="editor">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> ✏️ 에디터 기본 설정</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 16px">
+          <div>
+            <div class="profile-field-lbl">기본 글꼴</div>
+            <select class="sinput" id="def-font" onchange="saveEditorDefaults()" style="width:100%;max-width:none">
+              <option value="Malgun Gothic">맑은 고딕</option>
+              <option value="NanumGothic">나눔고딕</option>
+              <option value="NanumMyeongjo">나눔명조</option>
+              <option value="Dotum">돋움</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+          </div>
+          <div>
+            <div class="profile-field-lbl">기본 크기</div>
+            <select class="sinput" id="def-size" onchange="saveEditorDefaults()" style="width:100%;max-width:none">
+              <option value="13">13pt</option>
+              <option value="14" selected>14pt</option>
+              <option value="15">15pt</option>
+              <option value="16">16pt</option>
+            </select>
+          </div>
+          <div>
+            <div class="profile-field-lbl">자동저장 딜레이</div>
+            <select class="sinput" id="def-autosave" onchange="saveEditorDefaults()" style="width:100%;max-width:none">
+              <option value="400">0.4초 (즉시)</option>
+              <option value="800" selected>0.8초</option>
+              <option value="1500">1.5초</option>
+              <option value="3000">3초</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <!-- 단축키 -->
-      <div class="ssec">
-        <div class="sstitle">⌨️ 단축키 모음</div>
+      <div class="ssec" data-sec="shortcut2">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> ⌨️ 단축키 모음</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;font-size:12px">
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+K</code><span style="color:var(--tx2)">전체 검색</span></div>
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+M</code><span style="color:var(--tx2)">플로팅 메모</span></div>
@@ -5995,12 +6014,17 @@ async function gdPull(){
     if(d.works)S.works=d.works;if(d.scheds)S.scheds=d.scheds;if(d.archives)S.archives=d.archives;
     if(d.profile)S.profile=d.profile;if(d.writingNodes)S.writingNodes=d.writingNodes;if(d.toolNodes)S.toolNodes=d.toolNodes;
     if(d.toolsOpenMap)S._toolsOpenMap=d.toolsOpenMap;
+    if(d.settle)S.settle=d.settle;
+    if(!S.settle) S.settle={platforms:['리디','카카페','시리즈','문피아'],works:[]};
+    if(!S.settle.platforms) S.settle.platforms=['리디','카카페','시리즈','문피아'];
+    if(!S.settle.works) S.settle.works=[];
     if(!S.profile.activityLog) S.profile.activityLog=[];
     if(!S.profile.todos)       S.profile.todos=[];
     if(S.profile.homeMemo===undefined) S.profile.homeMemo='';
     await save();_gdDirty=false;
     renderSettings();renderHome();renderSched();renderArchive();
     initWritingTab();renderToolsTree();
+    if(typeof initSettleTab==='function') initSettleTab();
     gdBar('✅ Drive 데이터 불러오기 완료!','ok');
   }catch(e){gdBar('❌ 불러오기 실패: '+e.message,'err');}
 }
@@ -8230,6 +8254,32 @@ function _csSaveTemplate(itemId, tpl){
 }
 
 // ── 캐릭터 시트 렌더 ──
+
+// 작품도구 탭 모바일 사이드바 토글
+function toolsToggleMobileSidebar(){
+  const sb=document.getElementById('tools-sidebar');
+  const lbl=document.getElementById('tools-mobile-toggle-label');
+  if(!sb) return;
+  const isOpen=sb.classList.contains('mobile-open');
+  sb.classList.toggle('mobile-open',!isOpen);
+  if(lbl) lbl.textContent=isOpen?'작품 목록 열기':'작품 목록 닫기';
+}
+
+// CS 우측 패널 접기/펼치기 (전역 상태)
+let _csRightCollapsed = false;
+function toggleCsRight(btn, right){
+  _csRightCollapsed=!_csRightCollapsed;
+  right.classList.toggle('collapsed',_csRightCollapsed);
+  if(btn) btn.textContent=_csRightCollapsed?'◀':'▶';
+}
+
+// RM 사이드 패널 접기/펼치기 (전역 상태)
+let _rmSideCollapsed = false;
+function toggleRmSide(btn, side){
+  _rmSideCollapsed=!_rmSideCollapsed;
+  side.classList.toggle('collapsed',_rmSideCollapsed);
+  if(btn) btn.textContent=_rmSideCollapsed?'◀':'▶';
+}
 function renderToolsCS(node, container){
   container.innerHTML = '';
   const d = node.data || {};
@@ -8320,6 +8370,15 @@ function renderToolsCS(node, container){
   const rightHdr = document.createElement('div');
   rightHdr.className = 'cs-right-hdr';
   rightHdr.innerHTML = '<span>캐릭터 특성</span>';
+  // 접기/펼치기 버튼
+  const csToggleBtn = document.createElement('button');
+  csToggleBtn.className = 'cs-right-toggle';
+  csToggleBtn.title = '패널 접기/펼치기';
+  csToggleBtn.textContent = _csRightCollapsed ? '◀' : '▶';
+  csToggleBtn.onclick = () => toggleCsRight(csToggleBtn, right);
+  rightHdr.appendChild(csToggleBtn);
+  // 이전 상태 복원
+  if(_csRightCollapsed) right.classList.add('collapsed');
   right.appendChild(rightHdr);
 
   const catsWrap = document.createElement('div');
@@ -9888,7 +9947,15 @@ function renderToolsRM(node, container){
   side.className = 'rm-side';
   const sideHdr = document.createElement('div');
   sideHdr.className = 'rm-side-hdr';
-  sideHdr.textContent = '👥 캐릭터';
+  sideHdr.style.cssText='display:flex;align-items:center;';
+  const sideHdrSpan=document.createElement('span'); sideHdrSpan.textContent='👥 캐릭터'; sideHdrSpan.style.flex='1';
+  const rmToggleBtn=document.createElement('button');
+  rmToggleBtn.className='rm-side-toggle'; rmToggleBtn.title='패널 접기/펼치기';
+  rmToggleBtn.textContent=_rmSideCollapsed?'◀':'▶';
+  rmToggleBtn.onclick=()=>toggleRmSide(rmToggleBtn, side);
+  sideHdr.append(sideHdrSpan, rmToggleBtn);
+  // 이전 상태 복원
+  if(_rmSideCollapsed) side.classList.add('collapsed');
   side.appendChild(sideHdr);
   const sideList = document.createElement('div');
   sideList.className = 'rm-side-list';
@@ -10352,7 +10419,24 @@ function _rmRenderLegend(cvWrap, d){
   const rels = d.rels || [];
   if(!rels.length) return;
   const legend=document.createElement('div'); legend.className='rm-legend';
-  const title=document.createElement('div'); title.className='rm-legend-title'; title.textContent='🔗 관계 범례';
+  const legendHdr=document.createElement('div');
+  legendHdr.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:5px';
+  const legendTitle=document.createElement('div'); legendTitle.className='rm-legend-title';
+  legendTitle.style.margin='0'; legendTitle.textContent='🔗 관계 범례';
+  const legendToggle=document.createElement('button');
+  legendToggle.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:10px;padding:0 2px;margin-left:auto';
+  legendToggle.textContent='▼';
+  legendToggle.title='범례 접기/펼치기';
+  const legendBody=document.createElement('div');
+  legendBody.id='rm-legend-body';
+  legendToggle.onclick=()=>{
+    const open=legendBody.style.display!=='none';
+    legendBody.style.display=open?'none':'block';
+    legendToggle.textContent=open?'▶':'▼';
+  };
+  legendHdr.append(legendTitle, legendToggle);
+  legend.appendChild(legendHdr);
+  const title=legendBody; // alias for below
   legend.appendChild(title);
   // 중복 없이 라벨 기준으로 표시
   const seen=new Set();
@@ -10373,6 +10457,7 @@ function _rmRenderLegend(cvWrap, d){
     lbl.textContent=rel.label||style.label;
     item.append(lineSvg,lbl); legend.appendChild(item);
   });
+  legend.appendChild(legendBody);
   cvWrap.appendChild(legend);
 }
 
