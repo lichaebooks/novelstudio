@@ -2359,13 +2359,27 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
         </div>
       </div>
 
-      <!-- 비밀번호 변경 -->
+      <!-- 비밀번호 관리 -->
       <div class="ssec">
-        <div class="sstitle">🔒 비밀번호 변경</div>
-        <div class="srow"><span class="slabel">현재 비밀번호</span><input class="sinput" id="cpw" type="password" placeholder="현재 비밀번호"/></div>
-        <div class="srow"><span class="slabel">새 비밀번호</span><input class="sinput" id="npw" type="password" placeholder="새 비밀번호 (4자 이상)"/></div>
-        <div class="srow"><span class="slabel">비밀번호 확인</span><input class="sinput" id="npw2" type="password" placeholder="새 비밀번호 재입력"/></div>
-        <div class="srow"><button class="btn" onclick="changePw()">변경하기</button><span id="pwmsg" style="font-size:12px;margin-left:4px"></span></div>
+        <div class="sstitle">🔒 비밀번호 관리</div>
+
+        <!-- 비밀번호 사용 여부 토글 -->
+        <div class="srow" style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bdr)">
+          <span class="slabel">비밀번호 잠금</span>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--tx2)">
+            <input type="checkbox" id="pw-use-toggle" onchange="togglePwUse(this.checked)" style="cursor:pointer;width:16px;height:16px"/>
+            <span id="pw-use-label">활성화됨</span>
+          </label>
+          <span style="font-size:11px;color:var(--tx3);margin-left:8px" id="pw-use-hint">끄면 다음 접속 시 비밀번호 없이 바로 입장</span>
+        </div>
+
+        <!-- 비밀번호 변경 -->
+        <div id="pw-change-section">
+          <div class="srow"><span class="slabel">현재 비밀번호</span><input class="sinput" id="cpw" type="password" placeholder="현재 비밀번호"/></div>
+          <div class="srow"><span class="slabel">새 비밀번호</span><input class="sinput" id="npw" type="password" placeholder="새 비밀번호 (4자 이상)"/></div>
+          <div class="srow"><span class="slabel">비밀번호 확인</span><input class="sinput" id="npw2" type="password" placeholder="새 비밀번호 재입력"/></div>
+          <div class="srow"><button class="btn" onclick="changePw()">변경하기</button><span id="pwmsg" style="font-size:12px;margin-left:4px"></span></div>
+        </div>
       </div>
 
       <!-- 에디터 기본 설정 -->
@@ -2639,6 +2653,10 @@ async function sha256(s){
   return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 async function doLogin(){
+  // 비밀번호 비활성화 상태면 바로 입장
+  if(localStorage.getItem('ws_pw_disabled')==='1'){
+    enterApp(); return;
+  }
   const pw=document.getElementById('pwinput').value.trim();if(!pw)return;
   const stored=localStorage.getItem('ws_pw');
   const h=await sha256(pw);
@@ -2674,7 +2692,7 @@ async function enterApp(){
   gdLoadToken();
   gdHandleCallback();
   setTimeout(checkDriveNewer,2000);
-  if(!localStorage.getItem('ws_pw')){
+  if(!localStorage.getItem('ws_pw')&&localStorage.getItem('ws_pw_disabled')!=='1'){
     const e=document.getElementById('lerr');e.className='lerr lhint';
     e.textContent='처음 사용하시나요? 원하는 비밀번호를 입력하면 바로 설정됩니다.';
   }
@@ -2683,8 +2701,30 @@ function doLogout(){
   _loaded=false;clearTimeout(_st);
   document.getElementById('app').style.display='none';
   document.getElementById('lscreen').style.display='flex';
+  // 비밀번호 비활성화면 바로 재입장
+  if(localStorage.getItem('ws_pw_disabled')==='1'){
+    enterApp(); return;
+  }
   document.getElementById('pwinput').value='';
   document.getElementById('pwinput').focus();
+}
+function togglePwUse(enabled){
+  const lbl=document.getElementById('pw-use-label');
+  const hint=document.getElementById('pw-use-hint');
+  const sec=document.getElementById('pw-change-section');
+  if(enabled){
+    localStorage.removeItem('ws_pw_disabled');
+    if(lbl) lbl.textContent='활성화됨';
+    if(hint) hint.textContent='끄면 다음 접속 시 비밀번호 없이 바로 입장';
+    if(sec) sec.style.opacity='1';
+  } else {
+    localStorage.setItem('ws_pw_disabled','1');
+    if(lbl) lbl.textContent='비활성화됨 (비밀번호 없이 바로 입장)';
+    if(hint) hint.style.color='var(--yw)';
+    if(hint) hint.textContent='⚠ 현재 비밀번호 잠금이 꺼져 있습니다';
+    if(sec) sec.style.opacity='0.4';
+  }
+  toast(enabled ? '비밀번호 잠금이 켜졌습니다' : '비밀번호 잠금이 꺼졌습니다. 다음 접속부터 바로 입장합니다.');
 }
 async function changePw(){
   const cp=document.getElementById('cpw').value,np=document.getElementById('npw').value,np2=document.getElementById('npw2').value;
@@ -5772,6 +5812,16 @@ function renderSettings(){
   loadProfile();
   renderWorks();
   renderCustomAlarms();
+  // 비밀번호 토글 상태 반영
+  const pwTgl=document.getElementById('pw-use-toggle');
+  const pwSec=document.getElementById('pw-change-section');
+  const pwLbl=document.getElementById('pw-use-label');
+  const pwHint=document.getElementById('pw-use-hint');
+  const pwDisabled=localStorage.getItem('ws_pw_disabled')==='1';
+  if(pwTgl) pwTgl.checked=!pwDisabled;
+  if(pwLbl) pwLbl.textContent=pwDisabled?'비활성화됨 (비밀번호 없이 바로 입장)':'활성화됨';
+  if(pwHint){pwHint.textContent=pwDisabled?'⚠ 현재 비밀번호 잠금이 꺼져 있습니다':'끄면 다음 접속 시 비밀번호 없이 바로 입장';pwHint.style.color=pwDisabled?'var(--yw)':'var(--tx3)';}
+  if(pwSec) pwSec.style.opacity=pwDisabled?'0.4':'1';
   setTimeout(()=>{ applySectionOrder(); initSettingsDrag(); pomoInit(); }, 50);
   buildThemeGrid();
   loadEditorDefaults();
@@ -11141,6 +11191,10 @@ function _imAddField(node, container, itemId, tpl){
 //  INIT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 (async()=>{
+  // 비밀번호 비활성화 상태면 바로 입장
+  if(localStorage.getItem('ws_pw_disabled')==='1'){
+    enterApp(); return;
+  }
   // 로그인 화면 초기화
   loadTheme();
   const pi=document.getElementById('pwinput');
