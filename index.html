@@ -1520,6 +1520,133 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 #float-memo-hdr button{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 5px;border-radius:3px}
 #float-memo-hdr button:hover{background:var(--surf3);color:var(--tx)}
 #float-memo-body{flex:1;padding:10px 12px;outline:none;font-size:12px;color:var(--tx);line-height:1.7;overflow-y:auto;font-family:inherit;min-height:80px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   정산관리 탭
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#psettle{overflow:hidden;flex-direction:column}
+.settle-wrap{display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden}
+
+/* 상단 요약바 */
+.settle-topbar{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;flex-wrap:wrap}
+.settle-topbar-year{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--tx)}
+.settle-topbar-nav{background:none;border:1px solid var(--bdr);border-radius:6px;color:var(--tx2);cursor:pointer;padding:2px 8px;font-size:12px;line-height:1.4}
+.settle-topbar-nav:hover{background:var(--surf2);color:var(--ac)}
+.settle-kpi{display:flex;flex-direction:column;gap:1px;padding:0 12px;border-left:1px solid var(--bdr2)}
+.settle-kpi-val{font-size:15px;font-weight:800;color:var(--ac)}
+.settle-kpi-lbl{font-size:10px;color:var(--tx3)}
+
+/* 메인 바디 */
+.settle-body{display:flex;flex:1;overflow:hidden;min-height:0}
+
+/* Zone B 사이드바 */
+.settle-side{width:220px;flex-shrink:0;border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;background:var(--surf)}
+.settle-side-hdr{padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.settle-side-list{flex:1;overflow-y:auto;padding:6px 0}
+.settle-work-group{margin-bottom:2px}
+.settle-work-label{display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--tx);cursor:pointer;user-select:none;transition:background .12s}
+.settle-work-label:hover{background:var(--surf2)}
+.settle-work-arrow{font-size:9px;color:var(--tx3);transition:transform .15s;flex-shrink:0}
+.settle-work-arrow.open{transform:rotate(90deg)}
+.settle-contract-item{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 28px;font-size:11px;color:var(--tx2);cursor:pointer;transition:background .12s;border-radius:0}
+.settle-contract-item:hover{background:var(--surf2)}
+.settle-contract-item.sel{background:rgba(56,139,253,.1);color:var(--ac);font-weight:600}
+.settle-contract-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.settle-contract-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.settle-work-amt{font-size:10px;color:var(--tx3);flex-shrink:0}
+.settle-side-add{padding:8px 12px;border-top:1px solid var(--bdr);flex-shrink:0}
+.settle-add-btn{width:100%;padding:6px;border:1px dashed var(--bdr2);border-radius:6px;background:none;color:var(--tx3);font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.settle-add-btn:hover{border-color:var(--ac);color:var(--ac);background:rgba(56,139,253,.05)}
+
+/* Zone C 메인 */
+.settle-main{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.settle-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--tx3);gap:8px;font-size:12px;text-align:center}
+.settle-empty-icon{font-size:40px}
+
+/* Zone D 플랫폼 관리 */
+.settle-platform-zone{padding:12px 20px;border-top:2px solid var(--bdr);background:var(--surf2);flex-shrink:0}
+.settle-platform-hdr{font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:8px}
+.settle-platform-list{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.settle-platform-chip{display:flex;align-items:center;gap:4px;padding:3px 10px;background:var(--surf);border:1px solid var(--bdr);border-radius:20px;font-size:11px;color:var(--tx2)}
+.settle-platform-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:0 2px;line-height:1}
+.settle-platform-del:hover{color:var(--rd)}
+.settle-platform-add-btn{padding:3px 10px;background:none;border:1px dashed var(--bdr2);border-radius:20px;font-size:11px;color:var(--tx3);cursor:pointer;transition:all .15s;font-family:inherit}
+.settle-platform-add-btn:hover{border-color:var(--ac);color:var(--ac)}
+.settle-platform-inp{padding:3px 8px;background:var(--surf);border:1px solid var(--ac);border-radius:20px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;width:80px}
+
+/* 플랫폼 색상 */
+.settle-dot-리디{background:#ff6b6b}
+.settle-dot-카카페{background:#ffd43b}
+.settle-dot-시리즈{background:#51cf66}
+.settle-dot-문피아{background:#339af0}
+.settle-dot-default{background:#a0aec0}
+
+/* ── 정산 2단계: 작품 정보 카드 + 월별 그리드 */
+.settle-info-card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.settle-info-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.settle-info-work{font-size:16px;font-weight:800;color:var(--tx)}
+.settle-info-platform{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2)}
+.settle-info-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.settle-field{display:flex;flex-direction:column;gap:3px}
+.settle-field-lbl{font-size:10px;font-weight:700;color:var(--tx3)}
+.settle-field-inp{background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--tx);outline:none;font-family:inherit;width:100%;box-sizing:border-box}
+.settle-field-inp:focus{border-color:var(--ac)}
+.settle-field-inp.sel{background:var(--surf2)}
+.settle-del-btn{background:none;border:1px solid rgba(248,81,73,.3);border-radius:5px;color:var(--rd);font-size:11px;cursor:pointer;padding:4px 10px;font-family:inherit}
+.settle-del-btn:hover{background:rgba(248,81,73,.08)}
+
+/* 연도 탭 */
+.settle-year-tabs{display:flex;gap:4px;align-items:center}
+.settle-year-tab{padding:4px 12px;border-radius:6px;border:1px solid var(--bdr);background:none;color:var(--tx3);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.settle-year-tab.on{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700}
+.settle-year-tab:hover:not(.on){background:var(--surf2);color:var(--tx)}
+.settle-year-add{padding:4px 8px;border-radius:6px;border:1px dashed var(--bdr2);background:none;color:var(--tx3);font-size:11px;cursor:pointer;font-family:inherit}
+.settle-year-add:hover{border-color:var(--ac);color:var(--ac)}
+
+/* 월별 그리드 */
+.settle-grid-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
+.settle-grid-hdr{display:grid;grid-template-columns:80px repeat(12,1fr) 80px;background:var(--surf2);border-bottom:1px solid var(--bdr)}
+.settle-grid-hdr-cell{padding:7px 4px;font-size:10px;font-weight:700;color:var(--tx3);text-align:center;border-right:1px solid var(--bdr2)}
+.settle-grid-hdr-cell:last-child{border-right:none;color:var(--ac)}
+.settle-grid-row{display:grid;grid-template-columns:80px repeat(12,1fr) 80px}
+.settle-grid-cell{padding:2px 3px;border-right:1px solid var(--bdr2);border-top:1px solid var(--bdr2)}
+.settle-grid-cell:last-child{border-right:none;background:rgba(56,139,253,.05)}
+.settle-grid-inp{width:100%;background:transparent;border:none;outline:none;font-size:11px;color:var(--tx);text-align:right;padding:4px 4px;font-family:inherit;box-sizing:border-box}
+.settle-grid-inp:focus{background:rgba(56,139,253,.07)}
+.settle-grid-total{font-size:11px;font-weight:800;color:var(--ac);text-align:right;padding:6px 6px;display:flex;align-items:center;justify-content:flex-end}
+.settle-grid-advance{font-size:10px;padding:4px 8px;border-top:1px solid var(--bdr2);color:var(--tx3);text-align:right;display:flex;justify-content:space-between;align-items:center}
+.settle-grid-advance b{color:var(--gn)}
+.settle-grid-advance.negative b{color:var(--rd)}
+
+
+/* ── 정산 3단계: Zone C 차트 */
+.settle-chart-section{display:flex;flex-direction:column;gap:8px}
+.settle-chart-title{font-size:11px;font-weight:700;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.settle-chart-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px}
+.settle-spark-row{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;padding:4px 0}
+.settle-spark-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.settle-spark-lbl{font-size:9px;color:var(--tx3);font-weight:700}
+
+/* ── 정산 5단계: 상단 대시보드 */
+.settle-dashboard{border-bottom:1px solid var(--bdr);background:var(--bg);flex-shrink:0;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.settle-dash-row1{display:grid;grid-template-columns:200px 1fr 200px;gap:12px}
+.settle-dash-card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.settle-dash-card-title{font-size:11px;font-weight:700;color:var(--tx2);flex-shrink:0}
+.settle-dash-card-body{flex:1;display:flex;align-items:center;justify-content:center;min-height:120px}
+.settle-dash-empty{font-size:11px;color:var(--tx3);text-align:center}
+/* 도넛 범례 */
+.settle-donut-legend{display:flex;flex-direction:column;gap:3px;width:100%;margin-top:4px}
+.settle-donut-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--tx2)}
+.settle-donut-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+.settle-dash-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.settle-dash-card-half .settle-dash-card-body{min-height:110px}
+/* 수평 바 */
+.settle-hbar-item{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.settle-hbar-lbl{font-size:10px;color:var(--tx2);width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.settle-hbar-track{flex:1;height:14px;background:var(--surf2);border-radius:7px;overflow:hidden;position:relative}
+.settle-hbar-fill{height:100%;border-radius:7px;transition:width .4s}
+.settle-hbar-val{font-size:10px;color:var(--tx3);width:48px;flex-shrink:0;text-align:right}
 </style>
 </head>
 <body>
@@ -1785,11 +1912,88 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
   <!-- ── SETTLE ── -->
   <div class="panel" id="psettle">
-    <div class="tab-placeholder">
-      <div class="tab-placeholder-icon">💰</div>
-      <div class="tab-placeholder-title">정산관리 탭</div>
-      <div class="tab-placeholder-desc">6단계에서 구현됩니다.<br>플랫폼별 회차 정산 입력, 수익 차트</div>
-      <div class="tab-placeholder-badge">6단계</div>
+    <div class="settle-wrap">
+      <!-- 상단 요약바 -->
+      <div class="settle-topbar">
+        <div class="settle-topbar-year">
+          <button class="settle-topbar-nav" onclick="settleChYear(-1)">◀</button>
+          <span id="settle-year-lbl">2026년</span>
+          <button class="settle-topbar-nav" onclick="settleChYear(1)">▶</button>
+        </div>
+        <div class="settle-kpi">
+          <div class="settle-kpi-val" id="settle-kpi-total">—</div>
+          <div class="settle-kpi-lbl">연간 총수익</div>
+        </div>
+        <div class="settle-kpi">
+          <div class="settle-kpi-val" id="settle-kpi-month">—</div>
+          <div class="settle-kpi-lbl">이번달 수익</div>
+        </div>
+        <div class="settle-kpi">
+          <div class="settle-kpi-val" id="settle-kpi-works">—</div>
+          <div class="settle-kpi-lbl">작품 수</div>
+        </div>
+        <div class="settle-kpi">
+          <div class="settle-kpi-val" id="settle-kpi-contracts">—</div>
+          <div class="settle-kpi-lbl">등록 수</div>
+        </div>
+        <div style="margin-left:auto;flex-shrink:0">
+          <button class="settle-topbar-nav" id="settle-dash-toggle" onclick="settleToggleDash()" style="padding:4px 10px;font-size:11px">📊 대시보드 ▾</button>
+        </div>
+      </div>
+      <!-- 대시보드 (5단계) -->
+      <div class="settle-dashboard" id="settle-dashboard" style="display:none">
+        <!-- Row 1 -->
+        <div class="settle-dash-row1">
+          <div class="settle-dash-card" id="settle-dash-donut">
+            <div class="settle-dash-card-title">🍩 작품별 수익 비중</div>
+            <div class="settle-dash-card-body" id="settle-dash-donut-body"></div>
+          </div>
+          <div class="settle-dash-card settle-dash-card-wide" id="settle-dash-stackbar">
+            <div class="settle-dash-card-title">📊 월별 수익 × 플랫폼</div>
+            <div class="settle-dash-card-body" id="settle-dash-stackbar-body"></div>
+          </div>
+          <div class="settle-dash-card" id="settle-dash-line">
+            <div class="settle-dash-card-title">📈 연도별 추이</div>
+            <div class="settle-dash-card-body" id="settle-dash-line-body"></div>
+          </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="settle-dash-row2">
+          <div class="settle-dash-card settle-dash-card-half" id="settle-dash-hbar">
+            <div class="settle-dash-card-title">🏆 작품별 누적 수익 랭킹</div>
+            <div class="settle-dash-card-body" id="settle-dash-hbar-body"></div>
+          </div>
+          <div class="settle-dash-card settle-dash-card-half" id="settle-dash-compline">
+            <div class="settle-dash-card-title">🔀 작품별 월별 비교</div>
+            <div class="settle-dash-card-body" id="settle-dash-compline-body"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 메인 바디 -->
+      <div class="settle-body">
+        <!-- Zone B: 사이드바 -->
+        <div class="settle-side">
+          <div class="settle-side-hdr">
+            <span>작품 목록</span>
+          </div>
+          <div class="settle-side-list" id="settle-side-list"></div>
+          <div class="settle-side-add">
+            <button class="settle-add-btn" onclick="settleAddWork()">＋ 새 작품 추가</button>
+          </div>
+        </div>
+        <!-- Zone C: 메인 -->
+        <div class="settle-main" id="settle-main">
+          <div class="settle-empty">
+            <div class="settle-empty-icon">💰</div>
+            <div>좌측에서 계약을 선택하거나<br>새 계약을 추가하세요</div>
+          </div>
+        </div>
+      </div>
+      <!-- Zone D: 플랫폼 관리 -->
+      <div class="settle-platform-zone" id="settle-platform-zone">
+        <div class="settle-platform-hdr">🏢 플랫폼 관리</div>
+        <div class="settle-platform-list" id="settle-platform-list"></div>
+      </div>
     </div>
   </div>
 
@@ -2111,6 +2315,7 @@ const S={
   profile:{},     // 작가 프로필
   writingNodes:[], // 집필 트리 (2단계)
   toolNodes:[],   // 작품도구 (3단계)
+  settle:{platforms:['리디','카카페','시리즈','문피아'],works:[]}, // 정산관리 (income: {year: {platform: [12개월]}})
   sy:new Date().getFullYear(),
   sm:new Date().getMonth()+1,
   curTab:'home',
@@ -2125,7 +2330,7 @@ async function save(){
     await IDB.setAll({
       works:S.works,scheds:S.scheds,archives:S.archives,
       profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,
-      toolsOpenMap:S._toolsOpenMap,
+      toolsOpenMap:S._toolsOpenMap,settle:S.settle,
       ts:new Date().toISOString(),
     });
     const si=document.getElementById('saveind');
@@ -2160,6 +2365,9 @@ async function load(){
     syncWritingToWorks();
     S.toolNodes   = data.toolNodes    || [];
     S._toolsOpenMap = data.toolsOpenMap || {};
+    S.settle = data.settle || {platforms:['리디','카카페','시리즈','문피아'],works:[]};
+    if(!S.settle.platforms) S.settle.platforms=['리디','카카페','시리즈','문피아'];
+    if(!S.settle.works) S.settle.works=[];
     // ── 데이터 마이그레이션: 구버전 toolNodes (id 필드 없음) 처리 ──
     S.toolNodes.forEach((n,i)=>{
       if(!n.id) n.id = uid();
@@ -2266,6 +2474,7 @@ function switchTab(t){
   if(t==='schedule'){renderSched();}
   if(t==='archive'){renderArchive();}
   if(t==='tools'){renderToolsTree();}
+  if(t==='settle'){initSettleTab();}
 }
 
 
@@ -3431,6 +3640,992 @@ function makeSVGDonut(segments, size=80, thickness=16){
   return svg;
 }
 
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  정산관리 탭
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let _settleSelId = null;
+let _settleYear  = new Date().getFullYear();
+
+function settlePlatformColor(p){
+  return {'리디':'#ff6b6b','카카페':'#ffd43b','시리즈':'#51cf66','문피아':'#339af0'}[p]||'#a0aec0';
+}
+function settleFmt(n){
+  if(!n||n===0) return '—';
+  if(n>=100000000) return (n/100000000).toFixed(1)+'억';
+  if(n>=10000) return Math.round(n/10000)+'만';
+  return n.toLocaleString()+'원';
+}
+function settleYearTotal(workId, year){
+  const wk=(S.settle.works||[]).find(w=>w.id===workId);
+  if(!wk) return 0;
+  let total=0;
+  if(wk.income&&wk.income[year]){
+    const yd=wk.income[year];
+    if(typeof yd==='object'&&!Array.isArray(yd)){
+      total=Object.values(yd).reduce((s,arr)=>s+(Array.isArray(arr)?arr.reduce((a,v)=>a+(parseInt(v)||0),0):0),0);
+    } else if(Array.isArray(yd)){
+      total=yd.reduce((s,v)=>s+(parseInt(v)||0),0);
+    }
+  }
+  // 선인세도 수익 — 연간 합계에 포함
+  total += parseInt(wk.advance)||0;
+  return total;
+}
+// 특정 연도 특정 월의 작품 전 플랫폼 합계
+function settleMonthRowTotal(wk, year, monthIdx){
+  if(!wk.income||!wk.income[year]) return 0;
+  const yd=wk.income[year];
+  if(typeof yd==='object'&&!Array.isArray(yd)){
+    return Object.values(yd).reduce((s,arr)=>s+(Array.isArray(arr)?(parseInt(arr[monthIdx])||0):0),0);
+  }
+  if(Array.isArray(yd)) return parseInt(yd[monthIdx])||0;
+  return 0;
+}
+function settleChYear(d){
+  _settleYear+=d;
+  const el=document.getElementById('settle-year-lbl');
+  if(el) el.textContent=_settleYear+'년';
+  renderSettle();
+}
+
+function renderSettle(){
+  renderSettleTopbar();
+  renderSettleSide();
+  renderSettlePlatforms();
+  renderSettleDash();
+}
+function initSettleTab(){ renderSettle(); }
+
+/* ── 상단 요약바 */
+function renderSettleTopbar(){
+  const y=_settleYear, now=new Date(), m=now.getMonth()+1;
+  const works=S.settle.works||[];
+  const total=works.reduce((s,w)=>s+settleYearTotal(w.id,y),0);
+  const monthAmt=works.reduce((s,w)=>{
+    if(!w.income||!w.income[y]) return s;
+    const yd=w.income[y];
+    if(typeof yd==='object'&&!Array.isArray(yd)){
+      return s+Object.values(yd).reduce((a,arr)=>a+(Array.isArray(arr)?(parseInt(arr[m-1])||0):0),0);
+    }
+    if(Array.isArray(yd)) return s+(parseInt(yd[m-1])||0);
+    return s;
+  },0);
+  const workNames=[...new Set(works.map(w=>w.workName).filter(Boolean))].length;
+  const g=id=>document.getElementById(id);
+  if(g('settle-kpi-total'))    g('settle-kpi-total').textContent    = total>0?total.toLocaleString()+'원':'—';
+  if(g('settle-kpi-month'))    g('settle-kpi-month').textContent    = monthAmt>0?monthAmt.toLocaleString()+'원':'—';
+  if(g('settle-kpi-works'))    g('settle-kpi-works').textContent    = workNames+'개';
+  if(g('settle-kpi-contracts'))g('settle-kpi-contracts').textContent= works.length+'개';
+}
+
+/* ── Zone B 사이드바 */
+function renderSettleSide(){
+  const list=document.getElementById('settle-side-list'); if(!list) return;
+  const y=_settleYear;
+  const works=S.settle.works||[];
+  list.innerHTML='';
+
+  if(!works.length){
+    list.innerHTML='<div style="padding:20px 12px;font-size:11px;color:var(--tx3);text-align:center;line-height:1.7">작품을 추가하면<br>여기에 목록이 나타납니다</div>';
+    return;
+  }
+
+  // 작품명으로 그룹핑
+  const groupMap={};
+  works.forEach(wk=>{
+    const wn=wk.workName||'(이름 없음)';
+    if(!groupMap[wn]) groupMap[wn]={name:wn,open:true,items:[]};
+    groupMap[wn].items.push(wk);
+  });
+
+  Object.values(groupMap).forEach(g=>{
+    const grpDiv=document.createElement('div'); grpDiv.className='settle-work-group';
+    const lbl=document.createElement('div'); lbl.className='settle-work-label';
+    const arrow=document.createElement('span'); arrow.className='settle-work-arrow open'; arrow.textContent='▶';
+    const nm=document.createElement('span'); nm.style.cssText='flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px'; nm.textContent=g.name;
+    lbl.append(arrow,nm);
+    lbl.onclick=()=>{
+      g.open=!g.open;
+      arrow.className='settle-work-arrow'+(g.open?' open':'');
+      grpDiv.querySelectorAll('.settle-contract-item').forEach(el=>el.style.display=g.open?'':'none');
+    };
+    grpDiv.appendChild(lbl);
+
+    g.items.forEach(wk=>{
+      const item=document.createElement('div');
+      item.className='settle-contract-item'+(wk.id===_settleSelId?' sel':'');
+      const dot=document.createElement('span');
+      dot.className='settle-contract-dot';
+      dot.style.background='var(--ac)';
+      const name=document.createElement('span');
+      name.className='settle-contract-name';
+      name.textContent=wk.publisher||'출판사 미입력';
+      const total=settleYearTotal(wk.id,y);
+      const amt=document.createElement('span');
+      amt.className='settle-work-amt';
+      amt.textContent=total>0?settleFmt(total):'';
+      item.append(dot,name,amt);
+      item.onclick=()=>{ _settleSelId=wk.id; renderSettleSide(); renderSettleMain(); };
+      grpDiv.appendChild(item);
+    });
+    list.appendChild(grpDiv);
+  });
+}
+
+/* ── Zone C 메인 */
+function renderSettleMain(){
+  const main=document.getElementById('settle-main'); if(!main) return;
+  const wk=(S.settle.works||[]).find(w=>w.id===_settleSelId);
+  if(!wk){
+    main.innerHTML='<div class="settle-empty"><div class="settle-empty-icon">💰</div><div>좌측에서 작품을 선택하거나<br>새 작품을 추가하세요</div></div>';
+    return;
+  }
+  main.innerHTML='';
+
+  // ── 작품 정보 카드
+  const card=document.createElement('div'); card.className='settle-info-card';
+  const titleRow=document.createElement('div'); titleRow.className='settle-info-title';
+  const workTitle=document.createElement('div'); workTitle.className='settle-info-work'; workTitle.textContent=wk.workName;
+  const platInfo=document.createElement('div'); platInfo.className='settle-info-platform';
+  const platDot=document.createElement('span'); platDot.style.cssText='width:9px;height:9px;border-radius:50%;background:'+settlePlatformColor(wk.platform)+';display:inline-block';
+  const platName=document.createElement('span'); platName.textContent=wk.platform||'—';
+  const delBtn=document.createElement('button'); delBtn.className='settle-del-btn'; delBtn.textContent='🗑 삭제';
+  delBtn.onclick=()=>settleDeleteWork(wk.id);
+  platInfo.append(platDot,platName);
+  titleRow.append(workTitle,platInfo,delBtn);
+  card.appendChild(titleRow);
+
+  const platforms=S.settle.platforms||['리디','카카페','시리즈','문피아'];
+  const fields=[
+    {key:'publisher',label:'출판사',type:'text',ph:'출판사명'},
+    {key:'settleDay',label:'정산일',type:'text',ph:'예: 14일, 말일'},
+    {key:'advance',label:'선인세 (원)',type:'number',ph:'0'},
+    {key:'memo',label:'메모',type:'text',ph:'기타 메모'},
+  ];
+  const fieldGrid=document.createElement('div'); fieldGrid.className='settle-info-fields';
+  fields.forEach(f=>{
+    const wrap=document.createElement('div'); wrap.className='settle-field';
+    const lbl=document.createElement('div'); lbl.className='settle-field-lbl'; lbl.textContent=f.label;
+    const el=document.createElement('input'); el.type=f.type||'text';
+    el.className='settle-field-inp'; el.placeholder=f.ph||'';
+    el.value=wk[f.key]||'';
+    let _t;
+    el.oninput=()=>{ wk[f.key]=(f.type==='number'?parseInt(el.value)||0:el.value); clearTimeout(_t); _t=setTimeout(()=>{ dsave(); renderSettleSide(); renderSettleTopbar(); },600); };
+    wrap.append(lbl,el); fieldGrid.appendChild(wrap);
+  });
+  card.appendChild(fieldGrid);
+  main.appendChild(card);
+
+  // ── 연도 탭
+  if(!wk.income) wk.income={};
+  // 새 구조로 초기화
+  const _initYear=(yr)=>{
+    if(!wk.income[yr]||Array.isArray(wk.income[yr])){
+      const plts=S.settle.platforms||['리디','카카페','시리즈','문피아'];
+      const yi={종합:Array(12).fill(0)};
+      plts.forEach(p=>{ yi[p]=Array(12).fill(0); });
+      wk.income[yr]=yi;
+    }
+    // 플랫폼 관리에서 새로 추가된 플랫폼 있으면 행 추가
+    const plts=S.settle.platforms||[];
+    plts.forEach(p=>{ if(!wk.income[yr][p]) wk.income[yr][p]=Array(12).fill(0); });
+    if(!wk.income[yr]['종합']) wk.income[yr]['종합']=Array(12).fill(0);
+  };
+  if(!wk.income[_settleYear]) _initYear(_settleYear);
+  let selYear=_settleYear;
+
+  const yearTabBar=document.createElement('div'); yearTabBar.style.cssText='display:flex;align-items:center;gap:8px';
+  const tabsRow=document.createElement('div'); tabsRow.className='settle-year-tabs';
+  const gridWrap=document.createElement('div');
+
+  const renderTabs=()=>{
+    tabsRow.innerHTML='';
+    const years=Object.keys(wk.income).map(Number).sort();
+    years.forEach(yr=>{
+      const btn=document.createElement('button');
+      btn.className='settle-year-tab'+(yr===selYear?' on':'');
+      btn.textContent=yr+'년';
+      btn.onclick=()=>{ selYear=yr; _initYear(selYear); renderTabs(); renderGrid(); };
+      tabsRow.appendChild(btn);
+    });
+    const addYrBtn=document.createElement('button'); addYrBtn.className='settle-year-add'; addYrBtn.textContent='＋ 연도';
+    addYrBtn.onclick=()=>{
+      const maxY=Math.max(...Object.keys(wk.income).map(Number));
+      const ny=maxY+1; _initYear(ny); dsave();
+      selYear=ny; renderTabs(); renderGrid();
+    };
+    tabsRow.appendChild(addYrBtn);
+  };
+  const renderGrid=()=>{
+    gridWrap.innerHTML='';
+    _renderSettleGrid(gridWrap,wk,selYear);
+    // 입력 후 차트 갱신
+    const cw=document.getElementById('settle-chart-wrap-'+wk.id);
+    if(cw){ cw.innerHTML=''; _renderSettleCharts(cw,wk,()=>selYear); }
+  };
+  yearTabBar.appendChild(tabsRow);
+  main.appendChild(yearTabBar);
+  main.appendChild(gridWrap);
+  // ── 차트 영역 (그리드 아래)
+  const chartWrap=document.createElement('div'); chartWrap.id='settle-chart-wrap-'+wk.id;
+  main.appendChild(chartWrap);
+  renderTabs();
+  renderGrid();
+  _renderSettleCharts(chartWrap, wk, ()=>selYear);
+}
+
+function _renderSettleGrid(wrap,wk,year){
+  if(!wk.income) wk.income={};
+  if(!wk.income[year]||Array.isArray(wk.income[year])){
+    const plts=S.settle.platforms||['리디','카카페','시리즈','문피아'];
+    const yi={종합:Array(12).fill(0)}; plts.forEach(p=>{ yi[p]=Array(12).fill(0); });
+    wk.income[year]=yi;
+  }
+  // 플랫폼 추가됐을 때 행 보완
+  const plts=S.settle.platforms||['리디','카카페','시리즈','문피아'];
+  plts.forEach(p=>{ if(!wk.income[year][p]) wk.income[year][p]=Array(12).fill(0); });
+  if(!wk.income[year]['종합']) wk.income[year]['종합']=Array(12).fill(0);
+
+  const yd=wk.income[year];
+  const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  // 행 순서: 종합 먼저, 그 다음 플랫폼들
+  const rowKeys=['종합',...plts];
+
+  const grid=document.createElement('div'); grid.className='settle-grid-wrap';
+
+  // 헤더
+  const hdr=document.createElement('div'); hdr.className='settle-grid-hdr';
+  [{t:year+'년',w:80},...months.map(m=>({t:m,w:null})),{t:'소계',w:80}].forEach(({t})=>{
+    const h=document.createElement('div'); h.className='settle-grid-hdr-cell'; h.textContent=t; hdr.appendChild(h);
+  });
+  grid.appendChild(hdr);
+
+  // 플랫폼별 행
+  const getRowSum=(key)=>(yd[key]||Array(12).fill(0)).reduce((s,v)=>s+(parseInt(v)||0),0);
+  const getMonthTotal=(mi)=>rowKeys.reduce((s,k)=>s+(parseInt((yd[k]||[])[mi])||0),0);
+
+  // 합계 행 요소 미리 생성
+  const totalRowCells=[];
+  const yearTotalEl=document.createElement('div');
+  yearTotalEl.className='settle-grid-total';
+
+  const updateAll=()=>{
+    // 월별 합계 행 업데이트
+    months.forEach((_,mi)=>{
+      if(totalRowCells[mi]) totalRowCells[mi].textContent=getMonthTotal(mi).toLocaleString();
+    });
+    // 연간 총합 (월정산 합계 + 선인세)
+    const monthlyTotal=rowKeys.reduce((s,k)=>s+getRowSum(k),0);
+    const adv=parseInt(wk.advance)||0;
+    const grandTotal=monthlyTotal+adv;
+    yearTotalEl.innerHTML=(adv>0
+      ? `<span style="font-size:10px;color:var(--tx3)">월정산 ${monthlyTotal.toLocaleString()}+선인세 ${adv.toLocaleString()}</span><br>${grandTotal.toLocaleString()}원`
+      : grandTotal.toLocaleString()+'원');
+    renderSettleTopbar(); renderSettleSide();
+    // 에리어차트 실시간 갱신
+    const cw=document.getElementById('settle-chart-wrap-'+wk.id);
+    if(cw){ cw.innerHTML=''; _renderSettleCharts(cw,wk,()=>year); }
+  };
+
+  rowKeys.forEach(key=>{
+    if(!yd[key]) yd[key]=Array(12).fill(0);
+    const row=document.createElement('div'); row.className='settle-grid-row';
+    // 행 라벨
+    const lbl=document.createElement('div'); lbl.className='settle-grid-cell';
+    lbl.style.cssText='display:flex;align-items:center;padding:4px 8px;font-size:10px;font-weight:700;flex-shrink:0;'+(key==='종합'?'color:var(--tx2)':'color:var(--ac)');
+    // 종합이 아닌 행은 플랫폼 색상 닷
+    if(key!=='종합'){
+      const dot=document.createElement('span');
+      dot.style.cssText='width:7px;height:7px;border-radius:50%;background:'+settlePlatformColor(key)+';display:inline-block;margin-right:4px;flex-shrink:0';
+      lbl.appendChild(dot);
+    }
+    lbl.appendChild(document.createTextNode(key));
+    row.appendChild(lbl);
+
+    months.forEach((_,mi)=>{
+      const cell=document.createElement('div'); cell.className='settle-grid-cell';
+      const inp=document.createElement('input'); inp.className='settle-grid-inp';
+      inp.type='number'; inp.min='0';
+      inp.value=yd[key][mi]||0;
+      let _t;
+      inp.oninput=()=>{ yd[key][mi]=parseInt(inp.value)||0; clearTimeout(_t); _t=setTimeout(()=>{ dsave(); updateAll(); },400); };
+      inp.onfocus=()=>{ if(inp.value==='0') inp.value=''; };
+      inp.onblur=()=>{ if(inp.value==='') inp.value=0; };
+      cell.appendChild(inp); row.appendChild(cell);
+    });
+    // 행 소계
+    const subCell=document.createElement('div'); subCell.className='settle-grid-cell';
+    const subEl=document.createElement('div'); subEl.className='settle-grid-total'; subEl.style.fontSize='10px';
+    subCell.appendChild(subEl); row.appendChild(subCell);
+    grid.appendChild(row);
+    // 행 소계 실시간 업데이트
+    row.querySelectorAll('.settle-grid-inp').forEach((inp,mi)=>{
+      inp.addEventListener('input',()=>{ subEl.textContent=getRowSum(key).toLocaleString(); });
+    });
+  });
+
+  // 선인세 행 (선인세 있을 때만 표시)
+  const adv2=parseInt(wk.advance)||0;
+  if(adv2>0){
+    const advRow=document.createElement('div'); advRow.className='settle-grid-row';
+    advRow.style.background='rgba(56,139,253,.04)';
+    const advLbl=document.createElement('div'); advLbl.className='settle-grid-cell';
+    advLbl.style.cssText='display:flex;align-items:center;padding:4px 8px;font-size:10px;font-weight:700;color:var(--ac);gap:4px';
+    advLbl.innerHTML='<span style="font-size:11px">💰</span>선인세';
+    advRow.appendChild(advLbl);
+    // 선인세는 1월 칸에 표시 (실제 수령 시점 기록용)
+    months.forEach((_,mi)=>{
+      const cell=document.createElement('div'); cell.className='settle-grid-cell';
+      if(mi===0){
+        const el=document.createElement('div');
+        el.style.cssText='text-align:right;padding:6px 4px;font-size:11px;font-weight:700;color:var(--ac)';
+        el.textContent=adv2.toLocaleString();
+        el.title='선인세 (수익에 합산됨)';
+        cell.appendChild(el);
+      }
+      advRow.appendChild(cell);
+    });
+    const advTotal=document.createElement('div'); advTotal.className='settle-grid-cell';
+    const advTotalEl=document.createElement('div'); advTotalEl.className='settle-grid-total';
+    advTotalEl.style.color='var(--ac)';
+    advTotalEl.textContent=adv2.toLocaleString()+'원';
+    advTotal.appendChild(advTotalEl); advRow.appendChild(advTotal);
+    grid.appendChild(advRow);
+  }
+
+  // 월별 합계 행
+  const totalRow=document.createElement('div'); totalRow.className='settle-grid-row';
+  totalRow.style.background='var(--surf2)';
+  const totalLbl=document.createElement('div'); totalLbl.className='settle-grid-cell';
+  totalLbl.style.cssText='display:flex;align-items:center;padding:4px 8px;font-size:10px;font-weight:700;color:var(--tx2)';
+  totalLbl.textContent='월 합계'; totalRow.appendChild(totalLbl);
+  months.forEach((_,mi)=>{
+    const cell=document.createElement('div'); cell.className='settle-grid-cell';
+    const el=document.createElement('div'); el.className='settle-grid-total'; el.style.cssText='font-size:11px;color:var(--ac)';
+    totalRowCells.push(el); cell.appendChild(el); totalRow.appendChild(cell);
+  });
+  const yrCell=document.createElement('div'); yrCell.className='settle-grid-cell';
+  yrCell.appendChild(yearTotalEl); totalRow.appendChild(yrCell);
+  grid.appendChild(totalRow);
+
+  wrap.appendChild(grid);
+  updateAll();
+}
+
+/* ── 작품 추가 */
+function settleAddWork(){
+  const sideList=document.getElementById('settle-side-list'); if(!sideList) return;
+  if(document.getElementById('settle-add-form')){ document.getElementById('settle-add-form').remove(); return; }
+  const platforms=S.settle.platforms||['리디','카카페','시리즈','문피아'];
+  const form=document.createElement('div'); form.id='settle-add-form';
+  form.style.cssText='padding:10px 12px;background:var(--surf2);border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:6px';
+  const nameInp=document.createElement('input'); nameInp.type='text'; nameInp.placeholder='작품명';
+  nameInp.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:4px 8px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;width:100%;box-sizing:border-box';
+  nameInp.onfocus=()=>nameInp.style.borderColor='var(--ac)';
+  nameInp.onblur=()=>nameInp.style.borderColor='var(--bdr)';
+  const pubInp=document.createElement('input');
+  pubInp.type='text'; pubInp.placeholder='출판사명 (선택)';
+  pubInp.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:4px 8px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;width:100%;box-sizing:border-box';
+  const btnRow=document.createElement('div'); btnRow.style.cssText='display:flex;gap:6px';
+  const okBtn=document.createElement('button');
+  okBtn.style.cssText='flex:1;background:var(--ac);color:#fff;border:none;border-radius:5px;padding:5px;font-size:11px;cursor:pointer;font-family:inherit';
+  okBtn.textContent='추가';
+  const cancelBtn=document.createElement('button');
+  cancelBtn.style.cssText='background:none;border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--tx2);cursor:pointer;font-family:inherit';
+  cancelBtn.textContent='취소';
+  const doAdd=()=>{
+    const workName=nameInp.value.trim(); if(!workName){ nameInp.focus(); return; }
+    const publisher=pubInp.value.trim()||'';
+    // income 구조: {year: {종합:[12], 리디:[12], 카카페:[12], ...}}
+    const plts=S.settle.platforms||['리디','카카페','시리즈','문피아'];
+    const yearIncome={종합:Array(12).fill(0)};
+    plts.forEach(p=>{ yearIncome[p]=Array(12).fill(0); });
+    const wk={ id:uid(), workName, publisher, settleDay:'', advance:0, memo:'', income:{} };
+    wk.income[_settleYear]=yearIncome;
+    if(!S.settle.works) S.settle.works=[];
+    S.settle.works.push(wk);
+    _settleSelId=wk.id;
+    form.remove();
+    dsave(); renderSettle(); renderSettleMain();
+    toast('"'+wk.workName+'" 추가됐습니다.');
+  };
+  okBtn.onclick=doAdd;
+  cancelBtn.onclick=()=>form.remove();
+  nameInp.onkeydown=e=>{ if(e.key==='Enter')doAdd(); if(e.key==='Escape')form.remove(); };
+  btnRow.append(okBtn,cancelBtn);
+  form.append(nameInp,pubInp,btnRow);
+  const sideAdd=document.querySelector('.settle-side-add');
+  if(sideAdd) sideAdd.insertAdjacentElement('beforebegin',form);
+  else sideList.appendChild(form);
+  nameInp.focus();
+}
+
+/* ── 작품 삭제 */
+function settleDeleteWork(id){
+  const wk=(S.settle.works||[]).find(w=>w.id===id);
+  if(!wk||!confirm('"'+wk.workName+'('+wk.platform+')" 작품을 삭제하시겠습니까?')) return;
+  S.settle.works=S.settle.works.filter(w=>w.id!==id);
+  if(_settleSelId===id) _settleSelId=null;
+  dsave(); renderSettle(); renderSettleMain();
+}
+
+/* ── Zone D 플랫폼 관리 */
+function renderSettlePlatforms(){
+  const list=document.getElementById('settle-platform-list'); if(!list) return;
+  const platforms=S.settle.platforms||[];
+  list.innerHTML='';
+  platforms.forEach((p,i)=>{
+    const chip=document.createElement('div'); chip.className='settle-platform-chip';
+    const dot=document.createElement('span'); dot.style.cssText='width:8px;height:8px;border-radius:50%;background:'+settlePlatformColor(p)+';display:inline-block;margin-right:3px';
+    const nm=document.createElement('span'); nm.textContent=p;
+    const del=document.createElement('button'); del.className='settle-platform-del'; del.textContent='✕';
+    del.onclick=()=>{ if(!confirm('"'+p+'" 플랫폼을 삭제하시겠습니까?')) return; S.settle.platforms.splice(i,1); dsave(); renderSettlePlatforms(); };
+    chip.append(dot,nm,del); list.appendChild(chip);
+  });
+  const addBtn=document.createElement('button'); addBtn.className='settle-platform-add-btn'; addBtn.textContent='＋ 추가';
+  addBtn.onclick=()=>{
+    addBtn.style.display='none';
+    const inp=document.createElement('input'); inp.className='settle-platform-inp'; inp.placeholder='플랫폼명';
+    const finish=()=>{
+      const v=inp.value.trim();
+      if(v&&!S.settle.platforms.includes(v)){ S.settle.platforms.push(v); dsave(); }
+      renderSettlePlatforms();
+    };
+    inp.onkeydown=e=>{ if(e.key==='Enter')finish(); if(e.key==='Escape')renderSettlePlatforms(); };
+    inp.onblur=()=>setTimeout(finish,150);
+    list.appendChild(inp); inp.focus();
+  };
+  list.appendChild(addBtn);
+}
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  정산 차트 (3단계)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 작품의 연도별 월합계 배열 추출
+function _settleMonthTotals(wk, year){
+  if(!wk.income||!wk.income[year]) return Array(12).fill(0);
+  const yd=wk.income[year];
+  if(Array.isArray(yd)) return yd.map(v=>parseInt(v)||0);
+  return Array.from({length:12},(_,i)=>
+    Object.values(yd).reduce((s,arr)=>s+(Array.isArray(arr)?(parseInt(arr[i])||0):0),0)
+  );
+}
+
+// SVG 에리어차트 생성
+function _makeSettleAreaChart(totals, year, w=520, h=120){
+  const max=Math.max(...totals,1);
+  const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const pad={l:36,r:12,t:14,b:22};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const px=(i)=>pad.l+i*(cw/11);
+  const py=(v)=>pad.t+ch-(v/max)*ch;
+
+  // 경로
+  const pts=totals.map((v,i)=>`${px(i)},${py(v)}`);
+  const linePath='M'+pts.join('L');
+  const areaPath=linePath+`L${px(11)},${pad.t+ch} L${px(0)},${pad.t+ch} Z`;
+
+  // Y축 눈금 (3개)
+  const yTicks=[0,Math.round(max/2),max].map(v=>{
+    const label=v>=10000?Math.round(v/10000)+'만':v.toLocaleString();
+    return `<text x="${pad.l-4}" y="${py(v)+4}" text-anchor="end" font-size="8" fill="var(--tx3)">${label}</text>
+<line x1="${pad.l}" y1="${py(v)}" x2="${pad.l+cw}" y2="${py(v)}" stroke="var(--bdr)" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+  }).join('');
+
+  // X축 월 라벨
+  const xLabels=months.map((m,i)=>`<text x="${px(i)}" y="${h-4}" text-anchor="middle" font-size="8" fill="var(--tx3)">${m}</text>`).join('');
+
+  // 데이터 포인트
+  const dots=totals.map((v,i)=>v>0?`<circle cx="${px(i)}" cy="${py(v)}" r="3" fill="var(--ac)" stroke="var(--surf)" stroke-width="1.5"/>
+<title>${months[i]}월: ${v.toLocaleString()}원</title>`:'').join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px;display:block">
+  <defs>
+    <linearGradient id="ag${year}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--ac)" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="var(--ac)" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  ${yTicks}
+  <path d="${areaPath}" fill="url(#ag${year})" stroke="none"/>
+  <path d="${linePath}" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linejoin="round"/>
+  ${dots}
+  ${xLabels}
+</svg>`;
+}
+
+// SVG 스파크라인 (단일 연도용 초소형)
+function _makeSparkline(totals, color='var(--ac)', w=80, h=32){
+  if(!totals||!totals.length) return '';
+  const max=Math.max(...totals,1);
+  const pts=totals.map((v,i)=>`${(i/(totals.length-1))*w},${h-2-(v/max)*(h-4)}`);
+  const line='M'+pts.join('L');
+  const area=line+`L${w},${h} L0,${h} Z`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+  <path d="${area}" fill="${color}" opacity="0.15"/>
+  <path d="${line}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>`;
+}
+
+// Zone C 하단 차트 렌더 (에리어 + 스파크라인)
+function _renderSettleCharts(wrap, wk, getYear){
+  wrap.innerHTML='';
+  const selYear=getYear();
+  const allYears=Object.keys(wk.income||{}).map(Number).sort();
+
+  // ① 에리어차트
+  const areaSection=document.createElement('div'); areaSection.className='settle-chart-wrap';
+  const areaTitle=document.createElement('div'); areaTitle.className='settle-chart-title';
+  areaTitle.innerHTML=`<span style="color:var(--ac)">▣</span> ${selYear}년 월별 수익 추이`;
+  const totals=_settleMonthTotals(wk, selYear);
+  const hasData=totals.some(v=>v>0);
+  const areaChart=document.createElement('div');
+  if(hasData){
+    areaChart.innerHTML=_makeSettleAreaChart(totals, selYear);
+  } else {
+    areaChart.style.cssText='text-align:center;padding:20px;font-size:11px;color:var(--tx3)';
+    areaChart.textContent='데이터를 입력하면 차트가 표시됩니다';
+  }
+  areaSection.append(areaTitle, areaChart);
+  wrap.appendChild(areaSection);
+
+  // ② 스파크라인 (연도별 나란히 비교)
+  if(allYears.length>0){
+    const sparkSection=document.createElement('div'); sparkSection.className='settle-chart-wrap';
+    const sparkTitle=document.createElement('div'); sparkTitle.className='settle-chart-title';
+    sparkTitle.innerHTML='<span style="color:var(--yw)">▣</span> 연도별 월별 추이 비교';
+    const sparkRow=document.createElement('div'); sparkRow.className='settle-spark-row';
+    const colors=['var(--ac)','var(--yw)','var(--gn)','#f472b6','#a78bfa'];
+    allYears.forEach((yr,idx)=>{
+      const yTotals=_settleMonthTotals(wk,yr);
+      const hasY=yTotals.some(v=>v>0);
+      const item=document.createElement('div'); item.className='settle-spark-item';
+      item.style.opacity = yr===selYear ? '1' : '0.6';
+      const lbl=document.createElement('div'); lbl.className='settle-spark-lbl';
+      lbl.style.color = yr===selYear ? 'var(--ac)' : 'var(--tx3)';
+      lbl.textContent=yr+'년';
+      const chart=document.createElement('div');
+      if(hasY){
+        chart.innerHTML=_makeSparkline(yTotals, colors[idx%colors.length]);
+      } else {
+        chart.style.cssText='width:80px;height:32px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--tx3)';
+        chart.textContent='—';
+      }
+      const sum=yTotals.reduce((s,v)=>s+v,0);
+      const sumEl=document.createElement('div');
+      sumEl.style.cssText='font-size:9px;color:var(--tx3);font-weight:700';
+      sumEl.textContent=sum>0?settleFmt(sum):'0원';
+      item.append(lbl,chart,sumEl);
+      sparkRow.appendChild(item);
+    });
+    sparkSection.append(sparkTitle,sparkRow);
+    wrap.appendChild(sparkSection);
+  }
+
+  // ③ 복수 연도 비교 라인차트
+  if(allYears.length>=2){
+    const compSection=document.createElement('div'); compSection.className='settle-chart-wrap';
+    const compTitle=document.createElement('div'); compTitle.className='settle-chart-title';
+    compTitle.innerHTML='<span style="color:var(--gn)">▣</span> 연도별 비교 라인';
+    const compChart=document.createElement('div');
+    const allTotals=allYears.map(yr=>_settleMonthTotals(wk,yr));
+    const hasComp=allTotals.some(t=>t.some(v=>v>0));
+    if(hasComp){
+      compChart.innerHTML=_makeSettleCompLine(allTotals, allYears);
+    } else {
+      compChart.style.cssText='text-align:center;padding:16px;font-size:11px;color:var(--tx3)';
+      compChart.textContent='2개 이상 연도의 데이터가 있으면 비교 차트가 표시됩니다';
+    }
+    compSection.append(compTitle, compChart);
+    wrap.appendChild(compSection);
+  }
+
+  // ④ 히트맵 (연도×월)
+  if(allYears.length>0){
+    const heatSection=document.createElement('div'); heatSection.className='settle-chart-wrap';
+    const heatTitle=document.createElement('div'); heatTitle.className='settle-chart-title';
+    heatTitle.innerHTML='<span style="color:#f472b6">▣</span> 수익 히트맵 (연도×월)';
+    const heatChart=document.createElement('div');
+    heatChart.innerHTML=_makeSettleHeatmap(wk, allYears);
+    heatSection.append(heatTitle, heatChart);
+    wrap.appendChild(heatSection);
+  }
+}
+
+
+// ③ 복수 연도 비교 라인차트 SVG
+function _makeSettleCompLine(allTotals, years, w=520, h=140){
+  const allVals=allTotals.flat();
+  const max=Math.max(...allVals,1);
+  const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const pad={l:40,r:60,t:14,b:22};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const px=i=>pad.l+i*(cw/11);
+  const py=v=>pad.t+ch-(v/max)*ch;
+  const colors=['var(--ac)','var(--yw)','var(--gn)','#f472b6','#a78bfa'];
+
+  // Y축 눈금
+  const yTicks=[0,Math.round(max/2),max].map(v=>{
+    const lbl=v>=10000?Math.round(v/10000)+'만':v.toLocaleString();
+    return `<text x="${pad.l-4}" y="${py(v)+4}" text-anchor="end" font-size="8" fill="var(--tx3)">${lbl}</text>
+<line x1="${pad.l}" y1="${py(v)}" x2="${pad.l+cw}" y2="${py(v)}" stroke="var(--bdr)" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+  }).join('');
+
+  // X축
+  const xLabels=months.map((m,i)=>`<text x="${px(i)}" y="${h-4}" text-anchor="middle" font-size="8" fill="var(--tx3)">${m}</text>`).join('');
+
+  // 연도별 라인
+  const lines=allTotals.map((totals,yi)=>{
+    const col=colors[yi%colors.length];
+    const pts=totals.map((v,i)=>`${px(i)},${py(v)}`);
+    const line=`<path d="M${pts.join('L')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" opacity="0.9"/>`;
+    const dots=totals.map((v,i)=>v>0?`<circle cx="${px(i)}" cy="${py(v)}" r="2.5" fill="${col}"><title>${years[yi]}년 ${months[i]}월: ${v.toLocaleString()}원</title></circle>`:'').join('');
+    return line+dots;
+  }).join('');
+
+  // 범례 (우측)
+  const legend=years.map((yr,yi)=>{
+    const col=colors[yi%colors.length];
+    const y2=pad.t+yi*16;
+    return `<line x1="${pad.l+cw+8}" y1="${y2+5}" x2="${pad.l+cw+22}" y2="${y2+5}" stroke="${col}" stroke-width="2"/>
+<text x="${pad.l+cw+26}" y="${y2+9}" font-size="9" fill="var(--tx2)">${yr}년</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px;display:block">
+  ${yTicks}${xLabels}${lines}${legend}
+</svg>`;
+}
+
+// ④ 히트맵 SVG (연도×월)
+function _makeSettleHeatmap(wk, years){
+  if(!years||!years.length) return '';
+  const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+  // 전체 최대값
+  let globalMax=0;
+  const grid=years.map(yr=>{
+    const totals=_settleMonthTotals(wk,yr);
+    totals.forEach(v=>{ if(v>globalMax)globalMax=v; });
+    return {yr, totals};
+  });
+
+  const cellW=36, cellH=22, lblW=44, hdrH=20;
+  const totalW=lblW+months.length*cellW;
+  const totalH=hdrH+years.length*cellH+4;
+
+  // 월 헤더
+  const mHdr=months.map((m,i)=>`<text x="${lblW+i*cellW+cellW/2}" y="14" text-anchor="middle" font-size="8" fill="var(--tx3)">${m}</text>`).join('');
+
+  // 행
+  const rows=grid.map(({yr,totals},ri)=>{
+    const y=hdrH+ri*cellH;
+    const cells=totals.map((v,ci)=>{
+      const ratio=globalMax>0?v/globalMax:0;
+      // 수익 많을수록 진한 파란색
+      const alpha=(0.08+ratio*0.85).toFixed(2);
+      const textCol=ratio>0.5?'#fff':'var(--tx2)';
+      const lbl=v>0?(v>=10000?Math.round(v/10000)+'만':v.toLocaleString()):'';
+      return `<rect x="${lblW+ci*cellW}" y="${y}" width="${cellW-1}" height="${cellH-1}" rx="2"
+        fill="var(--ac)" fill-opacity="${alpha}"/>
+<text x="${lblW+ci*cellW+cellW/2}" y="${y+cellH/2+4}" text-anchor="middle" font-size="7.5" fill="${textCol}">${lbl}</text>`;
+    }).join('');
+    const yrLbl=`<text x="${lblW-4}" y="${y+cellH/2+4}" text-anchor="end" font-size="9" font-weight="700" fill="var(--tx2)">${yr}</text>`;
+    return yrLbl+cells;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${totalW} ${totalH}" width="100%" style="max-width:${totalW}px;display:block;overflow:visible">
+  ${mHdr}${rows}
+</svg>`;
+}
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  정산 대시보드 (5단계)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let _settleDashOpen = false;
+
+function settleToggleDash(){
+  _settleDashOpen = !_settleDashOpen;
+  const dash = document.getElementById('settle-dashboard');
+  const btn  = document.getElementById('settle-dash-toggle');
+  if(dash) dash.style.display = _settleDashOpen ? 'flex' : 'none';
+  if(btn)  btn.textContent = _settleDashOpen ? '📊 대시보드 ▴' : '📊 대시보드 ▾';
+  if(_settleDashOpen) renderSettleDash();
+}
+
+function renderSettleDash(){
+  if(!_settleDashOpen) return;
+  const y    = _settleYear;
+  const works = S.settle.works||[];
+  const plts  = S.settle.platforms||['리디','카카페','시리즈','문피아'];
+
+  // ── 도넛: 작품별 연간 수익 비중
+  const donutBody = document.getElementById('settle-dash-donut-body');
+  if(donutBody){
+    const COLORS = ['#388bfd','#3fb950','#f0883e','#bc8cff','#ff7b72','#56d364','#ffa657','#58a6ff','#d2a8ff'];
+    const wkData = works.map((w,i)=>({
+      name: w.workName||'—',
+      val:  settleYearTotal(w.id, y),
+      color: COLORS[i%COLORS.length]
+    })).filter(d=>d.val>0);
+    const total = wkData.reduce((s,d)=>s+d.val, 0);
+    if(!wkData.length){
+      donutBody.innerHTML='<div class="settle-dash-empty">데이터 없음</div>';
+    } else {
+      donutBody.style.cssText='display:flex;flex-direction:column;align-items:center;width:100%;gap:6px';
+      donutBody.innerHTML='';
+      // SVG 도넛
+      const svg = _makeSettleDonut(wkData, total);
+      donutBody.insertAdjacentHTML('beforeend', svg);
+      // 범례
+      const leg = document.createElement('div'); leg.className='settle-donut-legend';
+      wkData.slice(0,6).forEach(d=>{
+        const pct = Math.round(d.val/total*100);
+        leg.insertAdjacentHTML('beforeend',
+          `<div class="settle-donut-legend-item">
+            <span class="settle-donut-dot" style="background:${d.color}"></span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</span>
+            <span style="flex-shrink:0;font-weight:700">${pct}%</span>
+          </div>`);
+      });
+      donutBody.appendChild(leg);
+    }
+  }
+
+  // ── 스택바: 월별 × 플랫폼
+  const stackBody = document.getElementById('settle-dash-stackbar-body');
+  if(stackBody){
+    // 월별 × 플랫폼 집계
+    const allKeys = ['종합', ...plts];
+    const PLT_COLORS = {'종합':'#7d8590','리디':'#ff6b6b','카카페':'#ffd43b','시리즈':'#51cf66','문피아':'#339af0'};
+    const getColor = k => PLT_COLORS[k]||('#'+Math.abs(k.split('').reduce((a,c)=>a*31+c.charCodeAt(0),0)).toString(16).slice(0,6).padStart(6,'9'));
+    // 월별 각 플랫폼 합계
+    const monthData = Array.from({length:12},(_,mi)=>{
+      const row={};
+      allKeys.forEach(k=>{
+        row[k]=works.reduce((s,w)=>{
+          if(!w.income||!w.income[y]||!w.income[y][k]) return s;
+          return s+(parseInt(w.income[y][k][mi])||0);
+        },0);
+      });
+      return row;
+    });
+    const monthMax = Math.max(...monthData.map(r=>Object.values(r).reduce((s,v)=>s+v,0)),1);
+    const hasData = monthData.some(r=>Object.values(r).some(v=>v>0));
+    if(!hasData){
+      stackBody.innerHTML='<div class="settle-dash-empty">데이터 없음</div>';
+    } else {
+      stackBody.innerHTML='';
+      stackBody.appendChild(
+        _makeSettleStackBar(monthData, allKeys, monthMax, getColor)
+      );
+    }
+  }
+
+  // ── Row2 렌더
+  _renderSettleDashRow2(y, works);
+
+  // ── 라인: 연도별 총수익 추이
+  const lineBody = document.getElementById('settle-dash-line-body');
+  if(lineBody){
+    // 전체 작품의 연도별 총합 수집
+    const allYears = [...new Set(works.flatMap(w=>Object.keys(w.income||{})))].map(Number).sort();
+    if(allYears.length<2){
+      lineBody.innerHTML='<div class="settle-dash-empty">연도 2개 이상<br>입력 시 표시됩니다</div>';
+    } else {
+      const totals = allYears.map(yr=>works.reduce((s,w)=>s+settleYearTotal(w.id,yr),0));
+      lineBody.innerHTML='';
+      lineBody.insertAdjacentHTML('beforeend', _makeSettleYearLine(allYears, totals));
+    }
+  }
+}
+
+// 도넛차트 SVG
+function _makeSettleDonut(data, total, size=130){
+  const cx=size/2, cy=size/2, R=size*0.38, r=size*0.22;
+  let angle=-Math.PI/2;
+  const paths=data.map(d=>{
+    const sweep=(d.val/total)*2*Math.PI;
+    const x1=cx+R*Math.cos(angle), y1=cy+R*Math.sin(angle);
+    angle+=sweep;
+    const x2=cx+R*Math.cos(angle), y2=cy+R*Math.sin(angle);
+    const large=sweep>Math.PI?1:0;
+    const ix1=cx+r*Math.cos(angle-sweep), iy1=cy+r*Math.sin(angle-sweep);
+    const ix2=cx+r*Math.cos(angle), iy2=cy+r*Math.sin(angle);
+    return `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R} 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} L${ix2.toFixed(1)},${iy2.toFixed(1)} A${r},${r} 0 ${large},0 ${ix1.toFixed(1)},${iy1.toFixed(1)} Z" fill="${d.color}" opacity="0.9"/>`;
+  }).join('');
+  const totalLbl = total>=10000?Math.round(total/10000)+'만':total.toLocaleString();
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+  ${paths}
+  <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="9" fill="var(--tx3)">총수익</text>
+  <text x="${cx}" y="${cy+10}" text-anchor="middle" font-size="11" font-weight="800" fill="var(--tx)">${totalLbl}</text>
+</svg>`;
+}
+
+// 스택 바차트 DOM
+function _makeSettleStackBar(monthData, keys, monthMax, getColor){
+  const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const wrap=document.createElement('div');
+  wrap.style.cssText='width:100%;display:flex;flex-direction:column;gap:4px';
+  // 바 영역
+  const bars=document.createElement('div');
+  bars.style.cssText='display:flex;align-items:flex-end;gap:3px;height:100px;width:100%';
+  months.forEach((_,mi)=>{
+    const colTotal=Object.values(monthData[mi]).reduce((s,v)=>s+v,0);
+    const col=document.createElement('div');
+    col.style.cssText='flex:1;display:flex;flex-direction:column-reverse;align-items:stretch;height:100%;justify-content:flex-start;gap:0;position:relative';
+    col.title=months[mi]+'월: '+colTotal.toLocaleString()+'원';
+    let usedH=0;
+    keys.forEach(k=>{
+      const v=monthData[mi][k]||0;
+      if(!v) return;
+      const h=Math.max(2,Math.round((v/monthMax)*100));
+      usedH+=h;
+      const seg=document.createElement('div');
+      seg.style.cssText=`height:${h}px;background:${getColor(k)};opacity:0.85;border-radius:${usedH===h?'3px 3px':'0'} 0 0`;
+      col.appendChild(seg);
+    });
+    bars.appendChild(col);
+  });
+  wrap.appendChild(bars);
+  // X축 월 라벨
+  const xlbl=document.createElement('div');
+  xlbl.style.cssText='display:flex;gap:3px';
+  months.forEach(m=>{
+    const l=document.createElement('div');
+    l.style.cssText='flex:1;text-align:center;font-size:8px;color:var(--tx3)';
+    l.textContent=m;xlbl.appendChild(l);
+  });
+  wrap.appendChild(xlbl);
+  return wrap;
+}
+
+// 연도별 라인차트 SVG
+function _makeSettleYearLine(years, totals, w=180, h=100){
+  const max=Math.max(...totals,1);
+  const pad={l:32,r:8,t:10,b:18};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const px=i=>pad.l+i*(cw/Math.max(years.length-1,1));
+  const py=v=>pad.t+ch-(v/max)*ch;
+  const pts=totals.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`);
+  const line='M'+pts.join('L');
+  const area=line+`L${px(years.length-1).toFixed(1)},${pad.t+ch} L${px(0).toFixed(1)},${pad.t+ch} Z`;
+  const dots=totals.map((v,i)=>{
+    const lbl=v>=10000?Math.round(v/10000)+'만':v.toLocaleString();
+    return `<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="3" fill="var(--ac)" stroke="var(--surf)" stroke-width="1.5"/>
+<text x="${px(i).toFixed(1)}" y="${Math.max(py(v)-6,pad.t+8)}" text-anchor="middle" font-size="8" fill="var(--ac)">${lbl}</text>`;
+  }).join('');
+  const xLabels=years.map((yr,i)=>`<text x="${px(i).toFixed(1)}" y="${h-2}" text-anchor="middle" font-size="8" fill="var(--tx3)">${yr}</text>`).join('');
+  const yMax=max>=10000?Math.round(max/10000)+'만':max.toLocaleString();
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px;display:block">
+  <text x="${pad.l-2}" y="${pad.t+4}" text-anchor="end" font-size="7" fill="var(--tx3)">${yMax}</text>
+  <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t+ch}" stroke="var(--bdr)" stroke-width="0.5"/>
+  <defs><linearGradient id="ylg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--ac)" stop-opacity="0.25"/><stop offset="100%" stop-color="var(--ac)" stop-opacity="0.02"/></linearGradient></defs>
+  <path d="${area}" fill="url(#ylg)"/>
+  <path d="${line}" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linejoin="round"/>
+  ${dots}${xLabels}
+</svg>`;
+}
+
+
+// ── Row2: 수평 바 랭킹 + 비교 라인
+
+function _renderSettleDashRow2(y, works){
+  const COLORS=['#388bfd','#3fb950','#f0883e','#bc8cff','#ff7b72','#56d364','#ffa657','#58a6ff'];
+
+  // ── 수평 바: 작품별 누적 수익 랭킹 (전 연도 합산)
+  const hbarBody=document.getElementById('settle-dash-hbar-body');
+  if(hbarBody){
+    hbarBody.innerHTML='';
+    // 전 연도 누적
+    const ranked=works.map((w,i)=>{
+      const total=Object.keys(w.income||{}).reduce((s,yr)=>s+settleYearTotal(w.id,parseInt(yr)),0);
+      // settleYearTotal은 선인세 포함이지만 연도별로 중복 포함될 수 있으니 advance는 1회만
+      return {name:w.workName||'—', val:total, color:COLORS[i%COLORS.length]};
+    }).filter(d=>d.val>0).sort((a,b)=>b.val-a.val);
+    if(!ranked.length){
+      hbarBody.innerHTML='<div class="settle-dash-empty">데이터 없음</div>';
+    } else {
+      const maxVal=ranked[0].val;
+      hbarBody.style.cssText='display:flex;flex-direction:column;width:100%;padding:4px 0';
+      ranked.slice(0,8).forEach((d,i)=>{
+        const pct=Math.round(d.val/maxVal*100);
+        const lbl=d.val>=100000000?(d.val/100000000).toFixed(1)+'억':d.val>=10000?Math.round(d.val/10000)+'만':d.val.toLocaleString();
+        const item=document.createElement('div'); item.className='settle-hbar-item';
+        const rank=document.createElement('div');
+        rank.style.cssText='font-size:9px;font-weight:800;color:var(--tx3);width:12px;flex-shrink:0;text-align:center';
+        rank.textContent=i+1;
+        const lblEl=document.createElement('div'); lblEl.className='settle-hbar-lbl'; lblEl.textContent=d.name; lblEl.title=d.name;
+        const track=document.createElement('div'); track.className='settle-hbar-track';
+        const fill=document.createElement('div'); fill.className='settle-hbar-fill';
+        fill.style.cssText=`width:${pct}%;background:${d.color}`;
+        track.appendChild(fill);
+        const valEl=document.createElement('div'); valEl.className='settle-hbar-val'; valEl.textContent=lbl;
+        item.append(rank,lblEl,track,valEl);
+        hbarBody.appendChild(item);
+      });
+    }
+  }
+
+  // ── 비교 라인: 작품별 이번 해 월별 추이 (최대 5작품)
+  const compBody=document.getElementById('settle-dash-compline-body');
+  if(compBody){
+    compBody.innerHTML='';
+    const wkData=works.map((w,i)=>({
+      name:w.workName||'—',
+      totals:_settleMonthTotals(w,y),
+      color:COLORS[i%COLORS.length]
+    })).filter(d=>d.totals.some(v=>v>0)).slice(0,5);
+    if(!wkData.length){
+      compBody.innerHTML='<div class="settle-dash-empty">데이터 없음</div>';
+    } else {
+      compBody.insertAdjacentHTML('beforeend',
+        _makeSettleWorkCompLine(wkData, y));
+    }
+  }
+}
+
+// 작품별 비교 라인차트 SVG
+function _makeSettleWorkCompLine(wkData, year, w=280, h=110){
+  const allVals=wkData.flatMap(d=>d.totals);
+  const max=Math.max(...allVals,1);
+  const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const pad={l:32,r:8,t:14,b:18};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const px=i=>pad.l+i*(cw/11);
+  const py=v=>pad.t+ch-(v/max)*ch;
+
+  const yMax=max>=10000?Math.round(max/10000)+'만':max.toLocaleString();
+  const yMid=Math.round(max/2);
+  const yMidLbl=yMid>=10000?Math.round(yMid/10000)+'만':yMid.toLocaleString();
+
+  const yTicks=`
+<text x="${pad.l-3}" y="${py(max)+4}" text-anchor="end" font-size="7" fill="var(--tx3)">${yMax}</text>
+<line x1="${pad.l}" y1="${py(max)}" x2="${pad.l+cw}" y2="${py(max)}" stroke="var(--bdr)" stroke-width="0.5" stroke-dasharray="2,2"/>
+<text x="${pad.l-3}" y="${py(yMid)+4}" text-anchor="end" font-size="7" fill="var(--tx3)">${yMidLbl}</text>
+<line x1="${pad.l}" y1="${py(yMid)}" x2="${pad.l+cw}" y2="${py(yMid)}" stroke="var(--bdr)" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+
+  const xLabels=months.map((m,i)=>
+    `<text x="${px(i).toFixed(1)}" y="${h-3}" text-anchor="middle" font-size="7" fill="var(--tx3)">${m}</text>`
+  ).join('');
+
+  const lines=wkData.map(d=>{
+    const pts=d.totals.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`);
+    return `<path d="M${pts.join('L')}" fill="none" stroke="${d.color}" stroke-width="1.8" stroke-linejoin="round" opacity="0.9"/>`;
+  }).join('');
+
+  // 범례 (우측 상단)
+  const legend=wkData.map((d,i)=>`
+<rect x="${pad.l}" y="${pad.t+i*14}" width="10" height="3" rx="1.5" fill="${d.color}"/>
+<text x="${pad.l+13}" y="${pad.t+i*14+3}" font-size="7.5" fill="var(--tx2)">${d.name.slice(0,7)}</text>`).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px;display:block">
+  ${yTicks}${xLabels}${lines}${legend}
+</svg>`;
+}
 function exportSchedImg(){toast('이미지 내보내기는 집필 탭 완성 후 구현 예정입니다.');}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -3841,7 +5036,7 @@ function loadEditorDefaults(){
 //  SETTINGS — BACKUP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function exportData(){
-  const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,lastWritingWork:S._lastWritingWork,lastWritingCh:S._lastWritingCh,v:1,date:new Date().toISOString()};
+  const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,settle:S.settle,lastWritingWork:S._lastWritingWork,lastWritingCh:S._lastWritingCh,v:1,date:new Date().toISOString()};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
   a.download='집필스튜디오_백업_'+new Date().toLocaleDateString('ko-KR').replace(/\.\s*/g,'-').replace(/-$/,'')+'.json';
   a.click();toast('백업 파일이 다운로드되었습니다.');
@@ -3857,6 +5052,7 @@ function importData(){
         if(d.works)S.works=d.works;if(d.scheds)S.scheds=d.scheds;
         if(d.archives)S.archives=d.archives;if(d.profile)S.profile=d.profile;
         if(d.toolsOpenMap)S._toolsOpenMap=d.toolsOpenMap;
+    if(d.settle)S.settle=d.settle;
         // 홈화면 신규 필드 초기화 (구버전 백업 파일 호환)
         if(!S.profile.activityLog) S.profile.activityLog=[];
         if(!S.profile.todos)       S.profile.todos=[];
@@ -3953,7 +5149,7 @@ async function gdPush(auto=false){
   if(_gdBusy){if(!auto)toast('저장 중입니다...');return;}
   _gdBusy=true;if(!auto)gdBar('💾 Google Drive에 저장 중...','ing',0);gdLog('저장 중...');
   try{
-    const payload=JSON.stringify({works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,v:1,date:new Date().toISOString()});
+    const payload=JSON.stringify({works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,settle:S.settle,v:1,date:new Date().toISOString()});
     const existing=await gdFindFile(token,GD_FNAME);
     const boundary='-------wsstudio_boundary';const meta=JSON.stringify({name:GD_FNAME,mimeType:'application/json'});
     const body=`--${boundary}\r\nContent-Type: application/json\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${payload}\r\n--${boundary}--`;
