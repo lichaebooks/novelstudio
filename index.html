@@ -2,12 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no" name="viewport"/>
+<meta content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <title>집필 스튜디오</title>
 <script async defer src="https://accounts.google.com/gsi/client"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+button,a,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 :root{
   --bg:#0d1117;--surf:#161b22;--surf2:#1c2128;--surf3:#21262d;
   --bdr:#30363d;--bdr2:#21262d;
@@ -115,7 +116,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 /* ── HEADER ── */
 .hdr{height:46px;background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 8px;gap:4px;flex-shrink:0;z-index:100;min-width:0}
 .hlogo{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;cursor:default;user-select:none}
-.tabs{display:flex;gap:2px;flex:1;min-width:0;overflow:hidden}
+.tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
 .tbtn{background:none;border:none;padding:5px 9px;border-radius:var(--r);color:var(--tx3);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap;flex-shrink:0}
 .tbtn:hover{background:var(--surf2);color:var(--tx)}
 .tbtn.on{background:var(--surf2);color:var(--ac);font-weight:600}
@@ -162,6 +163,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 .abody{flex:1;overflow:hidden;min-height:0}
 .panel{display:none;height:100%;flex-direction:column}
 .panel.on{display:flex}
+.panel,.panel *{-webkit-overflow-scrolling:touch;}
 
 /* ── STATUS BAR (bottom) ── */
 .statusbar{height:26px;background:var(--surf);border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 14px;gap:16px;flex-shrink:0;font-size:11px;color:var(--tx3)}
@@ -220,7 +222,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
 
 /* MBEditor toolbar */
 .mbtb{background:var(--surf2);border-bottom:1px solid var(--bdr);padding:5px 8px;display:flex;flex-wrap:wrap;align-items:center;gap:2px;flex-shrink:0}
-.mbt{background:none;border:1px solid transparent;border-radius:4px;min-width:26px;height:26px;padding:0 5px;color:var(--tx2);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .1s,border-color .1s;white-space:nowrap;font-family:inherit;position:relative}
+.mbt{background:none;border:1px solid transparent;border-radius:4px;min-width:26px;height:26px;touch-action:manipulation;padding:0 5px;color:var(--tx2);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .1s,border-color .1s;white-space:nowrap;font-family:inherit;position:relative}
 .mbt:hover{background:var(--surf3);border-color:var(--bdr);color:var(--tx)}
 .mbt.on{background:rgba(56,139,253,.15);border-color:var(--ac);color:var(--ac)}
 .mbsel{background:var(--surf);border:1px solid var(--bdr);border-radius:4px;color:var(--tx2);font-size:11px;padding:2px 4px;height:26px;cursor:pointer;outline:none;font-family:inherit}
@@ -1532,7 +1534,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
    정산관리 탭
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #psettle{overflow:hidden;flex-direction:column}
-.settle-wrap{display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden}
+.settle-wrap{display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden;min-height:0}
 
 /* 상단 요약바 */
 .settle-topbar{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;flex-wrap:wrap}
@@ -1697,6 +1699,170 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .custom-alarm-time{font-size:11px;color:var(--ac);font-weight:700;width:50px;text-align:right;flex-shrink:0}
 .custom-alarm-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:1px 5px}
 .custom-alarm-del:hover{color:var(--rd)}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   E-2 모바일 반응형 (600px 이하)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media(max-width:600px){
+
+  /* ── 공통 터치 타겟 */
+  button,input,select,textarea{font-size:16px!important;} /* iOS 자동줌 방지 */
+  .tbtn{padding:6px 8px;font-size:11px!important;}
+  .hbtn{padding:5px 8px;font-size:11px!important;}
+
+  /* ── 헤더 */
+  .hdr{padding:0 6px;gap:3px;}
+  .hlogo{font-size:18px;}
+  .lockbtn{padding:4px 7px;}
+
+  /* ── 홈 탭 */
+  .home-body{padding:12px;gap:14px;}
+  .hm-quick-bar{padding:8px 12px;gap:6px;flex-wrap:wrap;}
+  .hm-quick-btn{padding:5px 10px;font-size:11px!important;}
+  /* 홈 통계 4열 → 2열 */
+  .hm-stat-row{grid-template-columns:1fr 1fr!important;}
+  /* 홈 좌우 2열 → 단열 */
+  .hm-main{flex-direction:column!important;overflow:visible!important;}
+  .hm-right{width:100%!important;border-left:none!important;border-top:1px solid var(--bdr);}
+  .hm-left{padding:12px!important;overflow-y:visible!important;}
+
+  /* ── 집필 탭: 사이드바 숨기고 토글 버튼으로 */
+  #pwriting{flex-direction:column!important;}
+  .sidebar#writing-sidebar{
+    width:100%!important;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s;
+    border-right:none!important;
+    border-bottom:1px solid var(--bdr);
+  }
+  .sidebar#writing-sidebar.mobile-open{max-height:60vh;overflow-y:auto;}
+  #writing-mobile-toggle{display:flex!important;}
+  .writing-main{min-width:0!important;width:100%!important;}
+  .writing-toolbar{flex-wrap:wrap;gap:2px;}
+  .wc-bar{font-size:10px!important;}
+  /* 분할보기 버튼 숨김 */
+  #writing-split-btn{display:none!important;}
+
+  /* ── 스케줄 탭 */
+  .schedbody{flex-direction:column!important;}
+  #sched-tracker{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    border-top:1px solid var(--bdr);
+    border-left:none!important;
+  }
+  #sched-tracker-resize{display:none!important;}
+  .schedmain{overflow-x:auto;}
+  .schedtb{flex-wrap:wrap;gap:4px;padding:6px 8px!important;}
+
+  /* ── 자료실 탭 */
+  #parchive>div{flex-direction:column!important;height:auto!important;}
+  .archive-sidebar{
+    width:100%!important;
+    max-height:160px;
+    overflow-y:auto;
+    border-right:none!important;
+    border-bottom:1px solid var(--bdr);
+    flex-shrink:0;
+  }
+  /* 자료실 메인 */
+  #parchive .archive-main,
+  #parchive>div>div:not(.archive-sidebar){min-width:0;flex:1;overflow:auto;}
+
+  /* ── 작품도구 탭 */
+  #ptools{flex-direction:column!important;}
+  #ptools>.sidebar{
+    width:100%!important;
+    max-height:45vh;
+    overflow-y:auto;
+    border-right:none!important;
+    border-bottom:1px solid var(--bdr);
+    flex-shrink:0;
+  }
+  /* inline style 덮어쓰기 */
+  #ptools>.sidebar[style]{width:100%!important;}
+  .tools-sheet-main,
+  #ptools>div:not(.sidebar){min-width:0!important;flex:1;overflow:auto;}
+
+  /* ── 정산 탭 */
+  .settle-body{flex-direction:column!important;}
+  .settle-side{
+    width:100%!important;
+    max-height:200px;
+    border-right:none!important;
+    border-bottom:1px solid var(--bdr);
+  }
+  /* 정산 그리드 가로 스크롤 */
+  .settle-grid-wrap{overflow-x:auto!important;}
+  .settle-grid-hdr,
+  .settle-grid-row{min-width:700px;}
+  .settle-main{padding:12px!important;}
+  .settle-topbar{gap:8px;padding:8px 12px!important;flex-wrap:wrap;}
+  /* 대시보드 */
+  .settle-dash-row1{grid-template-columns:1fr!important;}
+  .settle-dash-row2{grid-template-columns:1fr!important;}
+  /* 정산표 정보 카드 필드 */
+  .settle-info-fields{grid-template-columns:1fr!important;}
+
+  /* ── 설정 탭 */
+  .settings-body{padding:12px!important;}
+  .ssec{padding:14px!important;}
+  .pomo-settings-grid{grid-template-columns:1fr 1fr!important;}
+  .srow{flex-wrap:wrap;gap:4px;}
+  .slabel{min-width:80px!important;font-size:11px!important;}
+  .sinput{max-width:100%!important;font-size:14px!important;}
+  /* 정산 info card 필드 */
+  .settle-info-fields{grid-template-columns:1fr 1fr!important;}
+  /* 뽀모도로 플로팅 패널 하단 통계 */
+  .pomo-stats-body{font-size:10px!important;}
+
+  /* ── 플로팅 패널들 */
+  #float-memo,#float-pomo{
+    width:calc(100vw - 24px)!important;
+    right:12px!important;
+    bottom:calc(12px + env(safe-area-inset-bottom))!important;
+    left:auto!important;
+  }
+  /* iOS safe-area */
+  .hdr{padding-top:env(safe-area-inset-top);}
+  #toast-wrap{bottom:calc(70px + env(safe-area-inset-bottom))!important;}
+
+  /* ── 모달/다이얼로그 */
+  .mbdlg{min-width:calc(100vw - 32px)!important;padding:16px!important;}
+
+  /* ── 토스트 */
+  #toast-wrap{left:12px!important;right:12px!important;bottom:70px!important;}
+  .toast{max-width:100%!important;}
+
+  /* ── 스크롤바 얇게 */
+  ::-webkit-scrollbar{width:3px;height:3px;}
+
+  /* ── 집필 탭 모바일 토글 버튼 */
+  #writing-mobile-toggle{
+    display:flex;align-items:center;gap:6px;padding:6px 12px;
+    font-size:11px!important;background:var(--surf2);
+    border-bottom:1px solid var(--bdr);flex-shrink:0;cursor:pointer;color:var(--tx2);
+  }
+  /* ── 에디터 툴바 */
+  .mbtb,.mbwrap>.mbtoolbar{overflow-x:auto!important;flex-wrap:nowrap!important;}
+  .mbedit{font-size:15px!important;line-height:1.9!important;}
+  /* ── 컨텍스트 메뉴 */
+  .ctx-menu{max-width:calc(100vw - 24px)!important;}
+  /* ── 홈 작품 카드 */
+  .hm-work-cards{grid-template-columns:1fr!important;}
+  /* ── 정산 KPI 바 */
+  .settle-kpi{min-width:80px;flex-shrink:1;}
+  .settle-kpi-val{font-size:14px!important;}
+  /* ── 탭바 폰트 */
+  .tbtn{font-size:10px!important;padding:5px 6px!important;}
+
+}
+
+
+/* 기본: 집필 모바일 토글 버튼 숨김 */
+#writing-mobile-toggle{display:none;}
 </style>
 </head>
 <body>
@@ -1785,6 +1951,11 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
   <!-- ── WRITING ── -->
   <div class="panel" id="pwriting" style="flex-direction:row">
+    <!-- 모바일 사이드바 토글 -->
+    <div id="writing-mobile-toggle" onclick="writingToggleMobileSidebar()">
+      <span>📚</span>
+      <span id="writing-mobile-toggle-label">작품 목록 열기</span>
+    </div>
     <!-- 좌측: 작품 트리 사이드바 + 트래커 -->
     <div class="sidebar" id="writing-sidebar">
       <div class="sbhdr">
@@ -2309,7 +2480,11 @@ function showCtx(e, items){
     if(r.right>window.innerWidth) menu.style.left=(x-r.width)+'px';
     if(r.bottom>window.innerHeight) menu.style.top=(y-r.height)+'px';
   });
-  setTimeout(()=>document.addEventListener('click',function h(){menu.remove();document.removeEventListener('click',h);},true),50);
+  const _closeCtx=()=>menu.remove();
+  setTimeout(()=>{
+    document.addEventListener('click',function h(){_closeCtx();document.removeEventListener('click',h);},true);
+    document.addEventListener('touchstart',function ht(){_closeCtx();document.removeEventListener('touchstart',ht);},true);
+  },50);
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2331,10 +2506,13 @@ const IDB={
   },
   _tx(stores,mode,fn){
     return new Promise((res,rej)=>{
-      const tx=this.db.transaction(stores,mode);
-      const req=fn(tx);
-      if(req){req.onsuccess=e=>res(e.target.result);req.onerror=rej;}
-      else{tx.oncomplete=()=>res();tx.onerror=rej;}
+      if(!this.db){rej(new Error('DB 미초기화'));return;}
+      try{
+        const tx=this.db.transaction(stores,mode);
+        const req=fn(tx);
+        if(req){req.onsuccess=e=>res(e.target.result);req.onerror=e=>rej(e.target.error);}
+        else{tx.oncomplete=()=>res();tx.onerror=e=>rej(e.target.error);}
+      }catch(e){rej(e);}
     });
   },
   fput(obj){return this._tx('files','readwrite',tx=>tx.objectStore('files').put(obj));},
@@ -2375,8 +2553,10 @@ const S={
 let _loaded=false;
 let _st;
 
+let _saving=false;
 async function save(){
-  if(!_loaded)return;
+  if(!_loaded||_saving)return;
+  _saving=true;
   try{
     await IDB.setAll({
       works:S.works,scheds:S.scheds,archives:S.archives,
@@ -2386,13 +2566,27 @@ async function save(){
     });
     const si=document.getElementById('saveind');
     if(si){si.classList.add('on');clearTimeout(save._t);save._t=setTimeout(()=>si.classList.remove('on'),900);}
-  }catch(e){console.error('save err:',e);toast('⚠️ 저장 오류: '+e.message,true);}
+  }catch(e){
+    console.error('save err:',e);
+    // IDB 실패 시 localStorage fallback
+    try{
+      const fb=JSON.stringify({works:S.works,profile:S.profile,writingNodes:S.writingNodes,settle:S.settle,v:1});
+      localStorage.setItem('ws_fallback',fb);
+    }catch(_){}
+    if(e.message&&!e.message.includes('DB 미초기화')){
+      toast('⚠️ 저장 오류: '+e.message,true);
+    }
+  }
+  finally{_saving=false;}
 }
 
 function dsave(){
   try{ saveWcSnapshot(); }catch(e){}
   clearTimeout(_st);
-  _st=setTimeout(()=>{save().then(()=>gdScheduleAuto());},400);
+  _st=setTimeout(()=>{
+    if(_saving){ dsave(); return; } // 저장 중이면 재스케줄
+    save().then(()=>gdScheduleAuto()).catch(e=>console.warn('dsave err:',e));
+  },500);
 }
 function ssave(){clearTimeout(_st);_st=setTimeout(()=>save(),400);}
 
@@ -2544,7 +2738,7 @@ function initResponsiveTabs(){
   if(window.ResizeObserver){
     new ResizeObserver(()=>requestAnimationFrame(_applyTabMode)).observe(hdr);
   } else {
-    window.addEventListener('resize', _applyTabMode);
+    window.addEventListener('resize', ()=>{ _applyTabMode(); _adjustEditorForMobile(); });
   }
   requestAnimationFrame(()=>requestAnimationFrame(_applyTabMode));
 }
@@ -3811,7 +4005,14 @@ function renderSettleSide(){
     const amt=document.createElement('span');
     amt.className='settle-work-amt'; amt.textContent=total>0?settleFmt(total):'';
     item.append(dot,name,amt);
-    item.onclick=()=>{ _settleSelId=wk.id; renderSettleSide(); renderSettleMain(); };
+    item.onclick=()=>{
+      _settleSelId=wk.id; renderSettleSide(); renderSettleMain();
+      // 모바일: 선택 후 사이드바 최소화
+      if(window.innerWidth<=600){
+        const side=document.querySelector('.settle-side');
+        if(side) side.style.maxHeight='40px';
+      }
+    };
     list.appendChild(item);
   });
 }
@@ -5932,11 +6133,29 @@ class MBEditor{
   }
   _paste(e){
     const items=e.clipboardData?.items;
-    if(items){for(const item of items){if(item.type.startsWith('image/')){e.preventDefault();const blob=item.getAsFile();if(!blob)continue;const r=new FileReader();r.onload=ev=>{const html=`<span class="mb-resizable" contenteditable="false"><img src="${ev.target.result}" style="max-width:100%;border-radius:4px;display:block"><span class="mb-rhandle"></span></span><br>`;this.ce.focus();document.execCommand('insertHTML',false,html);this._initResize(this.ce);this._change();};r.readAsDataURL(blob);return;}}}
+    if(items){for(const item of items){if(item.type.startsWith('image/')){e.preventDefault();const blob=item.getAsFile();if(!blob)continue;const r=new FileReader();r.onload=ev=>{
+  const wrap=document.createElement('span'); wrap.className='mb-resizable'; wrap.contentEditable='false';
+  const img=document.createElement('img'); img.src=ev.target.result; img.style.cssText='max-width:100%;border-radius:4px;display:block';
+  const handle=document.createElement('span'); handle.className='mb-rhandle';
+  wrap.append(img,handle);
+  this.ce.focus();
+  const sel=window.getSelection();
+  if(sel&&sel.rangeCount>0){
+    const range=sel.getRangeAt(0); range.deleteContents(); range.insertNode(wrap);
+    range.setStartAfter(wrap); range.collapse(true); sel.removeAllRanges(); sel.addRange(range);
+  } else { this.ce.appendChild(wrap); }
+  this._initResize(this.ce); this._change();
+};r.readAsDataURL(blob);return;}}}
     setTimeout(()=>this._change(),80);
   }
   _syncBtns(){['bold','italic','underline','strikeThrough'].forEach(cmd=>{try{const on=document.queryCommandState(cmd);this.tb.querySelectorAll(`[data-cmd="${cmd}"]`).forEach(b=>b.classList.toggle('on',on));}catch(e){}});}
-  _change(){this._normalizeHl();clearTimeout(this._st);this._st=setTimeout(()=>this.cb(this.ce.innerHTML),400);}
+  _change(){
+    try{this._normalizeHl();}catch(e){}
+    clearTimeout(this._st);
+    this._st=setTimeout(()=>{
+      try{if(this.ce)this.cb(this.ce.innerHTML);}catch(e){console.warn('editor _change err:',e);}
+    },400);
+  }
   get html(){return this.ce.innerHTML;}
   set html(v){this.ce.innerHTML=v||'';this._syncBtns();this._wrapExistingImages();this._initResize(this.ce);this._initTableResize(this.ce);}
   _wrapExistingImages(){this.ce.querySelectorAll('img:not(.mb-resizable img)').forEach(img=>{const wrap=document.createElement('span');wrap.className='mb-resizable';wrap.contentEditable='false';const handle=document.createElement('span');handle.className='mb-rhandle';img.replaceWith(wrap);wrap.appendChild(img);wrap.appendChild(handle);});}
@@ -5962,6 +6181,16 @@ function wChapters(workId){return wNodes().filter(n=>n.t==='CH'&&n.workId===work
 function wTrash(){return wNodes().filter(n=>n.deleted);}
 
 // ── 집필 트리 렌더 ──
+
+// 모바일 집필 사이드바 토글
+function writingToggleMobileSidebar(){
+  const sb = document.getElementById('writing-sidebar');
+  const lbl = document.getElementById('writing-mobile-toggle-label');
+  if(!sb) return;
+  const isOpen = sb.classList.contains('mobile-open');
+  sb.classList.toggle('mobile-open', !isOpen);
+  if(lbl) lbl.textContent = isOpen ? '작품 목록 열기' : '작품 목록 닫기';
+}
 function writingRenderTree(){
   const tree=document.getElementById('writing-tree');if(!tree)return;
   tree.innerHTML='';
@@ -6335,6 +6564,12 @@ function writingNavChapter(dir){
   if(next) writingOpenChapter(_writingSelWork,next.id);
 }
 function writingOpenChapter(workId,chId){
+  if(window.innerWidth<=600){
+    const sb=document.getElementById('writing-sidebar');
+    const lbl=document.getElementById('writing-mobile-toggle-label');
+    if(sb) sb.classList.remove('mobile-open');
+    if(lbl) lbl.textContent='작품 목록 열기';
+  }
   _writingSelWork=workId;_writingSelCh=chId;
   S._lastWritingWork=workId; S._lastWritingCh=chId;
   const w=wNodes().find(n=>n.id===workId);
@@ -6923,6 +7158,15 @@ function writingExportAll(){
 }
 
 // ── 집필 탭 초기화 ──
+
+// 모바일 에디터 padding 조정
+function _adjustEditorForMobile(){
+  if(window.innerWidth > 600) return;
+  ['writing-ce1','writing-ce2'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.style.padding = '16px';
+  });
+}
 function initWritingTab(){
   writingRenderTree();
   // 마지막 화면 복원
@@ -6930,6 +7174,7 @@ function initWritingTab(){
     const ch=wNodes().find(n=>n.id===S._lastWritingCh&&!n.deleted);
     if(ch) writingOpenChapter(S._lastWritingWork, S._lastWritingCh);
   }
+  setTimeout(_adjustEditorForMobile, 100);
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
