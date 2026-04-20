@@ -4198,9 +4198,26 @@ function renderSettleMain(){
     });
     const addYrBtn=document.createElement('button'); addYrBtn.className='settle-year-add'; addYrBtn.textContent='＋ 연도';
     addYrBtn.onclick=()=>{
-      const maxY=Math.max(...Object.keys(wk.income).map(Number));
-      const ny=maxY+1; _initYear(ny); dsave();
-      selYear=ny; renderTabs(); renderGrid();
+      // 인라인 입력 필드로 교체
+      addYrBtn.style.display='none';
+      const inp=document.createElement('input');
+      inp.type='number'; inp.min='2000'; inp.max='2099';
+      inp.placeholder=new Date().getFullYear();
+      inp.style.cssText='width:72px;background:var(--surf2);border:1px solid var(--ac);border-radius:6px;padding:3px 7px;font-size:11px;color:var(--tx);outline:none;font-family:inherit;text-align:center';
+      const confirmAdd=()=>{
+        const yr=parseInt(inp.value);
+        if(!yr||yr<1990||yr>2099){inp.focus();return;}
+        if(wk.income[yr]){toast('이미 있는 연도입니다.',true);inp.focus();return;}
+        _initYear(yr); dsave();
+        selYear=yr; renderTabs(); renderGrid();
+      };
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){e.preventDefault();confirmAdd();}
+        if(e.key==='Escape'){inp.remove();addYrBtn.style.display='';}
+      });
+      inp.addEventListener('blur',()=>setTimeout(()=>{inp.remove();addYrBtn.style.display='';},150));
+      tabsRow.appendChild(inp);
+      inp.focus();
     };
     tabsRow.appendChild(addYrBtn);
   };
