@@ -1747,14 +1747,32 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
   /* ── 스케줄 탭 */
   #pschedule{flex-direction:column!important;overflow:hidden!important;}
   .schedbody{flex-direction:column!important;flex:1!important;overflow:hidden!important;min-height:0!important;}
+  /* tracker: 세로 배치, 초기 40vh, 세로 드래그 리사이즈 핸들로 조절 */
   #sched-tracker{
     width:100%!important;min-width:0!important;max-width:100%!important;
-    max-height:280px;overflow-y:auto;
+    height:40vh;min-height:120px;max-height:70vh;
+    overflow-y:auto;
     border-top:1px solid var(--bdr);border-left:none!important;flex-shrink:0;
   }
-  #sched-tracker-resize{display:none!important;}
-  .schedmain{flex:1!important;overflow:auto!important;min-height:0!important;}
-  .schedtb{flex-wrap:wrap;gap:4px;padding:6px 8px!important;height:auto!important;}
+  /* 리사이즈 핸들: 세로 방향으로 변환 */
+  #sched-tracker-resize{
+    display:flex!important;
+    width:100%!important;height:6px!important;
+    cursor:ns-resize!important;
+    background:var(--bdr);flex-shrink:0;
+    touch-action:none;
+  }
+  #sched-tracker-resize:hover,#sched-tracker-resize:active{background:var(--ac)!important;}
+  .schedmain{flex:1!important;overflow:auto!important;min-height:80px!important;}
+  /* schedtb: 한 줄 고정, 마감일 칩바 숨김 */
+  .schedtb{
+    flex-wrap:nowrap!important;
+    overflow:hidden!important;
+    gap:4px;padding:5px 8px!important;
+    height:44px!important;min-height:44px!important;max-height:44px!important;
+  }
+  /* 마감일 칩바: 모바일에서 숨김 (schedtb 높이 절약) */
+  #sched-deadlines{display:none!important;}
   .weeksec{min-width:320px;}
 
   /* ── 자료실 탭 */
@@ -1884,12 +1902,32 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .cs-right.collapsed{width:0!important;min-width:0!important;overflow:hidden!important;padding:0!important;border-left:none!important;}
 /* RM 사이드 패널 토글 */
 .rm-side-toggle{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 4px;margin-left:auto;}
-.rm-side.collapsed{width:0!important;min-width:0!important;overflow:hidden!important;}
+.rm-side.collapsed{
+  width:28px!important;min-width:28px!important;overflow:hidden!important;
+  /* 패널 접혀도 토글 버튼 너비는 유지 */
+}
+.rm-side.collapsed .rm-side-list{display:none!important;}
+.rm-side.collapsed .rm-side-hdr{
+  border-bottom:none!important;
+  padding:6px 4px!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+}
+.rm-side.collapsed .rm-side-hdr span:first-child{display:none!important;}
 /* 범례 모바일에서 접기 */
 @media(max-width:600px){
   .rm-legend{position:relative!important;bottom:auto!important;left:auto!important;margin:8px;width:calc(100% - 16px)!important;box-sizing:border-box;}
   .rm-container{flex-direction:column!important;}
-  .rm-side{width:100%!important;max-height:140px;border-left:none!important;border-top:1px solid var(--bdr);}
+  .rm-side{width:100%!important;max-height:160px;border-left:none!important;border-top:1px solid var(--bdr);}
+  /* 모바일 collapsed: 세로 방향이므로 높이 0으로 처리, 버튼은 hdr에 남음 */
+  .rm-side.collapsed{
+    width:100%!important;min-width:0!important;
+    max-height:36px!important;height:36px!important;
+    overflow:hidden!important;
+  }
+  .rm-side.collapsed .rm-side-list{display:none!important;}
+  .rm-side.collapsed .rm-side-hdr{border-bottom:none!important;}
+  .rm-side.collapsed .rm-side-hdr span:first-child{display:none!important;}
 }
 </style>
 </head>
@@ -3486,13 +3524,18 @@ function initSchedTrackerResize(){
   const handle = document.getElementById('sched-tracker-resize');
   const tracker = document.getElementById('sched-tracker');
   if(!handle || !tracker) return;
+
+  const isMobile = () => window.innerWidth <= 600;
+
+  // ── PC: 가로 리사이즈 (기존) ──
   let _drag=false, _sx=0, _sw=0;
   handle.addEventListener('mousedown', e=>{
+    if(isMobile()) return;
     e.preventDefault(); _drag=true; _sx=e.clientX; _sw=tracker.offsetWidth;
     document.body.style.cursor='ew-resize'; document.body.style.userSelect='none';
   });
   document.addEventListener('mousemove', e=>{
-    if(!_drag) return;
+    if(!_drag||isMobile()) return;
     const nw = Math.max(160, Math.min(500, _sw - (e.clientX - _sx)));
     tracker.style.width = nw+'px';
   });
@@ -3500,6 +3543,27 @@ function initSchedTrackerResize(){
     if(!_drag) return; _drag=false;
     document.body.style.cursor=''; document.body.style.userSelect='';
   });
+
+  // ── 모바일: 세로 터치 리사이즈 ──
+  let _tDrag=false, _tSy=0, _tSh=0;
+  handle.addEventListener('touchstart', e=>{
+    if(!isMobile()) return;
+    e.preventDefault();
+    _tDrag=true;
+    _tSy=e.touches[0].clientY;
+    _tSh=tracker.offsetHeight;
+  }, {passive:false});
+  document.addEventListener('touchmove', e=>{
+    if(!_tDrag||!isMobile()) return;
+    e.preventDefault();
+    const dy = _tSy - e.touches[0].clientY; // 위로 드래그 = tracker 커짐
+    const panel = document.getElementById('pschedule');
+    const maxH = panel ? panel.offsetHeight * 0.75 : window.innerHeight * 0.7;
+    const nh = Math.max(120, Math.min(maxH, _tSh + dy));
+    tracker.style.height = nh+'px';
+    tracker.style.maxHeight = nh+'px';
+  }, {passive:false});
+  document.addEventListener('touchend', ()=>{ _tDrag=false; });
 }
 
 function chMonth(d){S.sy=S.sm+d>12?(S.sy+1):(S.sm+d<1?(S.sy-1):S.sy);S.sm=S.sm+d>12?1:(S.sm+d<1?12:S.sm+d);renderSched();}
@@ -6751,10 +6815,6 @@ function writingRenderTracker(body, workId){
 }
 
 // 트래커 갱신 (에디터 저장 시 호출)
-function writingUpdateProgress(workId){
-  const body=document.getElementById('wt-trk-body-'+workId);
-  if(body) writingRenderTracker(body, workId);
-}
 
 // 하위 호환
 function writingUpdateGoal(val){
@@ -7330,17 +7390,9 @@ function _ttsShowPanel(){
     _ttsUtterance.pitch = parseFloat(pitchInp.value);
     // 선택된 목소리 적용
     // iOS: voices가 비동기 로드 → 빈 배열이면 onvoiceschanged 후 speak
-    const startSpeak = (utterance) => {
-      const voices = window.speechSynthesis.getVoices();
-      if(voices.length > 0){
-        const selVoice = voices.find(v => v.name === _ttsSelVoice)
-          || voices.find(v => v.lang && v.lang.startsWith('ko'))
-          || voices[0];
-        if(selVoice) utterance.voice = selVoice;
-      }
-      if(window.speechSynthesis.paused) window.speechSynthesis.resume();
-      window.speechSynthesis.speak(utterance);
-    };
+    // iOS Safari: speak()는 반드시 사용자 제스처 직접 컨텍스트에서 호출해야 함
+    // onvoiceschanged / setTimeout 내부 호출 시 iOS가 gesture context 이탈로 판단해 무음 처리
+    // 해결: voices 설정은 동기로 처리, speak()는 이 자리에서 직접 호출
     _ttsUtterance.onstart = () => { _ttsPlaying = true; };
     _ttsUtterance.onend = () => {
       _ttsPlaying=false;
@@ -7349,23 +7401,25 @@ function _ttsShowPanel(){
     _ttsUtterance.onerror = (e) => {
       _ttsPlaying=false;
       const btn=document.getElementById('writing-tts-btn');if(btn)btn.textContent='🔊 TTS';
-      // interrupted는 정상 중단 (사용자가 멈춤)이므로 오류 표시 안 함
       if(e.error === 'interrupted' || e.error === 'canceled') return;
       toast('TTS 오류: ' + (e.error||'지원하지 않는 환경일 수 있습니다.'), true);
     };
-    // iOS: paused 상태일 수 있으므로 resume 후 speak
-    // voices 로드 대기 후 speak
-    const _doSpeak = () => startSpeak(_ttsUtterance);
-    if(window.speechSynthesis.getVoices().length === 0){
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        _doSpeak();
-      };
-      // fallback: 500ms 후에도 안 되면 그냥 실행
-      setTimeout(()=>{ if(!_ttsPlaying) _doSpeak(); }, 500);
-    } else {
-      _doSpeak();
-    }
+    // 현재 로드된 voices 중에서 선택 (getVoices()는 동기로 호출)
+    const _applyVoice = (utt) => {
+      const voices = window.speechSynthesis.getVoices();
+      if(voices.length > 0){
+        const selVoice = voices.find(v => v.name === _ttsSelVoice)
+          || voices.find(v => v.lang && v.lang.startsWith('ko'))
+          || voices[0];
+        if(selVoice) utt.voice = selVoice;
+      }
+    };
+    _applyVoice(_ttsUtterance);
+    // iOS gesture-unlock: 빈 utterance로 먼저 speak() 호출해 AudioContext 활성화
+    // 이후 실제 utterance로 교체 (모두 동기 컨텍스트 내)
+    window.speechSynthesis.cancel(); // 이전 재생 정리
+    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+    window.speechSynthesis.speak(_ttsUtterance); // 직접 호출 (gesture context 유지)
     _ttsPlaying = true;
     const btn = document.getElementById('writing-tts-btn'); if(btn) btn.textContent='⏹ 정지';
     panel.remove();
@@ -8360,7 +8414,12 @@ let _rmSideCollapsed = false;
 function toggleRmSide(btn, side){
   _rmSideCollapsed=!_rmSideCollapsed;
   side.classList.toggle('collapsed',_rmSideCollapsed);
-  if(btn) btn.textContent=_rmSideCollapsed?'◀':'▶';
+  // 모바일(세로 배치)에서는 화살표 방향 전환
+  if(window.innerWidth <= 600){
+    if(btn) btn.textContent=_rmSideCollapsed?'▼':'▲';
+  } else {
+    if(btn) btn.textContent=_rmSideCollapsed?'◀':'▶';
+  }
 }
 function renderToolsCS(node, container){
   container.innerHTML = '';
@@ -10519,10 +10578,13 @@ function _rmRenderLegend(cvWrap, d){
   };
   legendHdr.append(legendTitle, legendToggle);
   legend.appendChild(legendHdr);
-  legend.appendChild(legendBody);
-  const title=legendBody; // items append to legendBody
-  legend.appendChild(title);
-  // 중복 없이 라벨 기준으로 표시
+  legend.appendChild(legendBody); // legendBody는 한 번만 append
+  // 모바일 기본 상태: 접힌 채로 시작
+  if(window.innerWidth <= 600){
+    legendBody.style.display='none';
+    legendToggle.textContent='▶';
+  }
+  // 중복 없이 라벨 기준으로 표시 — legendBody에 append (toggle 작동하려면 필수)
   const seen=new Set();
   rels.forEach(rel=>{
     const key=(rel.label||'')+'|'+(rel.color||'')+'|'+(rel.lineStyle||'');
@@ -10539,7 +10601,8 @@ function _rmRenderLegend(cvWrap, d){
     lineSvg.appendChild(ln);
     const lbl=document.createElement('span'); lbl.style.cssText='font-size:10px;color:var(--tx2)';
     lbl.textContent=rel.label||style.label;
-    item.append(lineSvg,lbl); legend.appendChild(item);
+    item.append(lineSvg,lbl);
+    legendBody.appendChild(item); // legend 아닌 legendBody에 추가
   });
   cvWrap.appendChild(legend);
 }
