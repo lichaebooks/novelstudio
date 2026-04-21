@@ -1745,17 +1745,17 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
   #writing-split-btn{display:none!important;}
 
   /* ── 스케줄 탭 */
-  .schedbody{flex-direction:column!important;}
+  #pschedule{flex-direction:column!important;overflow:hidden!important;}
+  .schedbody{flex-direction:column!important;flex:1!important;overflow:hidden!important;min-height:0!important;}
   #sched-tracker{
-    width:100%!important;
-    min-width:0!important;
-    max-width:100%!important;
-    border-top:1px solid var(--bdr);
-    border-left:none!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    max-height:280px;overflow-y:auto;
+    border-top:1px solid var(--bdr);border-left:none!important;flex-shrink:0;
   }
   #sched-tracker-resize{display:none!important;}
-  .schedmain{overflow-x:auto;}
-  .schedtb{flex-wrap:wrap;gap:4px;padding:6px 8px!important;}
+  .schedmain{flex:1!important;overflow:auto!important;min-height:0!important;}
+  .schedtb{flex-wrap:wrap;gap:4px;padding:6px 8px!important;height:auto!important;}
+  .weeksec{min-width:320px;}
 
   /* ── 자료실 탭 */
   #parchive>div{flex-direction:column!important;height:auto!important;}
@@ -1773,18 +1773,22 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
   /* ── 작품도구 탭 */
   #ptools{flex-direction:column!important;}
-  #ptools>.sidebar{
+  #tools-mobile-toggle{display:flex!important;}
+  /* 사이드바: 기본 숨김, mobile-open 클래스 시 표시 */
+  #tools-sidebar{
+    max-height:0!important;
+    overflow:hidden!important;
     width:100%!important;
-    max-height:45vh;
-    overflow-y:auto;
     border-right:none!important;
     border-bottom:1px solid var(--bdr);
     flex-shrink:0;
+    transition:max-height .3s;
   }
-  /* inline style 덮어쓰기 */
-  #ptools>.sidebar[style]{width:100%!important;}
-  .tools-sheet-main,
-  #ptools>div:not(.sidebar){min-width:0!important;flex:1;overflow:auto;}
+  #tools-sidebar.mobile-open{max-height:50vh!important;overflow-y:auto!important;}
+  #tools-sidebar[style]{width:100%!important;max-height:0!important;}
+  #tools-sidebar.mobile-open[style]{max-height:50vh!important;}
+  /* 컨텐츠 영역 */
+  #tools-content-area{min-width:0!important;flex:1;overflow:auto;}
 
   /* ── 정산 탭 */
   .settle-body{flex-direction:column!important;}
@@ -1863,6 +1867,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
 /* 기본: 집필 모바일 토글 버튼 숨김 */
 #writing-mobile-toggle{display:none;}
+#tools-mobile-toggle{display:none;}
 
 /* ── 섹션 접기/펼치기 */
 .ssec-body{transition:max-height .25s ease,opacity .2s;overflow:hidden;max-height:2000px;opacity:1}
@@ -1873,12 +1878,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
 .profile-field-lbl{font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:3px}
 
-/* 작품도구 탭 모바일 토글 */
-#tools-mobile-toggle{display:none;align-items:center;gap:6px;padding:6px 12px;font-size:11px;background:var(--surf2);border-bottom:1px solid var(--bdr);flex-shrink:0;cursor:pointer;color:var(--tx2);}
-@media(max-width:600px){
-  #tools-mobile-toggle{display:flex!important;}
-  #ptools>.sidebar.mobile-open{max-height:50vh!important;overflow-y:auto;}
-}
+/* tools toggle — see main media query */
 /* CS 우측 패널 토글 버튼 */
 .cs-right-toggle{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:12px;padding:2px 4px;margin-left:auto;}
 .cs-right.collapsed{width:0!important;min-width:0!important;overflow:hidden!important;padding:0!important;border-left:none!important;}
@@ -2937,8 +2937,12 @@ function renderHome(){
   let todayChars=0;
   if(wWorks){wWorks().forEach(w=>{
     const wc=getWcSnap(y,m)[w.id]||{};
-    const cur=parseInt(wc[todayStr])||0,prev=parseInt(wc[prevStr])||0;
-    todayChars+=Math.max(0,cur-prev);
+    const cur=parseInt(wc[todayStr])||0;
+    const prev=parseInt(wc[prevStr])||0;
+    // 오늘 처음 기록된 값과 현재 값의 차이로 계산
+    // 세션 시작 기준값 사용 (있으면)
+    const sessionBase=parseInt(wc[todayStr+'_base'])||prev;
+    todayChars+=Math.max(0,cur-sessionBase);
   });}
 
   // 다음 마감 D-day
@@ -3427,6 +3431,8 @@ function saveWcSnapshot(){
   wChapters && wWorks().forEach(w=>{
     const total=wChapters(w.id).reduce((s,ch)=>s+charsOf(ch),0);
     if(!wc[w.id]) wc[w.id]={};
+    // 오늘 최초 저장 시 base값 기록 (오늘 시작 시점 글자수)
+    if(!wc[w.id][dateStr+'_base']) wc[w.id][dateStr+'_base']=total;
     wc[w.id][dateStr]=total;
   });
 }
@@ -6042,6 +6048,8 @@ async function gdPull(){
     renderSettings();renderHome();renderSched();renderArchive();
     initWritingTab();renderToolsTree();
     if(typeof initSettleTab==='function') initSettleTab();
+    // GD 불러오기 후 오늘 글자수 스냅샷 재설정 (다른 기기 데이터와 혼재 방지)
+    try{ saveWcSnapshot(); }catch(e){}
     gdBar('✅ Drive 데이터 불러오기 완료!','ok');
   }catch(e){gdBar('❌ 불러오기 실패: '+e.message,'err');}
 }
@@ -7288,13 +7296,18 @@ function _ttsShowPanel(){
     _ttsUtterance.rate = parseFloat(rateInp.value);
     _ttsUtterance.pitch = parseFloat(pitchInp.value);
     // 선택된 목소리 적용
-    const voices = window.speechSynthesis.getVoices();
-    if(voices.length > 0){
-      const selVoice = voices.find(v => v.name === _ttsSelVoice)
-        || voices.find(v => v.lang && v.lang.startsWith('ko'))
-        || voices[0];
-      if(selVoice) _ttsUtterance.voice = selVoice;
-    }
+    // iOS: voices가 비동기 로드 → 빈 배열이면 onvoiceschanged 후 speak
+    const startSpeak = (utterance) => {
+      const voices = window.speechSynthesis.getVoices();
+      if(voices.length > 0){
+        const selVoice = voices.find(v => v.name === _ttsSelVoice)
+          || voices.find(v => v.lang && v.lang.startsWith('ko'))
+          || voices[0];
+        if(selVoice) utterance.voice = selVoice;
+      }
+      if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utterance);
+    };
     _ttsUtterance.onstart = () => { _ttsPlaying = true; };
     _ttsUtterance.onend = () => {
       _ttsPlaying=false;
@@ -7308,8 +7321,18 @@ function _ttsShowPanel(){
       toast('TTS 오류: ' + (e.error||'지원하지 않는 환경일 수 있습니다.'), true);
     };
     // iOS: paused 상태일 수 있으므로 resume 후 speak
-    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
-    window.speechSynthesis.speak(_ttsUtterance);
+    // voices 로드 대기 후 speak
+    const _doSpeak = () => startSpeak(_ttsUtterance);
+    if(window.speechSynthesis.getVoices().length === 0){
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        _doSpeak();
+      };
+      // fallback: 500ms 후에도 안 되면 그냥 실행
+      setTimeout(()=>{ if(!_ttsPlaying) _doSpeak(); }, 500);
+    } else {
+      _doSpeak();
+    }
     _ttsPlaying = true;
     const btn = document.getElementById('writing-tts-btn'); if(btn) btn.textContent='⏹ 정지';
     panel.remove();
@@ -7682,6 +7705,7 @@ function _toolsShowEmpty(){
 
 // ── 시트 노드 열기 (라우터) ──
 function toolsOpenSheetNode(node){
+  _toolsCloseMobileSidebar();
   _toolsSelNodeId = node.id;
   const info = TOOL_SHEET_TYPES[node.type] || {label: node.type, icon: '📄'};
 
@@ -8280,6 +8304,14 @@ function toolsToggleMobileSidebar(){
   const isOpen=sb.classList.contains('mobile-open');
   sb.classList.toggle('mobile-open',!isOpen);
   if(lbl) lbl.textContent=isOpen?'작품 목록 열기':'작품 목록 닫기';
+}
+// 작품도구 시트 클릭 시 모바일 사이드바 자동 닫기
+function _toolsCloseMobileSidebar(){
+  if(window.innerWidth>600) return;
+  const sb=document.getElementById('tools-sidebar');
+  const lbl=document.getElementById('tools-mobile-toggle-label');
+  if(sb){sb.classList.remove('mobile-open');}
+  if(lbl) lbl.textContent='작품 목록 열기';
 }
 
 // CS 우측 패널 접기/펼치기 (전역 상태)
@@ -10439,21 +10471,23 @@ function _rmRenderLegend(cvWrap, d){
   const legendHdr=document.createElement('div');
   legendHdr.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:5px';
   const legendTitle=document.createElement('div'); legendTitle.className='rm-legend-title';
-  legendTitle.style.margin='0'; legendTitle.textContent='🔗 관계 범례';
+  legendTitle.style.cssText='margin:0;flex:1'; legendTitle.textContent='🔗 관계 범례';
   const legendToggle=document.createElement('button');
-  legendToggle.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:10px;padding:0 2px;margin-left:auto';
+  legendToggle.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:10px;padding:0 2px;line-height:1';
   legendToggle.textContent='▼';
   legendToggle.title='범례 접기/펼치기';
   const legendBody=document.createElement('div');
   legendBody.id='rm-legend-body';
-  legendToggle.onclick=()=>{
+  legendToggle.onclick=(e)=>{
+    e.stopPropagation();
     const open=legendBody.style.display!=='none';
     legendBody.style.display=open?'none':'block';
     legendToggle.textContent=open?'▶':'▼';
   };
   legendHdr.append(legendTitle, legendToggle);
   legend.appendChild(legendHdr);
-  const title=legendBody; // alias for below
+  legend.appendChild(legendBody);
+  const title=legendBody; // items append to legendBody
   legend.appendChild(title);
   // 중복 없이 라벨 기준으로 표시
   const seen=new Set();
@@ -10474,7 +10508,6 @@ function _rmRenderLegend(cvWrap, d){
     lbl.textContent=rel.label||style.label;
     item.append(lineSvg,lbl); legend.appendChild(item);
   });
-  legend.appendChild(legendBody);
   cvWrap.appendChild(legend);
 }
 
