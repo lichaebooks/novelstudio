@@ -2622,6 +2622,8 @@ async function save(){
     });
     const si=document.getElementById('saveind');
     if(si){si.classList.add('on');clearTimeout(save._t);save._t=setTimeout(()=>si.classList.remove('on'),900);}
+    // IDB 성공해도 settle 별도 백업 (항상 최신 유지)
+    try{ localStorage.setItem('ws_fallback_settle', JSON.stringify(S.settle)); }catch(_){}
   }catch(e){
     console.error('save err:',e);
     // IDB 실패 시 localStorage fallback
@@ -2629,6 +2631,8 @@ async function save(){
       const fb=JSON.stringify({works:S.works,profile:S.profile,writingNodes:S.writingNodes,settle:S.settle,v:1});
       localStorage.setItem('ws_fallback',fb);
     }catch(_){}
+    // settle 전용 별도 백업 (복원 경로 보장)
+    try{ localStorage.setItem('ws_fallback_settle', JSON.stringify(S.settle)); }catch(_){}
     if(e.message&&!e.message.includes('DB 미초기화')){
       toast('⚠️ 저장 오류: '+e.message,true);
     }
@@ -2671,6 +2675,13 @@ async function load(){
     S.toolNodes   = data.toolNodes    || [];
     S._toolsOpenMap = data.toolsOpenMap || {};
     S.settle = data.settle || {platforms:['리디','카카페','시리즈','문피아'],works:[]};
+    // localStorage fallback에서도 복원 시도 (IDB 실패 대비)
+    if((!S.settle.works||S.settle.works.length===0)&&(!S.settle.platforms||S.settle.platforms.length<=4)){
+      try{
+        const fb=localStorage.getItem('ws_fallback_settle');
+        if(fb){ const fs=JSON.parse(fb); if(fs&&fs.works&&fs.works.length>0) S.settle=fs; }
+      }catch(_){}
+    }
     if(!S.settle.platforms) S.settle.platforms=['리디','카카페','시리즈','문피아'];
     if(!S.settle.works) S.settle.works=[];
     // ── 데이터 마이그레이션: 구버전 toolNodes (id 필드 없음) 처리 ──
@@ -2730,6 +2741,10 @@ async function enterApp(){
   renderArchive();
   initWritingTab();
   initToolsTab();
+  // settle 초기 상태 설정 (탭 방문 전 자동 gdPush 시 기본값이 Drive에 쓰이는 것 방지)
+  if(S.settle&&S.settle.works&&S.settle.works.length>0&&!_settleSelId){
+    _settleSelId=S.settle.works[0].id;
+  }
   loadAlarmCfg();
   gdLoadToken();
   gdHandleCallback();
@@ -6061,6 +6076,8 @@ async function gdPull(){
     if(!S.profile.todos)       S.profile.todos=[];
     if(S.profile.homeMemo===undefined) S.profile.homeMemo='';
     await save();_gdDirty=false;
+    // Drive에서 불러온 settle도 별도 백업
+    try{ localStorage.setItem('ws_fallback_settle', JSON.stringify(S.settle)); }catch(_){}
     renderSettings();renderHome();renderSched();renderArchive();
     initWritingTab();renderToolsTree();
     if(typeof initSettleTab==='function') initSettleTab();
