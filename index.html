@@ -4183,21 +4183,24 @@ function renderSettleMain(){
 
   // ── 연도 탭
   if(!wk.income) wk.income={};
-  // 새 구조로 초기화
   const _initYear=(yr)=>{
     if(!wk.income[yr]||Array.isArray(wk.income[yr])){
       const plts=S.settle.platforms||['리디','카카페','시리즈','문피아'];
       const yi={종합:Array(12).fill(0)};
       plts.forEach(p=>{ yi[p]=Array(12).fill(0); });
       wk.income[yr]=yi;
+      dsave(); // 새 연도 구조 즉시 저장
     }
-    // 플랫폼 관리에서 새로 추가된 플랫폼 있으면 행 추가
     const plts=S.settle.platforms||[];
     plts.forEach(p=>{ if(!wk.income[yr][p]) wk.income[yr][p]=Array(12).fill(0); });
     if(!wk.income[yr]['종합']) wk.income[yr]['종합']=Array(12).fill(0);
   };
+  // 데이터가 있는 가장 최근 연도를 기본 표시 (현재 연도가 비어도 데이터 있는 연도 우선)
+  const _existYrs = Object.keys(wk.income).map(Number).sort((a,b)=>b-a);
+  const _hasData = yr => { const d=wk.income[yr]; if(!d||Array.isArray(d)) return false; return Object.values(d).some(arr=>Array.isArray(arr)&&arr.some(v=>v>0)); };
+  const _dataYr = _existYrs.find(yr=>_hasData(yr));
   if(!wk.income[_settleYear]) _initYear(_settleYear);
-  let selYear=_settleYear;
+  let selYear = _dataYr || _settleYear;
 
   const yearTabBar=document.createElement('div'); yearTabBar.style.cssText='display:flex;align-items:center;gap:8px';
   const tabsRow=document.createElement('div'); tabsRow.className='settle-year-tabs';
