@@ -92,7 +92,7 @@ body.th-cyberpunkpink{--bg:#0a0014;--surf:#120028;--surf2:#1e0040;--surf3:#28005
 .theme-swatch{height:44px;display:flex;flex-direction:column;gap:3px;padding:6px 8px}
 .theme-label{font-size:10px;padding:3px 0 4px;background:var(--surf2);color:var(--tx3);font-weight:600}
 
-body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
+body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit-user-select:none;user-select:none;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
@@ -1929,6 +1929,17 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
   .rm-side.collapsed .rm-side-hdr{border-bottom:none!important;}
   .rm-side.collapsed .rm-side-hdr span:first-child{display:none!important;}
 }
+
+/* ── 터치 호환: iOS callout/선택 방지 ── */
+[draggable="true"]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;}
+/* 드래그/이동 가능한 요소들 — 터치 시 텍스트 선택/스크롤 방지 */
+.rm-char-card,.rm-connect-dot,.rm-canvas-wrap{touch-action:none;-webkit-user-select:none;user-select:none;}
+.tl-item,.tl-drag-handle{-webkit-user-select:none;user-select:none;}
+.im-drag-handle,.im-field-wrap{-webkit-user-select:none;user-select:none;}
+.wt-ch-item,.wt-work-item,.tools-sheet-node{-webkit-user-select:none;user-select:none;}
+.wt-work-item,.wt-ch-item,.tl-item,.tl-card,.rm-char-card,.wed-ch-item,.ctx-menu,.im-field-wrap,.gs-tab-btn{
+  -webkit-touch-callout:none;
+}
 </style>
 </head>
 <body>
@@ -2554,6 +2565,140 @@ function toast(msg, isErr=false){
   setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);}, isErr?4000:2500);
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  터치 호환: 롱탭 → contextmenu / 터치 드래그앤드롭
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 롱탭(500ms) → contextmenu 이벤트 발생 — 기존 핸들러 수정 없이 동작
+function initLongPress(){
+  let _lt=null,_moved=false,_startX=0,_startY=0,_startEl=null;
+  document.addEventListener('touchstart',e=>{
+    // input/textarea/button 위는 롱탭 무시 (텍스트 선택 등 기본 동작 유지)
+    const tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select') return;
+    _moved=false;
+    _startEl=e.target;
+    const touch=e.touches[0];
+    _startX=touch.clientX; _startY=touch.clientY;
+    _lt=setTimeout(()=>{
+      if(_moved) return;
+      const el=document.elementFromPoint(touch.clientX,touch.clientY);
+      if(!el) return;
+      try{ navigator.vibrate&&navigator.vibrate(40); }catch(_){}
+      // contextmenu 발생 (기존 showCtx 핸들러가 그대로 작동)
+      el.dispatchEvent(new MouseEvent('contextmenu',{
+        bubbles:true,cancelable:true,
+        clientX:touch.clientX,clientY:touch.clientY
+      }));
+    },500);
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    const t=e.touches[0];
+    const dx=t.clientX-_startX,dy=t.clientY-_startY;
+    if(Math.sqrt(dx*dx+dy*dy)>8){ _moved=true; clearTimeout(_lt); }
+  },{passive:true});
+  document.addEventListener('touchend',()=>{clearTimeout(_lt);},{passive:true});
+  document.addEventListener('touchcancel',()=>{clearTimeout(_lt);},{passive:true});
+}
+
+// 터치 드래그앤드롭 — draggable="true" 요소에 자동 적용, 기존 drag 핸들러 수정 없이 동작
+function initTouchDnD(){
+  let _tel=null,_tClone=null,_tlast=null,_dragging=false,_sx=0,_sy=0;
+  // 세션 공유 dataTransfer (dragstart에서 setData한 값을 drop에서 getData로 접근 가능)
+  let _tDT={_d:{},setData(t,v){this._d[t]=v;},getData(t){return this._d[t]||'';},effectAllowed:'move',dropEffect:'move'};
+
+  // drag 이벤트 생성 — MouseEvent로 clientX/Y 올바르게 전달
+  function _disp(type, target, touch){
+    const init = touch
+      ? {bubbles:true,cancelable:true,clientX:touch.clientX,clientY:touch.clientY,
+         screenX:touch.screenX||touch.clientX,screenY:touch.screenY||touch.clientY}
+      : {bubbles:true,cancelable:true};
+    let evt;
+    try{ evt=new MouseEvent(type,init); }
+    catch(_){ evt=new Event(type,{bubbles:true,cancelable:true}); if(touch){evt.clientX=touch.clientX;evt.clientY=touch.clientY;} }
+    evt.dataTransfer=_tDT;
+    target.dispatchEvent(evt);
+  }
+
+  document.addEventListener('touchstart',e=>{
+    const el=e.target.closest('[draggable="true"]');
+    if(!el) return;
+    // draggable 요소 터치 시 즉시 텍스트 선택 방지
+    e.preventDefault();
+    _tel=el; _dragging=false;
+    // 세션 dataTransfer 초기화
+    _tDT={_d:{},setData(t,v){this._d[t]=v;},getData(t){return this._d[t]||'';},effectAllowed:'move',dropEffect:'move'};
+    const touch=e.touches[0];
+    _sx=touch.clientX; _sy=touch.clientY;
+  },{passive:false});
+
+  document.addEventListener('touchmove',e=>{
+    if(!_tel) return;
+    const touch=e.touches[0];
+    if(!_dragging){
+      const dx=touch.clientX-_sx, dy=touch.clientY-_sy;
+      if(Math.sqrt(dx*dx+dy*dy)<8) return;
+      _dragging=true;
+      _disp('dragstart',_tel,touch);
+      // 드래그 중 시각적 복제본
+      _tClone=_tel.cloneNode(true);
+      Object.assign(_tClone.style,{
+        position:'fixed',opacity:'0.65',pointerEvents:'none',
+        zIndex:'9999',width:_tel.offsetWidth+'px',
+        left:(touch.clientX-_tel.offsetWidth/2)+'px',
+        top:(touch.clientY-24)+'px',
+        boxShadow:'0 6px 20px rgba(0,0,0,.35)',
+        borderRadius:'6px',transition:'none',transform:'scale(1.04)'
+      });
+      document.body.appendChild(_tClone);
+    }
+    e.preventDefault();
+    if(_tClone){
+      _tClone.style.left=(touch.clientX-_tClone.offsetWidth/2)+'px';
+      _tClone.style.top=(touch.clientY-24)+'px';
+    }
+    // 복제본 잠시 숨기고 그 아래 요소 탐색
+    if(_tClone) _tClone.style.visibility='hidden';
+    const el2=document.elementFromPoint(touch.clientX,touch.clientY);
+    if(_tClone) _tClone.style.visibility='';
+    const over=el2?.closest('[draggable="true"]');
+    if(over&&over!==_tel){
+      // 이전 하이라이트 제거
+      if(_tlast&&_tlast!==over){
+        _tlast.classList.remove('drag-over-above','drag-over-below','drag-over-top','drag-over-bottom','drag-over');
+      }
+      _tlast=over;
+      // 항상 dragover 발생 (위/아래 판단을 위해 연속 발생 필요)
+      _disp('dragover',over,touch);
+    } else if(!over&&_tlast){
+      _tlast.classList.remove('drag-over-above','drag-over-below','drag-over-top','drag-over-bottom','drag-over');
+      _tlast=null;
+    }
+  },{passive:false});
+
+  document.addEventListener('touchend',e=>{
+    if(!_tel) return;
+    if(_tClone){ _tClone.remove(); _tClone=null; }
+    if(_tlast) _tlast.classList.remove('drag-over-above','drag-over-below','drag-over-top','drag-over-bottom','drag-over');
+    if(_dragging){
+      const touch=e.changedTouches[0];
+      if(_tClone) _tClone.style.visibility='hidden';
+      const el2=document.elementFromPoint(touch.clientX,touch.clientY);
+      if(_tClone) _tClone.style.visibility='';
+      const dropEl=el2?.closest('[draggable="true"]');
+      if(dropEl&&dropEl!==_tel) _disp('drop',dropEl,touch);
+      _disp('dragend',_tel,touch);
+    }
+    _tel=null; _tlast=null; _dragging=false;
+  },{passive:true});
+
+  document.addEventListener('touchcancel',()=>{
+    if(_tClone){ _tClone.remove(); _tClone=null; }
+    if(_tel) _disp('dragend',_tel,null);
+    _tel=null; _tlast=null; _dragging=false;
+  },{passive:true});
+}
+
 function showCtx(e, items){
   document.querySelector('.ctx-menu')?.remove();
   const menu=document.createElement('div');
@@ -2773,6 +2918,8 @@ async function enterApp(){
   startClock();
   initResponsiveTabs();
   initSchedTrackerResize();
+  initLongPress();   // 롱탭 → contextmenu
+  initTouchDnD();    // 터치 드래그앤드롭
   renderHome();
   renderSettings();
   renderSched();
@@ -7446,7 +7593,78 @@ function writingExport(type){
   const text=html.replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
   if(type==='txt'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.download=title+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('TXT 파일 저장 완료');}
   else if(type==='html'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:'맑은 고딕',sans-serif;font-size:14pt;line-height:2;max-width:800px;margin:2cm auto;padding:20px}</style></head><body>${html}</body></html>`],{type:'text/html;charset=utf-8'}));a.download=title+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('HTML 파일 저장 완료');}
-  else if(type==='word'){const doc=`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='UTF-8'><meta name=ProgId content=Word.Document><style>body{font-family:'맑은 고딕',sans-serif;font-size:11pt;line-height:2;margin:2cm}</style></head><body lang=KO><div class=WordSection1><h1>${title}</h1>${html}</div></body></html>`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+doc],{type:'application/msword;charset=utf-8'}));a.download=title+'.doc';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Word 파일 저장 완료');}
+  else if(type==='word'){const doc=`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='UTF-8'><meta name=ProgId content=Word.Document><style>body{font-family:'맑은 고딕',sans-serif;font-size:11pt;line-height:2;margin:2cm}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   터치 최적화 — user-select / touch-action 전략적 배분
+   body: user-select:none 기본 (위 body CSS에서 설정)
+   여기서는 허용/세분화 오버라이드만 선언
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ── [A] 텍스트 선택 허용 영역 ──────────────────
+   집필 에디터, 입력 필드, contenteditable 전체    */
+input, textarea, select,
+.mbedit, [contenteditable="true"],
+#float-memo-body,
+.settle-grid-inp,
+.writing-field input, .writing-field textarea,
+.tl-edit-input, .cs-field-input,
+.linput, .srch-input {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  touch-action: auto;
+}
+
+/* ── [B] touch-action:pan-y — 세로 스크롤 컨테이너 ──
+   손가락을 위아래로 움직이면 스크롤, 가로는 막음  */
+.treewrap, .rm-side-list, .sidebar,
+.schedmain, .tracker, .schedbody,
+.settle-side-list, .settle-main,
+.archive-main, .archive-sidebar,
+.tools-sidebar, #tools-sidebar,
+.writing-chlist, .writing-chlist-panel,
+.tl-body, .cs-right-body,
+.home-body, .panel {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── [C] touch-action:manipulation — 클릭 전용 요소 ──
+   더블탭 줌 방지, 스크롤은 부모에게 위임           */
+button, .tbtn, .hbtn, .icobtn, .splitbtn,
+.wt-btn, .mbt, .mnavbtn, .lockbtn,
+.tab-overflow-btn, .tab-overflow-item,
+.titem, .wt-work-item, .wt-ch-item,
+.tools-sheet-node, .tools-work-item,
+.rm-side-item, .ctx-item,
+.settle-contract-item, .settle-year-tab,
+.hm-quick-btn, .home-card,
+.sy-tab-btn, .sy-chip, .gs-tab-btn,
+.archive-item, .archive-work-item {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── [D] touch-action:none — 드래그/이동 전용 ──
+   스크롤·선택 완전 차단, 터치 이벤트를 JS가 직접 처리 */
+.rm-char-card, .rm-connect-dot, .rm-canvas-wrap,
+.tl-drag-handle, .im-drag-handle,
+[draggable="true"],
+#sched-tracker-resize {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ── [E] 읽기 전용 텍스트 — 복사 허용 ──
+   에러 메시지, 통계 수치 등 선택해서 복사 가능하게  */
+.home-stat-val, .wc-bar, .writing-ch-wc,
+.settle-kpi-val, .settling-val {
+  -webkit-user-select: text;
+  user-select: text;
+}
+</style></head><body lang=KO><div class=WordSection1><h1>${title}</h1>${html}</div></body></html>`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+doc],{type:'application/msword;charset=utf-8'}));a.download=title+'.doc';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Word 파일 저장 완료');}
 }
 
 function writingExportAll(){
@@ -10201,11 +10419,12 @@ function _rmRenderCard(ch, cvWrap, node, d, svg){
     const dot = document.createElement('div');
     dot.className = 'rm-connect-dot '+pos;
     dot.title = '드래그하여 관계 연결';
-    dot.addEventListener('mousedown', e=>{
+    dot.addEventListener('pointerdown', e=>{
       e.stopPropagation(); e.preventDefault();
+      dot.setPointerCapture(e.pointerId);
       const rect = cvWrap.getBoundingClientRect();
-      const cx = ch.x + 55; // 카드 중심 x
-      const cy = ch.y + 55; // 카드 중심 y
+      const cx = ch.x + 55;
+      const cy = ch.y + 55;
       _rmConnecting = {fromId: ch.id, startX: cx, startY: cy};
       _rmNode = node; _rmD_global = d; _rmCvWrap = cvWrap; _rmSvg = svg;
       document.body.style.cursor='crosshair';
@@ -10217,10 +10436,11 @@ function _rmRenderCard(ch, cvWrap, node, d, svg){
   card.addEventListener('contextmenu', e=>{
     _rmCardContextMenu(e, ch, node, d, cvWrap, svg);
   });
-  // 카드 드래그 이동
-  card.addEventListener('mousedown', e=>{
+  // 카드 드래그 이동 (pointer events — 마우스+터치 통합)
+  card.addEventListener('pointerdown', e=>{
     if(e.target.classList.contains('rm-connect-dot')) return;
     e.preventDefault();
+    card.setPointerCapture(e.pointerId);
     _rmDragCard = ch;
     _rmNode = node; _rmD_global = d; _rmCvWrap = cvWrap; _rmSvg = svg;
     const rect = cvWrap.getBoundingClientRect();
@@ -10296,7 +10516,8 @@ function _rmBindGlobalEvents(){
   if(_rmGlobalBound) return;
   _rmGlobalBound = true;
 
-  document.addEventListener('mousemove', e=>{
+  // pointer events — 마우스+터치 통합 (pointerdown/move/up)
+  document.addEventListener('pointermove', e=>{
     if(!_rmCvWrap) return;
     // 카드 드래그
     if(_rmDragCard){
@@ -10306,7 +10527,6 @@ function _rmBindGlobalEvents(){
       _rmDragCard.x=nx; _rmDragCard.y=ny;
       const el=document.getElementById('rm-card-'+_rmDragCard.id);
       if(el){el.style.left=nx+'px';el.style.top=ny+'px';}
-      // rAF로 스로틀 — 프레임당 1회만 선 재렌더
       if(_rmSvg && !_rmRafId){
         _rmRafId = requestAnimationFrame(()=>{
           _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
@@ -10321,13 +10541,13 @@ function _rmBindGlobalEvents(){
     }
   });
 
-  document.addEventListener('mouseup', e=>{
+  document.addEventListener('pointerup', e=>{
     // 카드 이동 완료
     if(_rmDragCard && _rmNode){
-      // 진행 중인 rAF 취소 후 최종 위치로 한 번 확정 렌더
       if(_rmRafId){ cancelAnimationFrame(_rmRafId); _rmRafId=null; }
       if(_rmSvg) _rmDrawAllLinesV2(_rmSvg, _rmD_global, _rmCvWrap);
       _saveWritingData(_rmNode.id,{chars:[..._rmD_global.chars]});
+      document.body.style.cursor='';
       _rmDragCard=null;
     }
     // 연결선 완료
