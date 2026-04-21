@@ -4046,8 +4046,19 @@ function renderSettle(){
   renderSettleSide();
   renderSettlePlatforms();
   renderSettleDash();
+  renderSettleMain(); // 선택된 작품이 있으면 메인 영역도 갱신
 }
-function initSettleTab(){ renderSettle(); }
+function initSettleTab(){
+  // 선택된 작품이 없고 작품이 있으면 첫 번째 작품 자동 선택
+  if(!_settleSelId && S.settle && S.settle.works && S.settle.works.length > 0){
+    _settleSelId = S.settle.works[0].id;
+  }
+  // 저장된 선택 ID가 현재 works에 없으면 초기화
+  if(_settleSelId && !(S.settle.works||[]).find(w=>w.id===_settleSelId)){
+    _settleSelId = S.settle.works && S.settle.works.length > 0 ? S.settle.works[0].id : null;
+  }
+  renderSettle();
+}
 
 /* ── 상단 요약바 */
 function renderSettleTopbar(){
@@ -5826,6 +5837,8 @@ function importData(){
 async function resetAll(){
   if(!confirm('⚠️ 모든 데이터가 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.'))return;
   S.works=[];S.scheds={};S.archives=[];S.profile={};S.writingNodes=[];S.toolNodes=[];
+  S.settle={platforms:['리디','카카페','시리즈','문피아'],works:[]};
+  _settleSelId=null;
   await save();renderSettings();renderHome();renderSched();renderArchive();toast('초기화 완료.');
 }
 async function updateStorageInfo(){
