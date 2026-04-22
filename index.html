@@ -2623,14 +2623,14 @@ function initTouchDnD(){
   document.addEventListener('touchstart',e=>{
     const el=e.target.closest('[draggable="true"]');
     if(!el) return;
-    // draggable 요소 터치 시 즉시 텍스트 선택 방지
-    e.preventDefault();
+    // touchstart에서 preventDefault 호출하지 않음 — click 이벤트 정상 발화 보장
+    // (드래그 확정은 touchmove에서 8px 이상 이동 시점에 처리)
     _tel=el; _dragging=false;
     // 세션 dataTransfer 초기화
     _tDT={_d:{},setData(t,v){this._d[t]=v;},getData(t){return this._d[t]||'';},effectAllowed:'move',dropEffect:'move'};
     const touch=e.touches[0];
     _sx=touch.clientX; _sy=touch.clientY;
-  },{passive:false});
+  },{passive:true});
 
   document.addEventListener('touchmove',e=>{
     if(!_tel) return;
