@@ -4356,13 +4356,18 @@ function renderSettleMain(){
   const card=document.createElement('div'); card.className='settle-info-card';
   const titleRow=document.createElement('div'); titleRow.className='settle-info-title';
   const workTitle=document.createElement('div'); workTitle.className='settle-info-work'; workTitle.textContent=wk.workName;
-  const platInfo=document.createElement('div'); platInfo.className='settle-info-platform';
-  const platDot=document.createElement('span'); platDot.style.cssText='width:9px;height:9px;border-radius:50%;background:'+settlePlatformColor(wk.platform)+';display:inline-block';
-  const platName=document.createElement('span'); platName.textContent=wk.platform||'—';
+  // 전체 연도 합산 누적액 계산
+  const _allYrTotal = Object.keys(wk.income||{}).reduce((sum, yr)=>{
+    const yd = wk.income[yr];
+    if(!yd||Array.isArray(yd)) return sum;
+    return sum + Object.values(yd).reduce((s,arr)=>s+(Array.isArray(arr)?arr.reduce((a,v)=>a+(parseInt(v)||0),0):0),0);
+  }, 0) + (parseInt(wk.advance)||0);
+  const totalBadge=document.createElement('div');
+  totalBadge.style.cssText='font-size:13px;font-weight:700;color:var(--ac);white-space:nowrap;';
+  totalBadge.textContent = _allYrTotal>0 ? '누계 '+settleFmt(_allYrTotal) : '누계 —';
   const delBtn=document.createElement('button'); delBtn.className='settle-del-btn'; delBtn.textContent='🗑 삭제';
   delBtn.onclick=()=>settleDeleteWork(wk.id);
-  platInfo.append(platDot,platName);
-  titleRow.append(workTitle,platInfo,delBtn);
+  titleRow.append(workTitle,totalBadge,delBtn);
   card.appendChild(titleRow);
 
   const platforms=S.settle.platforms||['리디','카카페','시리즈','문피아'];
@@ -4422,11 +4427,9 @@ function renderSettleMain(){
     if(!wk.income[yr]['종합']) wk.income[yr]['종합']=Array(12).fill(0);
   };
   // 데이터가 있는 가장 최근 연도를 기본 표시 (현재 연도가 비어도 데이터 있는 연도 우선)
-  const _existYrs = Object.keys(wk.income).map(Number).sort((a,b)=>b-a);
-  const _hasData = yr => { const d=wk.income[yr]; if(!d||Array.isArray(d)) return false; return Object.values(d).some(arr=>Array.isArray(arr)&&arr.some(v=>v>0)); };
-  const _dataYr = _existYrs.find(yr=>_hasData(yr));
+  // 연도 화살표와 동기화: _settleYear를 직접 사용
   if(!wk.income[_settleYear]) _initYear(_settleYear);
-  let selYear = _dataYr || _settleYear;
+  let selYear = _settleYear;
 
   const yearTabBar=document.createElement('div'); yearTabBar.style.cssText='display:flex;align-items:center;gap:8px';
   const tabsRow=document.createElement('div'); tabsRow.className='settle-year-tabs';
@@ -4567,6 +4570,9 @@ function _renderSettleGrid(wrap,wk,year){
     // 행 소계
     const subCell=document.createElement('div'); subCell.className='settle-grid-cell';
     const subEl=document.createElement('div'); subEl.className='settle-grid-total'; subEl.style.fontSize='10px';
+    // 초기값 설정 (탭 재진입 시에도 소계 표시)
+    const _rowSum = getRowSum(key);
+    subEl.textContent = _rowSum > 0 ? _rowSum.toLocaleString() : '';
     subCell.appendChild(subEl); row.appendChild(subCell);
     grid.appendChild(row);
     // 행 소계 실시간 업데이트
@@ -7614,22 +7620,23 @@ input, textarea, select,
   touch-action: auto;
 }
 
-/* ── [B] touch-action:pan-y — 세로 스크롤 컨테이너 ──
-   손가락을 위아래로 움직이면 스크롤, 가로는 막음  */
-.treewrap, .rm-side-list, .sidebar,
-.schedmain, .tracker, .schedbody,
+/* ── [B] touch-action:pan-y — 실제 overflow 스크롤 컨테이너만 ──
+   overflow-y:auto/scroll인 요소에만 적용.
+   레이아웃 래퍼(.panel, .schedbody 등)는 제외 — 자식 click 차단 방지 */
+.treewrap,
+.rm-side-list,
 .settle-side-list, .settle-main,
-.archive-main, .archive-sidebar,
-.tools-sidebar, #tools-sidebar,
-.writing-chlist, .writing-chlist-panel,
-.tl-body, .cs-right-body,
-.home-body, .panel {
+.writing-chlist,
+.tl-body,
+.archive-sidebar > *,
+#sched-tracker {
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
 /* ── [C] touch-action:manipulation — 클릭 전용 요소 ──
-   더블탭 줌 방지, 스크롤은 부모에게 위임           */
+   더블탭 줌 방지 + 300ms 딜레이 제거.
+   [draggable="true"] 아이템도 여기 포함 — 드래그 핸들은 initTouchDnD가 처리 */
 button, .tbtn, .hbtn, .icobtn, .splitbtn,
 .wt-btn, .mbt, .mnavbtn, .lockbtn,
 .tab-overflow-btn, .tab-overflow-item,
@@ -7639,17 +7646,18 @@ button, .tbtn, .hbtn, .icobtn, .splitbtn,
 .settle-contract-item, .settle-year-tab,
 .hm-quick-btn, .home-card,
 .sy-tab-btn, .sy-chip, .gs-tab-btn,
-.archive-item, .archive-work-item {
+.archive-item, .archive-work-item,
+[draggable="true"] {
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
 }
 
 /* ── [D] touch-action:none — 드래그/이동 전용 ──
-   스크롤·선택 완전 차단, 터치 이벤트를 JS가 직접 처리 */
+   JS가 터치를 완전히 직접 처리하는 요소만.
+   클릭도 해야 하는 [draggable] 아이템은 [C]에서 처리하고 여기서 제외. */
 .rm-char-card, .rm-connect-dot, .rm-canvas-wrap,
 .tl-drag-handle, .im-drag-handle,
-[draggable="true"],
 #sched-tracker-resize {
   touch-action: none;
   -webkit-user-select: none;
