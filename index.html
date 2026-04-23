@@ -1942,7 +1942,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 }
 
 /* 말풍선↔핸들 교대: has-memo이면 말풍선 표시, hover시 핸들로 전환 */
-.wt-ch-reaction{position:absolute;left:1px;top:50%;transform:translateY(-50%);font-size:9px;line-height:1;z-index:3;display:none;pointer-events:none;user-select:none}
+.wt-ch-reaction{position:absolute;left:4px;top:50%;transform:translateY(-50%);font-size:9px;line-height:1;z-index:3;display:none;pointer-events:none;user-select:none}
 .wt-ch-reaction.has-memo{display:block;opacity:.85}
 .wt-ch-item:hover .wt-ch-reaction.has-memo{display:none}
 .wt-ch-item.has-reaction-memo .wt-ch-drag{opacity:0}
@@ -4584,7 +4584,7 @@ function _renderSettleGrid(wrap,wk,year){
     // 연간 총합 (월정산 합계 + 선인세)
     const monthlyTotal=rowKeys.reduce((s,k)=>s+getRowSum(k),0);
     const adv=parseInt(wk.advance)||0;
-    const advYr=parseInt((wk.advanceDate||'').split('-')[0])||0; const advHere=adv>0&&advYr&&advYr===parseInt(selYear);
+    const advYr=parseInt((wk.advanceDate||'').split('-')[0])||0; const advHere=adv>0&&advYr&&advYr===parseInt(year);
     const grandTotal=monthlyTotal+(advHere?adv:0);
     yearTotalEl.innerHTML=(advHere
       ? `<span style="font-size:10px;color:var(--tx3)">월정산 ${monthlyTotal.toLocaleString()}+선인세 ${adv.toLocaleString()}</span><br>${grandTotal.toLocaleString()}원`
@@ -6480,16 +6480,7 @@ class MBEditor{
     ce.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&a.href){e.preventDefault();window.open(a.href,'_blank','noopener');}});
     this._initDrop(ce);this._initResize(ce);this._initToggle(ce);
     const _self=this;
-    ce.addEventListener('contextmenu',e=>{
-      // 문단 메모 우클릭 — 선택 텍스트 있을 때
-      const sel=window.getSelection();
-      const selTxt=sel&&sel.toString().trim();
-      if(selTxt&&sel.rangeCount>0&&!e.target.closest('table.mb-table')){
-        e.preventDefault();
-        _showNoteCtxMenu(e,sel,ce,ch);
-        return;
-      }
-      const tbl=e.target.closest('table.mb-table');if(tbl){e.preventDefault();e.stopPropagation();_self._showTblCtx(e,tbl,e.target.closest('td,th'));}});
+    ce.addEventListener('contextmenu',e=>{const tbl=e.target.closest('table.mb-table');if(tbl){e.preventDefault();e.stopPropagation();_self._showTblCtx(e,tbl,e.target.closest('td,th'));}});
     const mo=new MutationObserver(()=>{this._wrapExistingImages();this._initResize(ce);this._initTableResize(ce);ce.querySelectorAll('table.mb-table').forEach(t=>this._addTableHandles(t));});
     mo.observe(ce,{childList:true,subtree:true});
   }
@@ -7130,6 +7121,19 @@ function writingOpenChapter(workId,chId){
   _writingEditor.html=ch.content||'';
   // 문단 메모 아이콘 렌더링
   setTimeout(()=>{ const ce=document.getElementById('writing-ce1'); if(ce)_renderAllNoteIcons(ce,ch); },100);
+  // 문단 메모 우클릭 리스너 (ch가 확보된 이후 직접 등록)
+  setTimeout(()=>{
+    const ce2=document.getElementById('writing-ce1');
+    if(!ce2) return;
+    ce2.addEventListener('contextmenu', function _noteCtx(e){
+      const sel=window.getSelection();
+      const selTxt=sel&&sel.toString().trim();
+      if(selTxt&&sel.rangeCount>0&&!e.target.closest('table.mb-table')){
+        e.preventDefault();
+        _showNoteCtxMenu(e,sel,ce2,ch);
+      }
+    });
+  },150);
 
   // 글자수 초기화
   const initPlain=(ch.content||'').replace(/<[^>]*>/g,'').replace(/\s/g,'');
