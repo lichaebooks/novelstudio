@@ -451,6 +451,20 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit
 .spell-item{padding:5px 8px;border-radius:5px;border:1px solid var(--bdr);margin-bottom:4px;font-size:11px}
 .spell-item-word{color:var(--rd);font-weight:700}
 .spell-item-suggest{color:var(--ac)}
+.spell-popup{position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.18);z-index:9999;width:320px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.spell-popup-head{font-size:11px;color:var(--tx3);display:flex;justify-content:space-between;align-items:center}
+.spell-popup-words{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.spell-popup-orig{color:var(--rd);font-weight:700;font-size:14px;text-decoration:line-through}
+.spell-popup-arr{color:var(--tx3);font-size:13px}
+.spell-popup-sug{color:var(--gn);font-weight:700;font-size:14px}
+.spell-popup-desc{font-size:11px;color:var(--tx3);line-height:1.5}
+.spell-popup-btns{display:flex;gap:6px;justify-content:flex-end}
+.spell-popup-nav{background:none;border:1px solid var(--bdr);border-radius:5px;cursor:pointer;padding:3px 8px;font-size:12px;color:var(--tx2)}
+.spell-popup-nav:hover{background:var(--surf2)}
+.spell-popup-skip{background:none;border:1px solid var(--bdr);border-radius:5px;cursor:pointer;padding:4px 12px;font-size:12px;color:var(--tx2)}
+.spell-popup-skip:hover{background:var(--surf2)}
+.spell-popup-fix{background:var(--ac);color:#fff;border:none;border-radius:5px;cursor:pointer;padding:4px 14px;font-size:12px;font-weight:600}
+.spell-popup-fix:hover{opacity:.85}
 
 /* 트리 empty */
 .wt-empty{padding:20px;text-align:center;color:var(--tx3);font-size:12px;display:flex;flex-direction:column;gap:8px;align-items:center}
@@ -1946,12 +1960,12 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .wt-ch-reaction{display:none} /* 기존 span은 숨김 처리 */
 .wt-ch-item.has-reaction-memo .wt-ch-drag{opacity:.75;color:var(--ac)}
 .wt-ch-item.has-reaction-memo:hover .wt-ch-drag{opacity:1;color:var(--tx3)}
-.reaction-panel{position:absolute;top:0;right:0;width:280px;height:100%;background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;z-index:100;box-shadow:-4px 0 16px rgba(0,0,0,.12);transition:transform .2s}
-.reaction-panel.hidden{transform:translateX(100%)}
-.reaction-panel-hdr{padding:10px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--surf2)}
-.reaction-panel-body{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
-.reaction-panel textarea{flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:10px;font-size:13px;color:var(--tx);resize:none;font-family:inherit;line-height:1.6;min-height:120px}
-.reaction-panel textarea:focus{outline:none;border-color:var(--ac)}
+.reaction-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:2000;display:flex;align-items:center;justify-content:center}
+.reaction-modal{background:var(--surf);border-radius:12px;width:420px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.reaction-modal-hdr{padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.reaction-modal-body{flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.reaction-modal textarea{flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:10px;font-size:13px;color:var(--tx);resize:none;font-family:inherit;line-height:1.6;min-height:140px}
+.reaction-modal textarea:focus{outline:none;border-color:var(--ac)}
 .hm-habit-chart{display:flex;align-items:flex-end;gap:3px;height:60px;padding:4px 0 0}
 .hm-habit-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
 .hm-habit-bar{width:100%;background:var(--ac);border-radius:3px 3px 0 0;min-height:2px;transition:height .3s;opacity:.8}
@@ -1964,8 +1978,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .hm-habit-stat-val{font-size:13px;font-weight:800;color:var(--ac)}
 .hm-habit-stat-lbl{font-size:9px;color:var(--tx3);margin-top:1px}
 @media(max-width:600px){
-  .reaction-panel{position:fixed;bottom:0;left:0;right:0;width:100%;height:auto;max-height:60vh;top:auto;border-left:none;border-top:1px solid var(--bdr);border-radius:14px 14px 0 0}
-  .reaction-panel.hidden{transform:translateY(100%)}
+
   #writing-tree-resize{display:none!important;}
 }
 
@@ -2093,7 +2106,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 에디터 활성 시 -->
-      <div style="display:none;flex-direction:column;flex:1;overflow:visible;position:relative" id="writing-editor-wrap">
+      <div style="display:none;flex-direction:column;flex:1;overflow:hidden" id="writing-editor-wrap">
         <!-- 에디터 탑바 -->
         <div style="padding:8px 16px;border-bottom:1px solid var(--bdr);background:var(--surf2);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap">
           <input type="text" id="writing-ch-title-inp" placeholder="회차 제목 입력..." style="flex:1;font-size:15px;font-weight:700;background:transparent;border:none;outline:none;color:var(--tx);font-family:inherit;border-bottom:1px dashed transparent;min-width:0" oninput="writingUpdateChTitle(this.value)"/>
@@ -2154,10 +2167,8 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
         </div>
 
         <!-- 맞춤법 검사 결과 패널 -->
-        <div id="writing-spell-panel" style="display:none;border-top:1px solid var(--bdr);background:var(--surf2);padding:10px 16px;max-height:160px;overflow-y:auto;flex-shrink:0">
-          <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:6px">🔍 맞춤법 검사</div>
-          <div id="writing-spell-results" style="font-size:12px;color:var(--tx)"></div>
-        </div>
+        <!-- 맞춤법 팝업 (fixed 위치) -->
+        <div id="writing-spell-panel" style="display:none"></div>
 
         <!-- 상태바 -->
         <div class="wc-bar" id="writing-editor-statusbar">
@@ -2576,6 +2587,20 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Ctrl+Z</code><span style="color:var(--tx2)">실행 취소</span></div>
           <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr2)"><code style="background:var(--surf2);padding:1px 6px;border-radius:3px;color:var(--ac)">Esc</code><span style="color:var(--tx2)">검색창 닫기</span></div>
         </div>
+
+      <!-- 맞춤법 예외 사전 섹션 -->
+      <div class="ssec" data-sec="spell">
+        <div class="sstitle"><span class="ssec-drag-handle" title="드래그하여 순서 변경">⠿</span> 📖 맞춤법 예외 사전</div>
+        <div style="font-size:11px;color:var(--tx3);background:var(--surf2);padding:8px 12px;border-radius:6px;margin-bottom:10px">
+          💡 등록한 단어/표현은 맞춤법 검사에서 오류로 표시되지 않습니다. 작품명, 인명, 장르 관용 표현 등을 추가하세요.
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input id="spell-except-inp" class="sinput" placeholder="예외로 등록할 단어 입력..." style="flex:1" onkeydown="if(event.key==='Enter')spellExceptAdd()"/>
+          <button class="btn btng" onclick="spellExceptAdd()" style="font-size:12px;padding:4px 12px">추가</button>
+        </div>
+        <div id="spell-except-list" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px"></div>
+      </div>
+
       </div>
 
     </div>
@@ -2906,6 +2931,7 @@ async function load(){
     if(!S.profile.customAlarms) S.profile.customAlarms = [];
     if(!S.profile.todos)       S.profile.todos = [];
     if(S.profile.homeMemo === undefined) S.profile.homeMemo = '';
+if(!S.profile.spellExcept) S.profile.spellExcept = [];
     S.writingNodes= data.writingNodes || [];
     S._lastWritingWork = data.lastWritingWork || null;
     S._lastWritingCh   = data.lastWritingCh   || null;
@@ -6256,6 +6282,7 @@ function renderSettings(){
   loadProfile();
   renderWorks();
   renderCustomAlarms();
+  renderSpellExceptList();
   // 비밀번호 토글 상태 반영
   const pwTgl=document.getElementById('pw-use-toggle');
   const pwSec=document.getElementById('pw-change-section');
@@ -7467,93 +7494,159 @@ function _splitLoadTool(node){
 
 // ── 맞춤법 검사 ──
 function writingSpellCheck(){
-  const panel=document.getElementById('writing-spell-panel');if(!panel)return;
-  if(panel.style.display!=='none'){panel.style.display='none';return;}
+  // 팝업 이미 열려있으면 닫기
+  if(document.getElementById('spell-popup')){
+    _spellClose();return;
+  }
   const ch=wNodes().find(n=>n.id===_writingSelCh);
   if(!ch){toast('회차를 먼저 선택하세요.',true);return;}
   const rawText=(ch.content||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
   if(!rawText){toast('내용이 없습니다.',true);return;}
-  panel.style.display='block';
-  const res=document.getElementById('writing-spell-results');
-  if(!res)return;
-  res.innerHTML='<span style="color:var(--tx3)">⏳ 검사 중...</span>';
-  // spell_rules.json fetch (GitHub Pages 기준 루트 경로)
+  toast('검사 중...');
   fetch('./spell_rules.json?v='+Date.now())
-    .then(r=>{if(!r.ok)throw new Error('rules load fail');return r.json();})
+    .then(r=>{if(!r.ok)throw new Error('fail');return r.json();})
     .then(data=>{
       const rules=data.rules||[];
-      // 사용자 예외 사전 (설정탭에서 등록한 단어 — 4단계에서 추가)
       const userExcept=(S.profile&&S.profile.spellExcept)||[];
+      const skipped=new Set(); // 이번 검사에서 제외한 패턴
       const errors=[];
       rules.forEach(rule=>{
         const pat=rule.pattern;
-        if(!pat)return;
-        // 사용자 예외에 있으면 건너뜀
-        if(userExcept.includes(pat))return;
+        if(!pat||userExcept.includes(pat))return;
         let idx=0;
         while((idx=rawText.indexOf(pat,idx))!==-1){
-          errors.push({
-            pattern:pat,
-            suggest:rule.suggest||'',
-            desc:rule.desc||'',
-            index:idx
-          });
+          errors.push({pattern:pat,suggest:rule.suggest||'',desc:rule.desc||'',index:idx});
           idx+=pat.length;
         }
       });
-      // 발견 위치 기준 정렬
       errors.sort((a,b)=>a.index-b.index);
-      if(!errors.length){
-        res.innerHTML='<span style="color:var(--gn)">✅ 맞춤법 오류가 없습니다.</span>';
-        return;
-      }
-      let body=`<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--tx2)">⚠️ ${errors.length}개 항목 발견:</div>`;
-      errors.forEach(err=>{
-        body+=`<div style="background:var(--surf2);border-left:3px solid var(--yw);border-radius:0 6px 6px 0;padding:6px 10px;margin-bottom:6px;font-size:11px;line-height:1.7">
-          <span style="color:var(--rd);font-weight:700">${err.pattern}</span>
-          ${err.suggest?`→ <span style="color:var(--gn);font-weight:700">${err.suggest}</span>`:''}
-          ${err.desc?`<br><span style="color:var(--tx3)">${err.desc}</span>`:''}
-        </div>`;
-      });
-      res.innerHTML=body;
+      if(!errors.length){toast('✅ 맞춤법 오류가 없습니다.');return;}
+      _spellShowPopup(errors, skipped, ch, rawText);
     })
-    .catch(()=>{
-      res.innerHTML='<span style="color:var(--tx3);font-size:11px">spell_rules.json 파일을 불러올 수 없습니다.<br>저장소 루트에 파일이 있는지 확인하세요.</span>';
-    });
+    .catch(()=>{toast('spell_rules.json 파일을 불러올 수 없습니다.',true);});
+}
+
+let _spellIdx=0;
+function _spellShowPopup(errors, skipped, ch, rawText){
+  _spellClose();
+  // 스킵된 항목 제외
+  const visible=errors.filter(e=>!skipped.has(e.pattern+'@'+e.index));
+  if(!visible.length){toast('✅ 모든 항목 검토 완료.');return;}
+  _spellIdx=Math.min(_spellIdx,visible.length-1);
+  const err=visible[_spellIdx];
+  const popup=document.createElement('div');
+  popup.id='spell-popup';popup.className='spell-popup';
+  // 위치: 에디터 우측 상단
+  const wrap=document.getElementById('writing-editor-wrap');
+  const wr=wrap?wrap.getBoundingClientRect():{right:window.innerWidth,top:80};
+  popup.style.cssText+=';top:'+(wr.top+16)+'px;right:'+(window.innerWidth-wr.right+8)+'px;';
+  // 헤더
+  const head=document.createElement('div');head.className='spell-popup-head';
+  const counter=document.createElement('span');counter.textContent=(_spellIdx+1)+'/'+visible.length;
+  const navRow=document.createElement('div');navRow.style.cssText='display:flex;gap:4px;align-items:center';
+  const prevBtn=document.createElement('button');prevBtn.className='spell-popup-nav';prevBtn.textContent='◀';
+  prevBtn.disabled=_spellIdx===0;
+  prevBtn.onclick=()=>{_spellIdx--;_spellShowPopup(errors,skipped,ch,rawText);};
+  const nextBtn=document.createElement('button');nextBtn.className='spell-popup-nav';nextBtn.textContent='▶';
+  nextBtn.disabled=_spellIdx>=visible.length-1;
+  nextBtn.onclick=()=>{_spellIdx++;_spellShowPopup(errors,skipped,ch,rawText);};
+  const closeBtn=document.createElement('button');closeBtn.className='spell-popup-nav';closeBtn.style.marginLeft='4px';closeBtn.textContent='✕';
+  closeBtn.onclick=_spellClose;
+  navRow.append(prevBtn,nextBtn,closeBtn);
+  head.append(counter,navRow);
+  // 오류/제안
+  const words=document.createElement('div');words.className='spell-popup-words';
+  const orig=document.createElement('span');orig.className='spell-popup-orig';orig.textContent=err.pattern;
+  words.appendChild(orig);
+  if(err.suggest){
+    const arr=document.createElement('span');arr.className='spell-popup-arr';arr.textContent='→';
+    const sug=document.createElement('span');sug.className='spell-popup-sug';sug.textContent=err.suggest;
+    words.append(arr,sug);
+  }
+  // 설명
+  const desc=document.createElement('div');desc.className='spell-popup-desc';desc.textContent=err.desc||'';
+  // 버튼
+  const btns=document.createElement('div');btns.className='spell-popup-btns';
+  const skipBtn=document.createElement('button');skipBtn.className='spell-popup-skip';skipBtn.textContent='제외';
+  skipBtn.onclick=()=>{
+    skipped.add(err.pattern+'@'+err.index);
+    _spellShowPopup(errors,skipped,ch,rawText);
+  };
+  const fixBtn=document.createElement('button');fixBtn.className='spell-popup-fix';fixBtn.textContent='수정';
+  fixBtn.disabled=!err.suggest;
+  fixBtn.onclick=()=>{
+    // ce1에서 해당 텍스트 교체
+    const ce=document.getElementById('writing-ce1');
+    if(ce&&err.suggest){
+      const walker=document.createTreeWalker(ce,NodeFilter.SHOW_TEXT);
+      let node;
+      while((node=walker.nextNode())){
+        const i=node.textContent.indexOf(err.pattern);
+        if(i>=0){
+          node.textContent=node.textContent.slice(0,i)+err.suggest+node.textContent.slice(i+err.pattern.length);
+          ch.content=ce.innerHTML;dsave();break;
+        }
+      }
+    }
+    // 수정된 항목 제외 처리 후 다음으로
+    skipped.add(err.pattern+'@'+err.index);
+    // rawText 갱신
+    const newRaw=(ch.content||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+    _spellShowPopup(errors,skipped,ch,newRaw);
+  };
+  btns.append(skipBtn,fixBtn);
+  popup.append(head,words,desc,btns);
+  document.body.appendChild(popup);
+}
+function _spellClose(){
+  document.getElementById('spell-popup')?.remove();
 }
 
 let _reactionPanelOpen=false;
 function writingToggleReaction(){
-  const panel=document.getElementById('writing-reaction-panel');
-  if(panel){panel.classList.add('hidden');setTimeout(()=>{panel.remove();},200);_reactionPanelOpen=false;const btn=document.getElementById('writing-reaction-btn');if(btn)btn.classList.remove('on');return;}
+  if(document.getElementById('reaction-modal-bg')){
+    document.getElementById('reaction-modal-bg').remove();
+    _reactionPanelOpen=false;
+    const btn=document.getElementById('writing-reaction-btn');if(btn)btn.classList.remove('on');
+    return;
+  }
   const ch=wNodes().find(n=>n.id===_writingSelCh);
   if(!ch){toast('회차를 먼저 선택하세요.',true);return;}
   _writingOpenReactionPanel(ch);
 }
 function _writingOpenReactionPanel(ch){
-  document.getElementById('writing-reaction-panel')?.remove();
-  const wrap=document.getElementById('writing-editor-wrap');if(!wrap)return;
-  const panel=document.createElement('div');panel.id='writing-reaction-panel';panel.className='reaction-panel hidden';
-  const hdr=document.createElement('div');hdr.className='reaction-panel-hdr';
-  const t=document.createElement('span');t.style.cssText='font-size:13px;font-weight:700;flex:1;color:var(--tx)';t.textContent='💬 독자 반응 메모';
-  const cs=document.createElement('span');cs.style.cssText='font-size:11px;color:var(--tx3);margin-right:8px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';cs.textContent=ch.title||'';
-  const cl=document.createElement('button');cl.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:16px;padding:0;line-height:1';cl.textContent='✕';cl.onclick=writingToggleReaction;
+  document.getElementById('reaction-modal-bg')?.remove();
+  const bg=document.createElement('div');bg.id='reaction-modal-bg';bg.className='reaction-modal-bg';
+  bg.onclick=(e)=>{if(e.target===bg)writingToggleReaction();};
+  const modal=document.createElement('div');modal.className='reaction-modal';
+  const hdr=document.createElement('div');hdr.className='reaction-modal-hdr';
+  const t=document.createElement('span');t.style.cssText='font-size:14px;font-weight:700;flex:1;color:var(--tx)';t.textContent='💬 독자 반응 메모';
+  const cs=document.createElement('span');cs.style.cssText='font-size:12px;color:var(--tx3)';cs.textContent=ch.title||'';
+  const cl=document.createElement('button');cl.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:18px;padding:0;line-height:1';cl.textContent='✕';cl.onclick=writingToggleReaction;
   hdr.append(t,cs,cl);
-  const body=document.createElement('div');body.className='reaction-panel-body';
-  const ta=document.createElement('textarea');ta.placeholder='이 회차 독자 반응, 댓글 등 자유롭게 기록...';ta.value=ch.reactionMemo||'';
+  const body=document.createElement('div');body.className='reaction-modal-body';
+  const ta=document.createElement('textarea');ta.placeholder='이 회차 독자 반응, 댓글, 좋아요 수 등 자유롭게 기록...';ta.value=ch.reactionMemo||'';
   let _rt;
-  ta.addEventListener('input',()=>{ch.reactionMemo=ta.value;clearTimeout(_rt);_rt=setTimeout(()=>{dsave();const dot=document.querySelector('.wt-ch-reaction[data-chid="'+ch.id+'"]');if(dot)dot.className='wt-ch-reaction'+(ch.reactionMemo?' has-memo':'');const pi2=dot?.closest('.wt-ch-item');if(pi2){pi2.classList.toggle('has-reaction-memo',!!ch.reactionMemo);const dh2=pi2.querySelector('.wt-ch-drag');if(dh2)dh2.textContent=ch.reactionMemo?'💬':'⠿';}},400);});
-  const hint=document.createElement('div');hint.style.cssText='font-size:10px;color:var(--tx3)';hint.textContent='자동 저장됩니다.';
-  body.append(ta,hint);panel.append(hdr,body);wrap.appendChild(panel);
-  requestAnimationFrame(()=>panel.classList.remove('hidden'));
+  ta.addEventListener('input',()=>{
+    ch.reactionMemo=ta.value;clearTimeout(_rt);
+    _rt=setTimeout(()=>{
+      dsave();
+      const dot=document.querySelector('.wt-ch-reaction[data-chid="'+ch.id+'"]');
+      if(dot)dot.className='wt-ch-reaction'+(ch.reactionMemo?' has-memo':'');
+      const pi2=dot?.closest('.wt-ch-item');
+      if(pi2){pi2.classList.toggle('has-reaction-memo',!!ch.reactionMemo);const dh2=pi2.querySelector('.wt-ch-drag');if(dh2)dh2.textContent=ch.reactionMemo?'💬':'⠿';}
+    },400);
+  });
+  const hint=document.createElement('div');hint.style.cssText='font-size:11px;color:var(--tx3)';hint.textContent='자동 저장됩니다.';
+  body.append(ta,hint);modal.append(hdr,body);bg.appendChild(modal);document.body.appendChild(bg);
   const btn=document.getElementById('writing-reaction-btn');if(btn)btn.classList.add('on');
-  _reactionPanelOpen=true;setTimeout(()=>ta.focus(),250);
+  _reactionPanelOpen=true;setTimeout(()=>ta.focus(),100);
 }
 function _writingUpdateReactionPanel(ch){
-  const panel=document.getElementById('writing-reaction-panel');if(!panel||!_reactionPanelOpen)return;
+  const modal=document.getElementById('reaction-modal-bg');if(!modal||!_reactionPanelOpen)return;
   if(!ch){writingToggleReaction();return;}
-  const spans=panel.querySelectorAll('.reaction-panel-hdr span');if(spans[1])spans[1].textContent=ch.title||'';
-  const ta=panel.querySelector('textarea');if(ta)ta.value=ch.reactionMemo||'';
+  const cs=modal.querySelector('.reaction-modal-hdr span:nth-child(2)');if(cs)cs.textContent=ch.title||'';
+  const ta=modal.querySelector('textarea');if(ta)ta.value=ch.reactionMemo||'';
 }
 let _fnrMatches=[],_fnrIdx=0;
 function writingToggleFnR(){
@@ -7736,63 +7829,53 @@ function _placeParaNoteIcon(span, ce, ch){
 function _openParaNotePopup(span, ce, ch){
   document.querySelector('.para-note-popup')?.remove();
   const popup=document.createElement('div');popup.className='para-note-popup';
-  popup.style.cssText='position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:6px;min-width:180px;max-width:260px';
-
-  const ta=document.createElement('textarea');
-  ta.rows=3;ta.style.cssText='width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:6px;font-size:12px;color:var(--tx);resize:none;font-family:inherit;line-height:1.5;box-sizing:border-box';
-  ta.placeholder='메모 입력...';ta.value=span.dataset.note||'';
-  ta.addEventListener('focus',()=>ta.style.borderColor='var(--ac)');
-  ta.addEventListener('blur',()=>ta.style.borderColor='var(--bdr)');
-
+  popup.style.cssText='position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:8px;min-width:200px;max-width:280px;width:max-content';
+  // 내용 입력 — contenteditable div (내용 따라 크기 유동)
+  const editor=document.createElement('div');
+  editor.contentEditable='true';
+  editor.style.cssText='background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:8px;font-size:12px;color:var(--tx);font-family:inherit;line-height:1.6;outline:none;min-height:40px;white-space:pre-wrap;word-break:break-all;cursor:text';
+  editor.textContent=span.dataset.note||'';
+  editor.addEventListener('focus',()=>editor.style.borderColor='var(--ac)');
+  editor.addEventListener('blur',()=>editor.style.borderColor='var(--bdr)');
   const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;justify-content:flex-end';
-
   const saveBtn=document.createElement('button');
-  saveBtn.style.cssText='background:var(--ac);color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer';
+  saveBtn.style.cssText='background:var(--ac);color:#fff;border:none;border-radius:5px;padding:4px 12px;font-size:12px;cursor:pointer';
   saveBtn.textContent='저장';
   saveBtn.onclick=()=>{
-    span.dataset.note=ta.value.trim();
+    span.dataset.note=editor.textContent.trim();
     popup.remove();
-    // 아이콘 갱신
     const pane=document.getElementById('writing-pane1');
     const icon=pane?.querySelector('.para-note-icon[data-for="'+span.dataset.nid+'"]');
     if(icon){icon.textContent=span.dataset.note?'📝':'📌';icon.title=span.dataset.note||'클릭하여 메모 입력';}
-    ch.content=ce.innerHTML; dsave();
+    ch.content=ce.innerHTML;dsave();
   };
-
   const delBtn=document.createElement('button');
-  delBtn.style.cssText='background:none;border:1px solid var(--rd);color:var(--rd);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer';
+  delBtn.style.cssText='background:none;border:1px solid var(--rd);color:var(--rd);border-radius:5px;padding:4px 12px;font-size:12px;cursor:pointer';
   delBtn.textContent='삭제';
   delBtn.onclick=()=>{
-    // span 언래핑
     const parent=span.parentNode;
     if(parent){while(span.firstChild)parent.insertBefore(span.firstChild,span);parent.removeChild(span);}
     popup.remove();
-    // 아이콘 제거
     const pane=document.getElementById('writing-pane1');
     pane?.querySelector('.para-note-icon[data-for="'+span.dataset.nid+'"]')?.remove();
-    ch.content=ce.innerHTML; dsave();
+    ch.content=ce.innerHTML;dsave();
   };
-
-  const cl=document.createElement('button');
-  cl.style.cssText='position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;color:var(--tx3);font-size:14px;padding:0';
-  cl.textContent='✕';cl.onclick=()=>popup.remove();
-
   btnRow.append(saveBtn,delBtn);
-  popup.style.position='fixed';
-  popup.appendChild(cl);popup.appendChild(ta);popup.appendChild(btnRow);
+  popup.append(editor,btnRow);
   document.body.appendChild(popup);
-
+  // 위치: span 바로 아래
   const sr=span.getBoundingClientRect();
-  // span 바로 아래에 표시, 화면 밖으로 나가면 위로 조정
-  popup.style.left=Math.min(Math.max(4, sr.left), window.innerWidth-270)+'px';
+  popup.style.left=Math.min(Math.max(4,sr.left),window.innerWidth-290)+'px';
   popup.style.top=(sr.bottom+4)+'px';
   requestAnimationFrame(()=>{
     const r=popup.getBoundingClientRect();
-    if(r.right>window.innerWidth-4) popup.style.left=Math.max(4,window.innerWidth-r.width-8)+'px';
-    if(r.bottom>window.innerHeight-4) popup.style.top=(sr.top-r.height-4)+'px';
+    if(r.right>window.innerWidth-4)popup.style.left=Math.max(4,window.innerWidth-r.width-8)+'px';
+    if(r.bottom>window.innerHeight-4)popup.style.top=(sr.top-r.height-4)+'px';
   });
-  ta.focus();
-
+  editor.focus();
+  // 커서를 끝으로
+  const range=document.createRange();const sel=window.getSelection();
+  range.selectNodeContents(editor);range.collapse(false);sel.removeAllRanges();sel.addRange(range);
   setTimeout(()=>{
     document.addEventListener('mousedown',function _cp(ev){
       if(!popup.contains(ev.target)&&!span.contains(ev.target)){popup.remove();}
@@ -7851,6 +7934,48 @@ function toolsOpenTrash(){
       toast('완전히 삭제됐습니다.');
     };
     item.append(restoreBtn,delBtn);list.appendChild(item);
+  });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  맞춤법 예외 사전
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function spellExceptAdd(){
+  const inp=document.getElementById('spell-except-inp');
+  if(!inp)return;
+  const word=inp.value.trim();
+  if(!word){toast('단어를 입력하세요.',true);return;}
+  if(!S.profile.spellExcept)S.profile.spellExcept=[];
+  if(S.profile.spellExcept.includes(word)){toast('이미 등록된 단어입니다.',true);return;}
+  S.profile.spellExcept.push(word);
+  inp.value='';
+  dsave();
+  renderSpellExceptList();
+  toast(`"${word}" 예외 등록 완료`);
+}
+function spellExceptRemove(word){
+  if(!S.profile.spellExcept)return;
+  S.profile.spellExcept=S.profile.spellExcept.filter(w=>w!==word);
+  dsave();
+  renderSpellExceptList();
+}
+function renderSpellExceptList(){
+  const el=document.getElementById('spell-except-list');if(!el)return;
+  el.innerHTML='';
+  const list=S.profile.spellExcept||[];
+  if(!list.length){
+    el.innerHTML='<span style="font-size:11px;color:var(--tx3)">등록된 예외 단어가 없습니다.</span>';
+    return;
+  }
+  list.forEach(word=>{
+    const tag=document.createElement('div');
+    tag.style.cssText='display:flex;align-items:center;gap:4px;background:var(--surf2);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--tx)';
+    const txt=document.createElement('span');txt.textContent=word;
+    const del=document.createElement('button');
+    del.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:13px;padding:0;line-height:1;margin-left:2px';
+    del.textContent='✕';del.title='삭제';
+    del.onclick=()=>spellExceptRemove(word);
+    tag.append(txt,del);el.appendChild(tag);
   });
 }
 
