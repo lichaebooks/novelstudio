@@ -2093,7 +2093,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 에디터 활성 시 -->
-      <div style="display:none;flex-direction:column;flex:1;overflow:hidden;position:relative" id="writing-editor-wrap">
+      <div style="display:none;flex-direction:column;flex:1;overflow:visible;position:relative" id="writing-editor-wrap">
         <!-- 에디터 탑바 -->
         <div style="padding:8px 16px;border-bottom:1px solid var(--bdr);background:var(--surf2);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap">
           <input type="text" id="writing-ch-title-inp" placeholder="회차 제목 입력..." style="flex:1;font-size:15px;font-weight:700;background:transparent;border:none;outline:none;color:var(--tx);font-family:inherit;border-bottom:1px dashed transparent;min-width:0" oninput="writingUpdateChTitle(this.value)"/>
@@ -7685,6 +7685,9 @@ function _insertParaNoteSpan(range, ce, ch){
       range.insertNode(span);
     }catch(e2){return;}
   }
+  // span 클릭 시 팝업 오픈 (아이콘 없어도 접근 가능)
+  span.onclick=(e)=>{ e.stopPropagation(); _openParaNotePopup(span,ce,ch); };
+  span.style.cursor='pointer';
   // ce1 저장
   ch.content=ce.innerHTML; dsave();
   // 아이콘 배치 후 팝업 오픈
@@ -7767,13 +7770,13 @@ function _openParaNotePopup(span, ce, ch){
   document.body.appendChild(popup);
 
   const sr=span.getBoundingClientRect();
-  popup.style.left=Math.max(4,sr.left-270)+'px';
-  popup.style.top=sr.top+'px';
+  // span 바로 아래에 표시, 화면 밖으로 나가면 위로 조정
+  popup.style.left=Math.min(Math.max(4, sr.left), window.innerWidth-270)+'px';
+  popup.style.top=(sr.bottom+4)+'px';
   requestAnimationFrame(()=>{
     const r=popup.getBoundingClientRect();
-    if(r.left<4)popup.style.left='4px';
-    if(r.bottom>window.innerHeight)popup.style.top=(sr.top-r.height)+'px';
-    if(r.right>window.innerWidth)popup.style.left=(window.innerWidth-r.width-8)+'px';
+    if(r.right>window.innerWidth-4) popup.style.left=Math.max(4,window.innerWidth-r.width-8)+'px';
+    if(r.bottom>window.innerHeight-4) popup.style.top=(sr.top-r.height-4)+'px';
   });
   ta.focus();
 
@@ -7791,6 +7794,9 @@ function _restoreParaNoteIcons(ce, ch){
   pane.querySelectorAll('.para-note-icon').forEach(el=>el.remove());
   ce.querySelectorAll('.para-note-span').forEach(span=>{
     if(!span.dataset.nid) span.dataset.nid='pn'+Date.now()+Math.random().toString(36).slice(2);
+    // 클릭 핸들러 (저장된 span에도 등록)
+    span.onclick=(e)=>{ e.stopPropagation(); _openParaNotePopup(span,ce,ch); };
+    span.style.cursor='pointer';
     _placeParaNoteIcon(span,ce,ch);
   });
 }
