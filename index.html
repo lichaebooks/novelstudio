@@ -7624,8 +7624,8 @@ function _spellShowPopup(errors, skipped, ch, rawText){
   btns.append(skipBtn,fixBtn,allBtn);
   popup.append(head,words,desc,btns);
   document.body.appendChild(popup);
-  // 현재 오류 위치 하이라이트 + 스크롤
-  _spellHighlight(err.pattern);
+  // 현재 오류 위치 하이라이트 + 스크롤 (setTimeout으로 렌더링 후 실행)
+  setTimeout(()=>_spellHighlight(err.pattern), 50);
 }
 function _spellHighlight(pattern){
   const ce=document.getElementById('writing-ce1');
