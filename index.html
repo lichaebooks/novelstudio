@@ -1969,14 +1969,11 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
   #writing-tree-resize{display:none!important;}
 }
 
-/* 문단 메모 */
-.editor-note{background:rgba(255,220,50,.18);border-bottom:1.5px solid rgba(255,180,0,.6);cursor:pointer;position:relative}
-.editor-note-icon{position:absolute;left:-26px;top:50%;transform:translateY(-50%);font-size:11px;line-height:1;cursor:pointer;z-index:10;opacity:.7;user-select:none}
-.editor-note-icon:hover{opacity:1}
-.editor-note-popup{position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--tx);box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:9999;max-width:260px;min-width:140px}
-.editor-note-popup textarea{width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:6px;font-size:12px;color:var(--tx);resize:none;font-family:inherit;line-height:1.5}
-.editor-note-popup textarea:focus{outline:none;border-color:var(--ac)}
-#writing-pane1{padding-left:30px!important;position:relative}
+.para-note-span{background:rgba(255,200,0,.2);border-bottom:1.5px solid rgba(220,160,0,.7);cursor:pointer}
+.para-note-span:hover{background:rgba(255,200,0,.32)}
+.para-note-icon{position:absolute;left:-22px;font-size:12px;cursor:pointer;z-index:10;opacity:.7;user-select:none;line-height:1;transform:translateY(-50%)}
+.para-note-icon:hover{opacity:1}
+#writing-pane1{position:relative}
 </style>
 </head>
 <body>
@@ -2096,7 +2093,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 에디터 활성 시 -->
-      <div style="display:none;flex-direction:column;flex:1;overflow:hidden" id="writing-editor-wrap">
+      <div style="display:none;flex-direction:column;flex:1;overflow:hidden;position:relative" id="writing-editor-wrap">
         <!-- 에디터 탑바 -->
         <div style="padding:8px 16px;border-bottom:1px solid var(--bdr);background:var(--surf2);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap">
           <input type="text" id="writing-ch-title-inp" placeholder="회차 제목 입력..." style="flex:1;font-size:15px;font-weight:700;background:transparent;border:none;outline:none;color:var(--tx);font-family:inherit;border-bottom:1px dashed transparent;min-width:0" oninput="writingUpdateChTitle(this.value)"/>
@@ -2113,7 +2110,6 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
             <!-- TTS -->
             <button class="splitbtn" id="writing-tts-btn" onclick="writingToggleTTS()" title="TTS 읽기">🔊 TTS</button>
             <!-- 독자반응 --><button class="splitbtn" id="writing-reaction-btn" onclick="writingToggleReaction()" title="독자 반응 메모">💬 반응</button>
-            <!-- 문단메모 --><button class="splitbtn" id="writing-note-btn" onclick="writingToggleNotePanel()" title="문단 메모">📝 메모</button>
             <!-- 찾기 --><button class="splitbtn" id="writing-fnr-btn" onclick="writingToggleFnR()" title="찾기/바꾸기">🔍 찾기/바꾸기</button>
             <!-- 내보내기 -->
             <div style="position:relative">
@@ -5491,37 +5487,31 @@ function renderWorks(){
   el.innerHTML='';
   S.works.forEach((w,i)=>{
     const card=document.createElement('div');card.className='work-card';
-    const cOpts=['검토중','거절','계약'].map(s=>`<option value="${s}" ${(w.contractStatus||'')=== s?'selected':''}>${s}</option>`).join('');
-    card.innerHTML=`<input type="color" value="${w.color||'#388bfd'}" style="width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;padding:0;flex-shrink:0" onchange="S.works[${i}].color=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
-      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+    card.innerHTML=`
+      <input type="color" value="${w.color||'#388bfd'}" style="width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;padding:0;flex-shrink:0" onchange="S.works[${i}].color=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
+      <div style="flex:1;display:flex;flex-direction:column;gap:5px">
         <input type="text" class="sinput" value="${w.name}" placeholder="작품명" style="max-width:none;font-weight:600" oninput="S.works[${i}].name=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <input type="text" class="sinput" value="${w.genre||''}" placeholder="장르" style="max-width:100px;font-size:11px" oninput="S.works[${i}].genre=this.value;dsave()"/>
-          <input type="text" class="sinput" value="${w.platform||''}" placeholder="연재 플랫폼" style="max-width:120px;font-size:11px" oninput="S.works[${i}].platform=this.value;dsave()"/>
-          <select class="sinput" style="max-width:90px;font-size:11px" onchange="S.works[${i}].status=this.value;dsave()">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          <input type="text" class="sinput" value="${w.genre||''}" placeholder="장르" style="max-width:80px;font-size:11px" oninput="S.works[${i}].genre=this.value;dsave()"/>
+          <input type="text" class="sinput" value="${w.platform||''}" placeholder="플랫폼" style="max-width:90px;font-size:11px" oninput="S.works[${i}].platform=this.value;dsave()"/>
+          <select class="sinput" style="max-width:100px;font-size:11px" onchange="S.works[${i}].status=this.value;dsave()">
             <option value="writing" ${w.status==='writing'?'selected':''}>집필중</option>
             <option value="hiatus" ${w.status==='hiatus'?'selected':''}>휴재</option>
             <option value="done" ${w.status==='done'?'selected':''}>완결</option>
+            <option value="submit" ${w.status==='submit'?'selected':''}>투고</option>
+            <option value="contest" ${w.status==='contest'?'selected':''}>공모전</option>
+            <option value="published" ${w.status==='published'?'selected':''}>출간완료</option>
+            <option value="ended" ${w.status==='ended'?'selected':''}>계약종료</option>
           </select>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:4px;border-top:1px dashed var(--bdr)">
-          <span style="font-size:10px;color:var(--tx3);flex-shrink:0">📬 투고</span>
-          <input type="text" class="sinput" value="${w.submissionDate||''}" placeholder="투고일" style="max-width:110px;font-size:11px" oninput="S.works[${i}].submissionDate=this.value;dsave()"/>
-          <select class="sinput" style="max-width:80px;font-size:11px" onchange="S.works[${i}].contractStatus=this.value;dsave()">
-            <option value="" ${!w.contractStatus?'selected':''}>상태</option>
-            ${cOpts}
-          </select>
-          <input type="text" class="sinput" value="${w.contractMemo||''}" placeholder="계약 메모" style="flex:1;min-width:80px;font-size:11px" oninput="S.works[${i}].contractMemo=this.value;dsave()"/>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span style="font-size:10px;color:var(--tx3);flex-shrink:0">👤 담당자</span>
-          <input type="text" class="sinput" value="${w.editorContact||''}" placeholder="담당자 연락처" style="flex:1;font-size:11px" oninput="S.works[${i}].editorContact=this.value;dsave()"/>
+          <input type="text" class="sinput" value="${w.editorContact||''}" placeholder="담당자 연락처" style="max-width:130px;font-size:11px" oninput="S.works[${i}].editorContact=this.value;dsave()"/>
         </div>
       </div>
-      <button class="btn btnr" style="padding:4px 8px;font-size:11px;flex-shrink:0;align-self:flex-start" onclick="removeWork(${i})">삭제</button>`;
+      <button class="btn btnr" style="padding:4px 8px;font-size:11px;flex-shrink:0;align-self:flex-start" onclick="removeWork(${i})">삭제</button>
+    `;
     el.appendChild(card);
   });
 }
+
 
 function addWork(){
   S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
@@ -7119,7 +7109,24 @@ function writingOpenChapter(workId,chId){
     clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>{dsave();writingUpdateProgress(workId);},600);
   });
   _writingEditor.html=ch.content||'';
-  // 문단 메모 아이콘 렌더링
+  // 문단 메모 아이콘 복원
+  setTimeout(()=>{ const _ce2=document.getElementById('writing-ce1'); if(_ce2)_restoreParaNoteIcons(_ce2,ch); },80);
+  // 문단 메모: 새 ce1에 contextmenu 리스너 등록 (매번 새 요소이므로 누적 없음)
+  {
+    const _ce=document.getElementById('writing-ce1');
+    if(_ce) _ce.addEventListener('contextmenu', function(e){
+      const sel=window.getSelection();
+      if(!sel||!sel.toString().trim()||sel.rangeCount===0) return;
+      if(e.target.closest('table.mb-table')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      // range 소멸 전에 즉시 처리
+      const range=sel.getRangeAt(0);
+      const sc=range.startContainer, so=range.startOffset;
+      const ec=range.endContainer, eo=range.endOffset;
+      _showParagraphNoteMenu(e, sc, so, ec, eo, _ce, ch);
+    });
+  }
   // 글자수 초기화
   const initPlain=(ch.content||'').replace(/<[^>]*>/g,'').replace(/\s/g,'');
   const wcEl=document.getElementById('writing-ch-wc');if(wcEl)wcEl.textContent=initPlain.length.toLocaleString()+'자';
@@ -7514,7 +7521,6 @@ function writingToggleReaction(){
 function _writingOpenReactionPanel(ch){
   document.getElementById('writing-reaction-panel')?.remove();
   const wrap=document.getElementById('writing-editor-wrap');if(!wrap)return;
-  wrap.style.position='relative';
   const panel=document.createElement('div');panel.id='writing-reaction-panel';panel.className='reaction-panel hidden';
   const hdr=document.createElement('div');hdr.className='reaction-panel-hdr';
   const t=document.createElement('span');t.style.cssText='font-size:13px;font-weight:700;flex:1;color:var(--tx)';t.textContent='💬 독자 반응 메모';
@@ -7627,136 +7633,166 @@ function _renderHabitReport(container){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  문단 메모 패널 (ch.notes 배열 저장)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let _notePanelOpen=false;
-function writingToggleNotePanel(){
-  const panel=document.getElementById('writing-note-panel');
-  if(panel){
-    panel.classList.add('hidden');
-    setTimeout(()=>{panel.remove();},200);
-    _notePanelOpen=false;
-    const btn=document.getElementById('writing-note-btn');
-    if(btn)btn.classList.remove('on');
-    return;
-  }
-  const ch=wNodes().find(n=>n.id===_writingSelCh);
-  if(!ch){toast('회차를 먼저 선택하세요.',true);return;}
-  _openNotePanelForCh(ch);
-}
-function _openNotePanelForCh(ch){
-  document.getElementById('writing-note-panel')?.remove();
-  const wrap=document.getElementById('writing-editor-wrap');if(!wrap)return;
-  wrap.style.position='relative';
-  if(!ch.notes)ch.notes=[];
 
-  const panel=document.createElement('div');
-  panel.id='writing-note-panel';panel.className='reaction-panel hidden';
-
-  const hdr=document.createElement('div');hdr.className='reaction-panel-hdr';
-  const t=document.createElement('span');t.style.cssText='font-size:13px;font-weight:700;flex:1;color:var(--tx)';t.textContent='📝 문단 메모';
-  const addBtn=document.createElement('button');
-  addBtn.style.cssText='background:var(--ac);color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer';
-  addBtn.textContent='+ 추가';
-  addBtn.onclick=()=>{
-    // 선택 텍스트 가져오기
-    const sel=window.getSelection();
-    const selTxt=sel&&sel.toString().trim()||'';
-    _openNoteEditForm(null, selTxt, ch, panel);
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  문단 메모 (드래그→우클릭→span+팝업)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function _showParagraphNoteMenu(e, sc, so, ec, eo, ce, ch){
+  document.querySelector('.para-note-menu')?.remove();
+  const menu=document.createElement('div');
+  menu.className='ctx-menu para-note-menu';
+  const item=document.createElement('div');item.className='ctx-item';item.textContent='📝 메모 넣기';
+  item.onclick=(ev)=>{
+    ev.stopPropagation();menu.remove();
+    // 저장된 위치로 range 재구성
+    try{
+      const r2=document.createRange();
+      r2.setStart(sc,so);r2.setEnd(ec,eo);
+      _insertParaNoteSpan(r2,ce,ch);
+    }catch(err){console.warn('note range err',err);}
   };
-  const cl=document.createElement('button');
-  cl.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:16px;padding:0 0 0 8px;line-height:1';
-  cl.textContent='✕';cl.onclick=writingToggleNotePanel;
-  hdr.append(t,addBtn,cl);
-
-  const body=document.createElement('div');body.className='reaction-panel-body';body.id='note-list-body';
-  panel.append(hdr,body);wrap.appendChild(panel);
-  _refreshNoteList(ch,panel);
-  requestAnimationFrame(()=>panel.classList.remove('hidden'));
-  const btn=document.getElementById('writing-note-btn');if(btn)btn.classList.add('on');
-  _notePanelOpen=true;
-}
-function _refreshNoteList(ch,panel){
-  const body=panel.querySelector('#note-list-body');if(!body)return;
-  body.innerHTML='';
-  if(!ch.notes)ch.notes=[];
-  if(!ch.notes.length){
-    const e=document.createElement('div');
-    e.style.cssText='font-size:11px;color:var(--tx3);padding:10px 0;text-align:center';
-    e.textContent='메모가 없습니다. 텍스트 선택 후 + 추가를 눌러 메모를 추가하세요.';
-    body.appendChild(e);return;
-  }
-  ch.notes.forEach((note,idx)=>{
-    const item=document.createElement('div');
-    item.style.cssText='padding:8px 0;border-bottom:1px solid var(--bdr)';
-    if(note.anchor){
-      const anchor=document.createElement('div');
-      anchor.style.cssText='font-size:10px;color:var(--tx3);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;';
-      anchor.textContent='"'+note.anchor+'"';
-      anchor.title='클릭하여 해당 텍스트로 이동';
-      anchor.onclick=()=>{
-        const ce=document.getElementById('writing-ce1');if(!ce)return;
-        const walker=document.createTreeWalker(ce,NodeFilter.SHOW_TEXT);
-        let nd;while((nd=walker.nextNode())){
-          const i2=nd.textContent.indexOf(note.anchor);
-          if(i2>=0){
-            const r=document.createRange();r.setStart(nd,i2);r.setEnd(nd,i2+note.anchor.length);
-            const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
-            nd.parentElement?.scrollIntoView({block:'center',behavior:'smooth'});break;
-          }
-        }
-      };
-      item.appendChild(anchor);
-    }
-    const txt=document.createElement('div');
-    txt.style.cssText='font-size:12px;color:var(--tx);margin-bottom:4px;cursor:pointer;line-height:1.5';
-    txt.textContent=note.text||'(내용 없음)';
-    txt.onclick=()=>_openNoteEditForm(idx, note.anchor||'', ch, panel);
-    const del=document.createElement('button');
-    del.style.cssText='background:none;border:none;cursor:pointer;color:var(--tx3);font-size:11px;float:right';
-    del.textContent='✕';
-    del.onclick=(e)=>{e.stopPropagation();ch.notes.splice(idx,1);dsave();_refreshNoteList(ch,panel);};
-    item.append(txt,del);body.appendChild(item);
+  menu.appendChild(item);
+  document.body.appendChild(menu);
+  menu.style.cssText='left:'+e.clientX+'px;top:'+e.clientY+'px';
+  requestAnimationFrame(()=>{
+    const r=menu.getBoundingClientRect();
+    if(r.right>window.innerWidth) menu.style.left=(e.clientX-r.width)+'px';
+    if(r.bottom>window.innerHeight) menu.style.top=(e.clientY-r.height)+'px';
   });
+  // 다음 클릭 시 메뉴 닫기 — mousedown으로 잡아야 item.onclick 이전에 안 닫힘
+  setTimeout(()=>{
+    document.addEventListener('mousedown',function _closeMenu(ev){
+      if(!menu.contains(ev.target)) menu.remove();
+      document.removeEventListener('mousedown',_closeMenu,true);
+    },true);
+  },10);
 }
-function _openNoteEditForm(editIdx, anchorTxt, ch, panel){
-  // 기존 폼 제거
-  panel.querySelector('.note-edit-form')?.remove();
-  const body=panel.querySelector('#note-list-body');if(!body)return;
 
-  const form=document.createElement('div');form.className='note-edit-form';
-  form.style.cssText='background:var(--surf2);border-radius:8px;padding:10px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px';
-
-  if(anchorTxt){
-    const al=document.createElement('div');
-    al.style.cssText='font-size:10px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-    al.textContent='선택 텍스트: "'+anchorTxt+'"';
-    form.appendChild(al);
+function _insertParaNoteSpan(range, ce, ch){
+  // 이미 메모 span이면 편집 팝업 열기
+  const existing=range.startContainer.parentElement?.closest('.para-note-span');
+  if(existing){_openParaNotePopup(existing,ce,ch);return;}
+  const span=document.createElement('span');
+  span.className='para-note-span';
+  span.dataset.note='';
+  span.dataset.nid='pn'+Date.now();
+  try{ range.surroundContents(span); }
+  catch(e){
+    // 여러 노드에 걸친 경우 — extractContents로 처리
+    try{
+      const frag=range.extractContents();
+      span.appendChild(frag);
+      range.insertNode(span);
+    }catch(e2){return;}
   }
+  // ce1 저장
+  ch.content=ce.innerHTML; dsave();
+  // 아이콘 배치 후 팝업 오픈
+  _placeParaNoteIcon(span,ce,ch);
+  _openParaNotePopup(span,ce,ch);
+}
+
+function _placeParaNoteIcon(span, ce, ch){
+  // 기존 아이콘 있으면 제거
+  const pane=document.getElementById('writing-pane1');if(!pane)return;
+  const old=pane.querySelector('.para-note-icon[data-for="'+span.dataset.nid+'"]');
+  if(old)old.remove();
+
+  const icon=document.createElement('span');
+  icon.className='para-note-icon';
+  icon.dataset.for=span.dataset.nid;
+  icon.textContent=span.dataset.note?'📝':'📌';
+  icon.title=span.dataset.note||'클릭하여 메모 입력';
+  icon.onclick=(e)=>{e.stopPropagation();_openParaNotePopup(span,ce,ch);};
+
+  const _pos=()=>{
+    const sr=span.getBoundingClientRect();
+    const pr=pane.getBoundingClientRect();
+    if(sr.width===0&&sr.height===0)return; // 숨김 상태
+    icon.style.top=(sr.top-pr.top+pane.scrollTop+(sr.height/2)-8)+'px';
+  };
+  _pos();
+  pane.appendChild(icon);
+  // 스크롤 시 위치 갱신
+  (ce.closest('.mbedit')||pane).addEventListener('scroll',_pos,{passive:true});
+}
+
+function _openParaNotePopup(span, ce, ch){
+  document.querySelector('.para-note-popup')?.remove();
+  const popup=document.createElement('div');popup.className='para-note-popup';
+  popup.style.cssText='position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:6px;min-width:180px;max-width:260px';
 
   const ta=document.createElement('textarea');
-  ta.rows=3;ta.style.cssText='width:100%;background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:6px;font-size:12px;color:var(--tx);resize:none;font-family:inherit;line-height:1.5;box-sizing:border-box';
-  ta.placeholder='메모 내용 입력...';
-  if(editIdx!==null&&ch.notes[editIdx])ta.value=ch.notes[editIdx].text||'';
+  ta.rows=3;ta.style.cssText='width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:6px;font-size:12px;color:var(--tx);resize:none;font-family:inherit;line-height:1.5;box-sizing:border-box';
+  ta.placeholder='메모 입력...';ta.value=span.dataset.note||'';
   ta.addEventListener('focus',()=>ta.style.borderColor='var(--ac)');
   ta.addEventListener('blur',()=>ta.style.borderColor='var(--bdr)');
 
   const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;justify-content:flex-end';
+
   const saveBtn=document.createElement('button');
   saveBtn.style.cssText='background:var(--ac);color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer';
   saveBtn.textContent='저장';
   saveBtn.onclick=()=>{
-    if(!ch.notes)ch.notes=[];
-    const newNote={id:uid(),text:ta.value.trim(),anchor:anchorTxt,createdAt:Date.now()};
-    if(editIdx!==null)ch.notes[editIdx]=newNote;
-    else ch.notes.push(newNote);
-    dsave();form.remove();_refreshNoteList(ch,panel);
+    span.dataset.note=ta.value.trim();
+    popup.remove();
+    // 아이콘 갱신
+    const pane=document.getElementById('writing-pane1');
+    const icon=pane?.querySelector('.para-note-icon[data-for="'+span.dataset.nid+'"]');
+    if(icon){icon.textContent=span.dataset.note?'📝':'📌';icon.title=span.dataset.note||'클릭하여 메모 입력';}
+    ch.content=ce.innerHTML; dsave();
   };
-  const cancelBtn=document.createElement('button');
-  cancelBtn.style.cssText='background:none;border:1px solid var(--bdr);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--tx2)';
-  cancelBtn.textContent='취소';cancelBtn.onclick=()=>form.remove();
-  btnRow.append(saveBtn,cancelBtn);
-  form.append(ta,btnRow);
-  body.insertBefore(form,body.firstChild);
+
+  const delBtn=document.createElement('button');
+  delBtn.style.cssText='background:none;border:1px solid var(--rd);color:var(--rd);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer';
+  delBtn.textContent='삭제';
+  delBtn.onclick=()=>{
+    // span 언래핑
+    const parent=span.parentNode;
+    if(parent){while(span.firstChild)parent.insertBefore(span.firstChild,span);parent.removeChild(span);}
+    popup.remove();
+    // 아이콘 제거
+    const pane=document.getElementById('writing-pane1');
+    pane?.querySelector('.para-note-icon[data-for="'+span.dataset.nid+'"]')?.remove();
+    ch.content=ce.innerHTML; dsave();
+  };
+
+  const cl=document.createElement('button');
+  cl.style.cssText='position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;color:var(--tx3);font-size:14px;padding:0';
+  cl.textContent='✕';cl.onclick=()=>popup.remove();
+
+  btnRow.append(saveBtn,delBtn);
+  popup.style.position='fixed';
+  popup.appendChild(cl);popup.appendChild(ta);popup.appendChild(btnRow);
+  document.body.appendChild(popup);
+
+  const sr=span.getBoundingClientRect();
+  popup.style.left=Math.max(4,sr.left-270)+'px';
+  popup.style.top=sr.top+'px';
+  requestAnimationFrame(()=>{
+    const r=popup.getBoundingClientRect();
+    if(r.left<4)popup.style.left='4px';
+    if(r.bottom>window.innerHeight)popup.style.top=(sr.top-r.height)+'px';
+    if(r.right>window.innerWidth)popup.style.left=(window.innerWidth-r.width-8)+'px';
+  });
   ta.focus();
+
+  setTimeout(()=>{
+    document.addEventListener('mousedown',function _cp(ev){
+      if(!popup.contains(ev.target)&&!span.contains(ev.target)){popup.remove();}
+      document.removeEventListener('mousedown',_cp,true);
+    },true);
+  },100);
+}
+
+// 회차 열릴 때 기존 note span 아이콘 복원
+function _restoreParaNoteIcons(ce, ch){
+  const pane=document.getElementById('writing-pane1');if(!pane)return;
+  pane.querySelectorAll('.para-note-icon').forEach(el=>el.remove());
+  ce.querySelectorAll('.para-note-span').forEach(span=>{
+    if(!span.dataset.nid) span.dataset.nid='pn'+Date.now()+Math.random().toString(36).slice(2);
+    _placeParaNoteIcon(span,ce,ch);
+  });
 }
 
 // ── TTS ──
