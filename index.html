@@ -7476,49 +7476,49 @@ function writingSpellCheck(){
   panel.style.display='block';
   const res=document.getElementById('writing-spell-results');
   if(!res)return;
-  // 2000자씩 잘라서 첫 청크만 검사 (API 제한)
-  const chunk=rawText.slice(0,2000);
   res.innerHTML='<span style="color:var(--tx3)">⏳ 검사 중...</span>';
-  // 부산대 맞춤법 검사기 API (CORS 우회: allorigins 프록시 사용)
-  const apiUrl='https://speller.cs.pusan.ac.kr/results';
-  const proxyUrl='https://api.allorigins.win/get?url='+encodeURIComponent(apiUrl+'?text='+encodeURIComponent(chunk));
-  fetch(proxyUrl)
-    .then(r=>r.json())
+  // spell_rules.json fetch (GitHub Pages 기준 루트 경로)
+  fetch('./spell_rules.json?v='+Date.now())
+    .then(r=>{if(!r.ok)throw new Error('rules load fail');return r.json();})
     .then(data=>{
-      let body='';
-      try{
-        const json=JSON.parse(data.contents);
-        const errors=json?.errInfo||[];
-        if(!errors.length){
-          res.innerHTML='<span style="color:var(--gn)">✅ 맞춤법 오류가 없습니다.</span>'+(rawText.length>2000?'<br><span style="color:var(--tx3);font-size:10px">※ 앞 2000자만 검사됩니다.</span>':'');
-          return;
+      const rules=data.rules||[];
+      // 사용자 예외 사전 (설정탭에서 등록한 단어 — 4단계에서 추가)
+      const userExcept=(S.profile&&S.profile.spellExcept)||[];
+      const errors=[];
+      rules.forEach(rule=>{
+        const pat=rule.pattern;
+        if(!pat)return;
+        // 사용자 예외에 있으면 건너뜀
+        if(userExcept.includes(pat))return;
+        let idx=0;
+        while((idx=rawText.indexOf(pat,idx))!==-1){
+          errors.push({
+            pattern:pat,
+            suggest:rule.suggest||'',
+            desc:rule.desc||'',
+            index:idx
+          });
+          idx+=pat.length;
         }
-        body='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--tx2)">⚠️ '+errors.length+'개 항목 발견'+(rawText.length>2000?' (앞 2000자 기준)':'')+' :</div>';
-        errors.forEach(err=>{
-          const orig=err.orgStr||'';
-          const cands=(err.candWord||'').split('|').filter(Boolean).slice(0,3).join(', ');
-          const help=err.help||'';
-          body+=`<div style="background:var(--surf2);border-left:3px solid var(--yw);border-radius:0 6px 6px 0;padding:6px 10px;margin-bottom:6px;font-size:11px;line-height:1.7">
-            <span style="color:var(--rd);font-weight:700">${orig}</span>
-            ${cands?`→ <span style="color:var(--gn);font-weight:700">${cands}</span>`:''}
-            ${help?`<br><span style="color:var(--tx3)">${help}</span>`:''}
-          </div>`;
-        });
-      }catch(e){
-        body='<span style="color:var(--tx3)">⚠️ 검사 결과를 파싱할 수 없습니다.<br>직접 검사: <a href="https://speller.cs.pusan.ac.kr" target="_blank" style="color:var(--ac)">부산대 맞춤법 검사기</a></span>';
+      });
+      // 발견 위치 기준 정렬
+      errors.sort((a,b)=>a.index-b.index);
+      if(!errors.length){
+        res.innerHTML='<span style="color:var(--gn)">✅ 맞춤법 오류가 없습니다.</span>';
+        return;
       }
+      let body=`<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--tx2)">⚠️ ${errors.length}개 항목 발견:</div>`;
+      errors.forEach(err=>{
+        body+=`<div style="background:var(--surf2);border-left:3px solid var(--yw);border-radius:0 6px 6px 0;padding:6px 10px;margin-bottom:6px;font-size:11px;line-height:1.7">
+          <span style="color:var(--rd);font-weight:700">${err.pattern}</span>
+          ${err.suggest?`→ <span style="color:var(--gn);font-weight:700">${err.suggest}</span>`:''}
+          ${err.desc?`<br><span style="color:var(--tx3)">${err.desc}</span>`:''}
+        </div>`;
+      });
       res.innerHTML=body;
     })
     .catch(()=>{
-      // 프록시 실패 시 폴백: 직접 링크 + 브라우저 내장 spellcheck 안내
-      res.innerHTML=`<span style="color:var(--tx3);font-size:11px;line-height:1.8">
-        네트워크 오류 또는 API 제한으로 자동 검사를 사용할 수 없습니다.<br>
-        👉 <a href="https://speller.cs.pusan.ac.kr" target="_blank" style="color:var(--ac)">부산대 맞춤법 검사기</a>에서 직접 검사하세요.<br>
-        <br>
-        또는 에디터 내 <b>빨간 밑줄</b> 단어를 우클릭하면 브라우저 교정 제안을 볼 수 있습니다.
-      </span>`;
-      // spellcheck 강제 활성화
-      const ce=document.getElementById('writing-ce1');if(ce)ce.spellcheck=true;
+      res.innerHTML='<span style="color:var(--tx3);font-size:11px">spell_rules.json 파일을 불러올 수 없습니다.<br>저장소 루트에 파일이 있는지 확인하세요.</span>';
     });
 }
 
