@@ -2131,7 +2131,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
       </div>
 
       <!-- 에디터 활성 시 -->
-      <div style="display:none;flex-direction:column;flex:1;overflow:hidden" id="writing-editor-wrap">
+      <div style="display:none;flex-direction:column;flex:1;overflow:hidden;position:relative" id="writing-editor-wrap">
         <!-- 에디터 탑바 -->
         <div style="padding:8px 16px;border-bottom:1px solid var(--bdr);background:var(--surf2);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap">
           <input type="text" id="writing-ch-title-inp" placeholder="회차 제목 입력..." style="flex:1;font-size:15px;font-weight:700;background:transparent;border:none;outline:none;color:var(--tx);font-family:inherit;border-bottom:1px dashed transparent;min-width:0" oninput="writingUpdateChTitle(this.value)"/>
@@ -2147,6 +2147,10 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
             <button class="splitbtn" onclick="writingSpellCheck()" title="맞춤법 검사">맞춤법</button>
             <!-- TTS -->
             <button class="splitbtn" id="writing-tts-btn" onclick="writingToggleTTS()" title="TTS 읽기">🔊 TTS</button>
+            <!-- 북마크 -->
+            <button class="splitbtn" id="writing-bookmark-btn" onclick="writingToggleBookmarkPanel()" title="에디터 북마크">🔖 북마크</button>
+            <!-- 찾기/바꾸기 -->
+            <button class="splitbtn" id="writing-find-btn" onclick="writingToggleFindPanel()" title="찾기/바꾸기">🔎 찾기</button>
             <!-- 독자 반응 메모 -->
             <button class="splitbtn" id="writing-reaction-btn" onclick="writingToggleReactionPanel()" title="독자 반응 메모">💬 반응</button>
             <!-- 내보내기 -->
@@ -2163,8 +2167,29 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
           </div>
         </div>
 
+        <div id="writing-find-panel" aria-hidden="true">
+          <div class="writing-find-row">
+            <input type="text" id="writing-find-input" class="writing-find-input" placeholder="찾을 텍스트" oninput="writingRefreshFindMatches()"/>
+            <div class="writing-find-status" id="writing-find-status">0 / 0</div>
+            <button class="icobtn" onclick="writingSetFindPanelOpen(false)" title="닫기">✕</button>
+          </div>
+          <div class="writing-find-row">
+            <input type="text" id="writing-replace-input" class="writing-find-input" placeholder="바꿀 텍스트"/>
+          </div>
+          <div class="writing-find-row" style="justify-content:space-between">
+            <div style="display:flex;gap:6px">
+              <button class="btn" style="padding:5px 10px;font-size:11px" onclick="writingFindPrev()">이전</button>
+              <button class="btn" style="padding:5px 10px;font-size:11px" onclick="writingFindNext()">다음</button>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn" style="padding:5px 10px;font-size:11px" onclick="writingReplaceCurrent()">수정</button>
+              <button class="btn btng" style="padding:5px 10px;font-size:11px" onclick="writingReplaceAll()">모두수정</button>
+            </div>
+          </div>
+        </div>
+
         <!-- 에디터 (단일/분할) -->
-        <div id="writing-editor-main">
+        <div id="writing-editor-main" style="position:relative;display:flex;overflow:hidden;flex:1;min-height:0">
           <!-- 에디터 1 -->
           <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0" id="writing-pane1">
             <div id="writing-tb1" class="mbtb"></div>
@@ -2180,6 +2205,19 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
             <div id="writing-xpanel-menu" style="display:none;position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:9999;min-width:200px;max-height:400px;overflow-y:auto;padding:4px"></div>
             <!-- pane2 에디터 영역 -->
             <div id="writing-ce2" class="mbedit" style="font-family:'맑은 고딕',Georgia,serif;font-size:14pt;line-height:2.0;padding:32px 48px;max-width:800px;margin:0 auto;width:100%" contenteditable="false" spellcheck="true" data-ph="가져오기 버튼으로 문서를 선택하세요"></div>
+          </div>
+
+          <div id="writing-bookmark-panel" aria-hidden="true">
+            <div class="writing-bookmark-hdr">
+              <div class="writing-bookmark-title">🔖 에디터 북마크</div>
+              <button class="icobtn" onclick="writingSetBookmarkPanelOpen(false)" title="닫기">✕</button>
+            </div>
+            <div class="writing-bookmark-add">
+              <div style="font-size:10px;color:var(--tx3);line-height:1.6">커서를 둘 문단이나 선택 영역 위치에서 북마크를 추가할 수 있습니다.</div>
+              <input type="text" id="writing-bookmark-note" class="writing-find-input" placeholder="메모 입력 (선택)"/>
+              <button class="btn btng" style="padding:6px 10px;font-size:11px;align-self:flex-start" onclick="writingAddBookmarkFromCurrent()">현재 위치 북마크 추가</button>
+            </div>
+            <div class="writing-bookmark-list" id="writing-bookmark-list"></div>
           </div>
 
           <div id="writing-reaction-panel" aria-hidden="true">
@@ -4179,7 +4217,7 @@ function syncWritingToWorks(){
   wWorks().forEach(wn=>{
     const existing = S.works.find(sw=>sw.id===wn.id);
     if(!existing){
-      S.works.push({id:wn.id,name:wn.name,color:wn.color,genre:wn.genre||'',platform:'',status:'writing',submitDate:'',contractStatus:'',editorContact:''});
+      S.works.push({id:wn.id,name:wn.name,color:wn.color,genre:wn.genre||'',platform:'',status:'writing',editorContact:''});
     } else {
       existing.name = wn.name;
       existing.color = wn.color;
@@ -5709,22 +5747,18 @@ function renderWorks(){
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <input type="text" class="sinput" value="${w.genre||''}" placeholder="장르" style="max-width:100px;font-size:11px" oninput="S.works[${i}].genre=this.value;dsave()"/>
           <input type="text" class="sinput" value="${w.platform||''}" placeholder="연재/투고 플랫폼" style="max-width:140px;font-size:11px" oninput="S.works[${i}].platform=this.value;dsave()"/>
-          <select class="sinput" style="max-width:90px;font-size:11px" onchange="S.works[${i}].status=this.value;dsave()">
+          <select class="sinput" style="max-width:110px;font-size:11px" onchange="S.works[${i}].status=this.value;dsave()">
             <option value="writing" ${w.status==='writing'?'selected':''}>집필중</option>
             <option value="hiatus" ${w.status==='hiatus'?'selected':''}>휴재</option>
             <option value="done" ${w.status==='done'?'selected':''}>완결</option>
+            <option value="submitting" ${w.status==='submitting'?'selected':''}>투고중</option>
+            <option value="contest" ${w.status==='contest'?'selected':''}>공모전</option>
+            <option value="published" ${w.status==='published'?'selected':''}>출간완료</option>
+            <option value="contract_end" ${w.status==='contract_end'?'selected':''}>계약종료</option>
           </select>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <input type="date" class="sinput" value="${w.submitDate||''}" title="투고일" style="max-width:150px;font-size:11px" oninput="S.works[${i}].submitDate=this.value;dsave()"/>
-          <select class="sinput" title="계약 상태" style="max-width:120px;font-size:11px" onchange="S.works[${i}].contractStatus=this.value;dsave()">
-            <option value="" ${!w.contractStatus?'selected':''}>계약 상태</option>
-            <option value="planned" ${w.contractStatus==='planned'?'selected':''}>투고 예정</option>
-            <option value="review" ${w.contractStatus==='review'?'selected':''}>검토 중</option>
-            <option value="rejected" ${w.contractStatus==='rejected'?'selected':''}>거절</option>
-            <option value="contracted" ${w.contractStatus==='contracted'?'selected':''}>계약</option>
-          </select>
-          <input type="text" class="sinput" value="${w.editorContact||''}" placeholder="담당자 연락처" style="flex:1;min-width:180px;font-size:11px;max-width:none" oninput="S.works[${i}].editorContact=this.value;dsave()"/>
+          <input type="text" class="sinput" value="${w.editorContact||''}" placeholder="담당자 연락처" style="max-width:170px;min-width:130px;font-size:11px" oninput="S.works[${i}].editorContact=this.value;dsave()"/>
         </div>
       </div>
       <button class="btn btnr" style="padding:4px 8px;font-size:11px;flex-shrink:0" onclick="removeWork(${i})">삭제</button>
@@ -5734,7 +5768,7 @@ function renderWorks(){
 }
 
 function addWork(){
-  S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',submitDate:'',contractStatus:'',editorContact:'',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
+  S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',editorContact:'',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
   syncWorksToWriting();
   dsave(); refreshAllTabs();
   toast('작품이 추가되었습니다.');
@@ -6952,6 +6986,10 @@ let _writingSaveTimer=null;
 let _ttsUtterance=null;
 let _ttsPlaying=false;
 let _writingReactionPanelOpen=false;
+let _writingBookmarkPanelOpen=false;
+let _writingFindPanelOpen=false;
+let _writingFindMatches=[];
+let _writingFindIndex=-1;
 let _writingReactionSaveTimer=null;
 
 // ── 집필 노드 helpers ──
@@ -7353,7 +7391,7 @@ function writingSetReactionPanelOpen(open){
     panel.setAttribute('aria-hidden',_writingReactionPanelOpen?'false':'true');
   }
   if(btn)btn.classList.toggle('on',_writingReactionPanelOpen);
-  if(_writingReactionPanelOpen)writingSyncReactionPanel();
+  if(_writingReactionPanelOpen){writingSetBookmarkPanelOpen(false);writingSyncReactionPanel();}
 }
 function writingToggleReactionPanel(){
   if(!_writingSelCh){toast('먼저 회차를 선택하세요.',true);return;}
@@ -7412,6 +7450,262 @@ function writingClearReactionMemo(){
   dsave();writingRenderTree();writingSyncReactionPanel();
 }
 
+function writingGetEditorRoot(){
+  return document.getElementById('writing-ce1');
+}
+function writingTouchEditorChanged(){
+  if(_writingEditor&&typeof _writingEditor._change==='function')_writingEditor._change();
+}
+
+function writingSetBookmarkPanelOpen(open){
+  _writingBookmarkPanelOpen=!!open;
+  const panel=document.getElementById('writing-bookmark-panel');
+  const btn=document.getElementById('writing-bookmark-btn');
+  if(panel){
+    panel.classList.toggle('open',_writingBookmarkPanelOpen);
+    panel.setAttribute('aria-hidden',_writingBookmarkPanelOpen?'false':'true');
+  }
+  if(btn)btn.classList.toggle('on',_writingBookmarkPanelOpen);
+  if(_writingBookmarkPanelOpen){
+    writingSetReactionPanelOpen(false);
+    writingRenderBookmarks();
+  }
+}
+function writingToggleBookmarkPanel(){
+  if(!_writingSelCh){toast('먼저 회차를 선택하세요.',true);return;}
+  writingSetBookmarkPanelOpen(!_writingBookmarkPanelOpen);
+}
+function writingGetBookmarkBlock(){
+  const ce=writingGetEditorRoot();
+  if(!ce)return null;
+  const sel=window.getSelection();
+  let node=sel&&sel.rangeCount?sel.getRangeAt(0).startContainer:null;
+  if(!node||!ce.contains(node))return ce.firstElementChild||null;
+  if(node.nodeType===3)node=node.parentElement;
+  let block=node&&node.closest?node.closest('p,div,h1,h2,h3,li,blockquote,td,th'):null;
+  if(!block||block===ce){
+    block=node&&node.closest?node.closest('*'):null;
+  }
+  if(!block||block===ce){
+    block=ce.firstElementChild||null;
+  }
+  return block;
+}
+function writingEnsureBookmarkTarget(block){
+  if(!block)return '';
+  if(!block.dataset.wbmId)block.dataset.wbmId=uid();
+  return block.dataset.wbmId;
+}
+function writingApplyBookmarkAnchors(){
+  const ce=writingGetEditorRoot();
+  const ch=writingGetCurrentChapter();
+  if(!ce)return;
+  ce.querySelectorAll('.writing-bookmark-anchor').forEach(el=>el.classList.remove('writing-bookmark-anchor'));
+  const bms=Array.isArray(ch&&ch.bookmarks)?ch.bookmarks:[];
+  bms.forEach(b=>{
+    if(!b||!b.targetId)return;
+    const el=ce.querySelector(`[data-wbm-id="${b.targetId}"]`);
+    if(el)el.classList.add('writing-bookmark-anchor');
+  });
+}
+function writingRenderBookmarks(){
+  const list=document.getElementById('writing-bookmark-list');
+  const note=document.getElementById('writing-bookmark-note');
+  const ch=writingGetCurrentChapter();
+  if(!list)return;
+  if(note&&!_writingBookmarkPanelOpen)note.value='';
+  if(!ch){list.innerHTML='<div class="writing-bookmark-empty">회차를 먼저 선택하세요.</div>';return;}
+  if(!Array.isArray(ch.bookmarks))ch.bookmarks=[];
+  writingApplyBookmarkAnchors();
+  if(!ch.bookmarks.length){list.innerHTML='<div class="writing-bookmark-empty">아직 북마크가 없습니다.<br>문단에 커서를 둔 뒤 북마크를 추가하세요.</div>';return;}
+  list.innerHTML='';
+  ch.bookmarks.forEach((bm,idx)=>{
+    const item=document.createElement('div');
+    item.className='writing-bookmark-card';
+    const excerpt=(bm.excerpt||'내용 없음').replace(/</g,'&lt;');
+    const noteVal=(bm.note||'').replace(/"/g,'&quot;');
+    item.innerHTML=`<div class="writing-bookmark-card-top"><div style="font-size:10px;color:var(--ac);font-weight:800">#${idx+1}</div><div class="writing-bookmark-card-title">${excerpt}</div></div><div class="writing-bookmark-card-meta">${bm.updatedAt?new Date(bm.updatedAt).toLocaleString('ko-KR'):'저장됨'}</div><input type="text" class="writing-find-input" value="${noteVal}" placeholder="메모 없음" data-bm-id="${bm.id}"/><div class="writing-bookmark-actions"><button class="btn" style="padding:5px 10px;font-size:11px" data-jump="${bm.id}">이동</button><button class="btn btnr" style="padding:5px 10px;font-size:11px" data-del="${bm.id}">삭제</button></div>`;
+    const inp=item.querySelector('input');
+    inp.oninput=()=>{
+      bm.note=inp.value;
+      bm.updatedAt=new Date().toISOString();
+      dsave();
+    };
+    item.querySelector('[data-jump]').onclick=()=>writingJumpBookmark(bm.id);
+    item.querySelector('[data-del]').onclick=()=>writingDeleteBookmark(bm.id);
+    list.appendChild(item);
+  });
+}
+function writingAddBookmarkFromCurrent(){
+  const ch=writingGetCurrentChapter();if(!ch){toast('먼저 회차를 선택하세요.',true);return;}
+  const block=writingGetBookmarkBlock();
+  if(!block){toast('북마크할 위치를 찾을 수 없습니다.',true);return;}
+  if(!Array.isArray(ch.bookmarks))ch.bookmarks=[];
+  const targetId=writingEnsureBookmarkTarget(block);
+  const noteEl=document.getElementById('writing-bookmark-note');
+  const note=(noteEl&&noteEl.value||'').trim();
+  let excerpt=((block.innerText||block.textContent||'').replace(/\s+/g,' ').trim()||'내용 없음').slice(0,40);
+  let bm=ch.bookmarks.find(x=>x.targetId===targetId);
+  if(!bm){
+    bm={id:uid(),targetId,excerpt,note,updatedAt:new Date().toISOString()};
+    ch.bookmarks.push(bm);
+  }else{
+    bm.excerpt=excerpt;
+    bm.note=note||bm.note||'';
+    bm.updatedAt=new Date().toISOString();
+  }
+  if(noteEl)noteEl.value='';
+  writingApplyBookmarkAnchors();
+  writingTouchEditorChanged();
+  dsave();
+  writingRenderBookmarks();
+  toast('북마크가 저장됐습니다.');
+}
+function writingJumpBookmark(id){
+  const ch=writingGetCurrentChapter();
+  const ce=writingGetEditorRoot();
+  const bm=Array.isArray(ch&&ch.bookmarks)?ch.bookmarks.find(x=>x.id===id):null;
+  if(!bm||!ce){toast('북마크를 찾을 수 없습니다.',true);return;}
+  const el=ce.querySelector(`[data-wbm-id="${bm.targetId}"]`);
+  if(!el){toast('북마크 위치를 찾을 수 없습니다.',true);return;}
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.add('writing-bookmark-anchor','flash');
+  setTimeout(()=>el.classList.remove('flash'),1100);
+  ce.focus();
+}
+function writingDeleteBookmark(id){
+  const ch=writingGetCurrentChapter();if(!ch||!Array.isArray(ch.bookmarks))return;
+  ch.bookmarks=ch.bookmarks.filter(x=>x.id!==id);
+  writingApplyBookmarkAnchors();
+  writingTouchEditorChanged();
+  dsave();
+  writingRenderBookmarks();
+}
+
+function writingSetFindPanelOpen(open){
+  _writingFindPanelOpen=!!open;
+  const panel=document.getElementById('writing-find-panel');
+  const btn=document.getElementById('writing-find-btn');
+  if(panel){
+    panel.classList.toggle('open',_writingFindPanelOpen);
+    panel.setAttribute('aria-hidden',_writingFindPanelOpen?'false':'true');
+  }
+  if(btn)btn.classList.toggle('on',_writingFindPanelOpen);
+  if(_writingFindPanelOpen){
+    writingSetReactionPanelOpen(false);
+    writingSetBookmarkPanelOpen(false);
+    const inp=document.getElementById('writing-find-input');
+    setTimeout(()=>inp&&inp.focus(),30);
+    writingRefreshFindMatches();
+  }else{
+    writingClearFindMarks();
+  }
+}
+function writingToggleFindPanel(){
+  if(!_writingSelCh){toast('먼저 회차를 선택하세요.',true);return;}
+  writingSetFindPanelOpen(!_writingFindPanelOpen);
+}
+function writingUpdateFindStatus(){
+  const el=document.getElementById('writing-find-status');
+  if(!el)return;
+  const total=_writingFindMatches.length;
+  const cur=total?(_writingFindIndex+1):0;
+  el.textContent=`${cur} / ${total}`;
+}
+function writingClearFindMarks(){
+  const ce=writingGetEditorRoot();
+  if(!ce){_writingFindMatches=[];_writingFindIndex=-1;writingUpdateFindStatus();return;}
+  ce.querySelectorAll('span.writing-find-mark').forEach(el=>{
+    el.replaceWith(document.createTextNode(el.textContent||''));
+  });
+  ce.normalize();
+  _writingFindMatches=[];
+  _writingFindIndex=-1;
+  writingUpdateFindStatus();
+}
+function writingFocusFindMatch(index){
+  if(!_writingFindMatches.length){_writingFindIndex=-1;writingUpdateFindStatus();return;}
+  _writingFindMatches.forEach(el=>el.classList.remove('current'));
+  _writingFindIndex=((index%_writingFindMatches.length)+_writingFindMatches.length)%_writingFindMatches.length;
+  const el=_writingFindMatches[_writingFindIndex];
+  if(el){
+    el.classList.add('current');
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  writingUpdateFindStatus();
+}
+function writingRefreshFindMatches(){
+  const ce=writingGetEditorRoot();
+  const inp=document.getElementById('writing-find-input');
+  if(!ce||!inp)return;
+  const q=inp.value||'';
+  writingClearFindMarks();
+  if(!q)return;
+  const walker=document.createTreeWalker(ce,NodeFilter.SHOW_TEXT,{
+    acceptNode(node){
+      if(!node||!node.nodeValue||!node.nodeValue.trim())return NodeFilter.FILTER_REJECT;
+      const p=node.parentElement;
+      if(!p)return NodeFilter.FILTER_REJECT;
+      if(p.closest('span.writing-find-mark,[contenteditable="false"],script,style'))return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const matches=[];
+  let node;
+  while((node=walker.nextNode())){
+    const source=node.nodeValue;
+    let idx=0;
+    while((idx=source.indexOf(q,idx))!==-1){
+      matches.push([node,idx]);
+      idx+=Math.max(q.length,1);
+    }
+  }
+  for(let i=matches.length-1;i>=0;i--){
+    const m=matches[i];
+    const textNode=m[0];
+    const start=m[1];
+    const after=textNode.splitText(start+q.length);
+    const middle=textNode.splitText(start);
+    const span=document.createElement('span');
+    span.className='writing-find-mark';
+    span.textContent=middle.nodeValue;
+    middle.parentNode.replaceChild(span,middle);
+    _writingFindMatches.unshift(span);
+  }
+  writingFocusFindMatch(0);
+}
+function writingFindNext(){
+  if(!_writingFindMatches.length){writingRefreshFindMatches();return;}
+  writingFocusFindMatch(_writingFindIndex+1);
+}
+function writingFindPrev(){
+  if(!_writingFindMatches.length){writingRefreshFindMatches();return;}
+  writingFocusFindMatch(_writingFindIndex-1);
+}
+function writingReplaceCurrent(){
+  if(!_writingFindMatches.length){writingRefreshFindMatches();return;}
+  const repl=(document.getElementById('writing-replace-input')?.value)||'';
+  const el=_writingFindMatches[_writingFindIndex];
+  if(!el)return;
+  el.replaceWith(document.createTextNode(repl));
+  const ce=writingGetEditorRoot();if(ce)ce.normalize();
+  writingTouchEditorChanged();
+  writingRefreshFindMatches();
+}
+function writingReplaceAll(){
+  const q=(document.getElementById('writing-find-input')?.value)||'';
+  if(!q){toast('찾을 텍스트를 입력하세요.',true);return;}
+  if(!_writingFindMatches.length)writingRefreshFindMatches();
+  if(!_writingFindMatches.length){toast('일치하는 내용이 없습니다.',true);return;}
+  const repl=(document.getElementById('writing-replace-input')?.value)||'';
+  const spans=[..._writingFindMatches];
+  spans.forEach(el=>el.replaceWith(document.createTextNode(repl)));
+  const ce=writingGetEditorRoot();if(ce)ce.normalize();
+  writingTouchEditorChanged();
+  writingRefreshFindMatches();
+  toast('모두 수정했습니다.');
+}
+
 // ── 에디터 열기 ──
 function writingNavChapter(dir){
   if(!_writingSelWork||!_writingSelCh) return;
@@ -7460,13 +7754,13 @@ function writingOpenChapter(workId,chId){
   }
 
   _writingEditor=new MBEditor('writing-tb1','writing-ce1','이곳에 집필을 시작하세요...',html=>{
-    ch.content=html;
-    const plain=html.replace(/<[^>]*>/g,'').replace(/\s/g,'');
+    ch.content=writingSanitizeEditorHtml(html);
+    const plain=ch.content.replace(/<[^>]*>/g,'').replace(/\s/g,'');
     const wcEl=document.getElementById('writing-ch-wc');if(wcEl)wcEl.textContent=plain.length.toLocaleString()+'자';
     const sbWc=document.getElementById('writing-statusbar-wc');if(sbWc)sbWc.textContent='이 회차: '+plain.length.toLocaleString()+'자';
     // 사이드바 wc 갱신
     const chWc=document.querySelector(`.wt-ch-item[data-id="${chId}"] .wt-ch-wc`);if(chWc)chWc.textContent=plain.length.toLocaleString()+'자';
-    const _logPlain=html.replace(/<[^>]*>/g,'').replace(/\s/g,'');
+    const _logPlain=ch.content.replace(/<[^>]*>/g,'').replace(/\s/g,'');
     const _logPrev=(ch._prevLen)||0; ch._prevLen=_logPlain.length;
     const _logDiff=Math.max(0,_logPlain.length-_logPrev);
     if(_logDiff>0){const _lw=wNodes().find(n=>n.id===workId);logActivity('writing',workId,_lw?.name||'',ch.title||'(제목없음)','+'+_logDiff.toLocaleString()+'자 작성');}
@@ -7484,6 +7778,9 @@ function writingOpenChapter(workId,chId){
   // 맞춤법 패널 숨김
   const spellPanel=document.getElementById('writing-spell-panel');if(spellPanel)spellPanel.style.display='none';
   writingSyncReactionPanel();
+  writingRenderBookmarks();
+  writingClearFindMarks();
+  if(_writingFindPanelOpen)writingRefreshFindMatches();
 
   // 트리 갱신
   writingRenderTree();
