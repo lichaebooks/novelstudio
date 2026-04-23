@@ -1942,11 +1942,10 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 }
 
 /* 말풍선↔핸들 교대: has-memo이면 말풍선 표시, hover시 핸들로 전환 */
-.wt-ch-reaction{position:absolute;left:4px;top:50%;transform:translateY(-50%);font-size:9px;line-height:1;z-index:3;display:none;pointer-events:none;user-select:none}
-.wt-ch-reaction.has-memo{display:block;opacity:.85}
-.wt-ch-item:hover .wt-ch-reaction.has-memo{display:none}
-.wt-ch-item.has-reaction-memo .wt-ch-drag{opacity:0}
-.wt-ch-item.has-reaction-memo:hover .wt-ch-drag{opacity:1}
+/* 말풍선: dragH 자체를 재활용 — has-reaction-memo 시 dragH를 💬로 표시 */
+.wt-ch-reaction{display:none} /* 기존 span은 숨김 처리 */
+.wt-ch-item.has-reaction-memo .wt-ch-drag{opacity:.75;color:var(--ac)}
+.wt-ch-item.has-reaction-memo:hover .wt-ch-drag{opacity:1;color:var(--tx3)}
 .reaction-panel{position:absolute;top:0;right:0;width:280px;height:100%;background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;z-index:100;box-shadow:-4px 0 16px rgba(0,0,0,.12);transition:transform .2s}
 .reaction-panel.hidden{transform:translateX(100%)}
 .reaction-panel-hdr{padding:10px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--surf2)}
@@ -6772,7 +6771,7 @@ function writingRenderTree(){
       let dragChId=null,dragOverChId=null,dragPos=null;
       chs.forEach((ch,ci)=>{
         const chItem=document.createElement('div');chItem.className='wt-ch-item'+(ch.id===_writingSelCh?' active':'')+(ch.done?' done':'');chItem.dataset.id=ch.id;chItem.draggable=true;
-        const dragH=document.createElement('span');dragH.className='wt-ch-drag';dragH.textContent='⠿';dragH.onmousedown=e=>e.stopPropagation();
+        const dragH=document.createElement('span');dragH.className='wt-ch-drag';dragH.textContent=ch.reactionMemo?'💬':'⠿';dragH.onmousedown=e=>e.stopPropagation();
         const chkbox=document.createElement('input');chkbox.type='checkbox';chkbox.className='wt-ch-done';chkbox.checked=!!ch.done;chkbox.title='완성 표시';
         chkbox.onclick=e=>{e.stopPropagation();ch.done=chkbox.checked;if(ch.done)logActivity('writing',w.id,w.name,ch.title||'(제목없음)','완성 처리됨');dsave();writingRenderTree();writingUpdateProgress(w.id);};
         const numEl=document.createElement('span');numEl.className='wt-ch-num';numEl.textContent=(ci+1)+'화';
@@ -7539,7 +7538,7 @@ function _writingOpenReactionPanel(ch){
   const body=document.createElement('div');body.className='reaction-panel-body';
   const ta=document.createElement('textarea');ta.placeholder='이 회차 독자 반응, 댓글 등 자유롭게 기록...';ta.value=ch.reactionMemo||'';
   let _rt;
-  ta.addEventListener('input',()=>{ch.reactionMemo=ta.value;clearTimeout(_rt);_rt=setTimeout(()=>{dsave();const dot=document.querySelector('.wt-ch-reaction[data-chid="'+ch.id+'"]');if(dot)dot.className='wt-ch-reaction'+(ch.reactionMemo?' has-memo':'');const pi2=dot?.closest('.wt-ch-item');if(pi2)pi2.classList.toggle('has-reaction-memo',!!ch.reactionMemo);},400);});
+  ta.addEventListener('input',()=>{ch.reactionMemo=ta.value;clearTimeout(_rt);_rt=setTimeout(()=>{dsave();const dot=document.querySelector('.wt-ch-reaction[data-chid="'+ch.id+'"]');if(dot)dot.className='wt-ch-reaction'+(ch.reactionMemo?' has-memo':'');const pi2=dot?.closest('.wt-ch-item');if(pi2)pi2.classList.toggle('has-reaction-memo',!!ch.reactionMemo);},400);});;const dh2=pi2?.querySelector('.wt-ch-drag');if(dh2)dh2.textContent=ch.reactionMemo?'💬':'⠿';
   const hint=document.createElement('div');hint.style.cssText='font-size:10px;color:var(--tx3)';hint.textContent='자동 저장됩니다.';
   body.append(ta,hint);panel.append(hdr,body);wrap.appendChild(panel);
   requestAnimationFrame(()=>panel.classList.remove('hidden'));
@@ -7641,15 +7640,27 @@ function _renderHabitReport(container){
 function _showNoteCtxMenu(e, sel, ce, ch){
   document.querySelector('.ctx-menu')?.remove();
   document.querySelector('.editor-note-popup')?.remove();
+  // range를 클릭 전에 저장 (클릭 시 selection이 사라지므로)
   const range = sel.getRangeAt(0);
+  const savedRange = {
+    sc: range.startContainer, so: range.startOffset,
+    ec: range.endContainer,   eo: range.endOffset
+  };
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
   const item = document.createElement('div');
   item.className = 'ctx-item';
   item.textContent = '📝 메모 넣기';
-  item.onclick = () => {
+  item.onclick = (ev) => {
+    ev.stopPropagation();
     menu.remove();
-    _insertNoteSpan(range, ce, ch);
+    // 저장한 range 재구성
+    try{
+      const r2 = document.createRange();
+      r2.setStart(savedRange.sc, savedRange.so);
+      r2.setEnd(savedRange.ec, savedRange.eo);
+      _insertNoteSpan(r2, ce, ch);
+    }catch(err){ console.warn('note range error', err); }
   };
   menu.appendChild(item);
   document.body.appendChild(menu);
