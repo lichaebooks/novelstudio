@@ -1940,6 +1940,62 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 .wt-work-item,.wt-ch-item,.tl-item,.tl-card,.rm-char-card,.wed-ch-item,.ctx-menu,.im-field-wrap,.gs-tab-btn{
   -webkit-touch-callout:none;
 }
+
+/* ── WRITING TREE RESIZE + REACTION MEMO ── */
+#writing-tree-resize{
+  width:5px;
+  cursor:col-resize;
+  background:var(--bdr);
+  flex-shrink:0;
+  transition:background .15s;
+  position:relative;
+  z-index:10;
+}
+#writing-tree-resize:hover,#writing-tree-resize:active{background:var(--ac)}
+#writing-reaction-btn.on{background:rgba(56,139,253,.15);border-color:var(--ac);color:var(--ac)}
+#writing-reaction-btn:disabled{opacity:.45;cursor:default}
+#writing-editor-main{position:relative;flex:1;display:flex;overflow:hidden;min-height:0}
+#writing-reaction-panel{
+  position:absolute;
+  top:0;right:0;bottom:0;
+  width:320px;max-width:min(40vw,420px);
+  background:var(--surf);
+  border-left:1px solid var(--bdr);
+  box-shadow:-8px 0 24px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .18s ease;
+  z-index:20;
+}
+#writing-reaction-panel.open{transform:translateX(0)}
+.writing-reaction-hdr{padding:10px 12px;background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.writing-reaction-title{font-size:12px;font-weight:700;color:var(--tx);flex:1}
+.writing-reaction-meta{padding:8px 12px 0;font-size:10px;color:var(--tx3);line-height:1.6}
+.writing-reaction-body{flex:1;display:flex;flex-direction:column;min-height:0}
+.writing-reaction-empty{flex:1;display:flex;align-items:center;justify-content:center;padding:18px 16px;color:var(--tx3);font-size:11px;text-align:center;line-height:1.7}
+#writing-reaction-text{
+  flex:1;border:none;outline:none;resize:none;background:transparent;
+  color:var(--tx);font-size:12px;line-height:1.8;font-family:inherit;
+  padding:12px 14px;min-height:120px;
+}
+.writing-reaction-foot{padding:8px 12px;border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.writing-reaction-foot span{font-size:10px;color:var(--tx3)}
+.wt-ch-reaction-indicator{
+  position:absolute;left:2px;top:50%;transform:translateY(-50%);
+  font-size:11px;line-height:1;opacity:.9;pointer-events:none;
+}
+.wt-ch-item:hover .wt-ch-reaction-indicator{opacity:.25}
+@media(max-width:600px){
+  #writing-tree-resize{display:none!important}
+  #writing-reaction-panel{
+    top:auto;left:0;right:0;bottom:0;width:100%;max-width:none;height:42vh;
+    transform:translateY(100%);border-left:none;border-top:1px solid var(--bdr);
+    box-shadow:0 -10px 28px rgba(0,0,0,.2)
+  }
+  #writing-reaction-panel.open{transform:translateY(0)}
+}
+
 </style>
 </head>
 <body>
@@ -2047,6 +2103,8 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
 
     </div>
 
+    <div id="writing-tree-resize" title="트리 너비 조절"></div>
+
     <!-- 우측: 에디터 영역 -->
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0" id="writing-editor-outer">
       <!-- 에디터 없을 때 빈 화면 -->
@@ -2074,6 +2132,8 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
             <button class="splitbtn" onclick="writingSpellCheck()" title="맞춤법 검사">맞춤법</button>
             <!-- TTS -->
             <button class="splitbtn" id="writing-tts-btn" onclick="writingToggleTTS()" title="TTS 읽기">🔊 TTS</button>
+            <!-- 독자 반응 메모 -->
+            <button class="splitbtn" id="writing-reaction-btn" onclick="writingToggleReactionPanel()" title="독자 반응 메모">💬 반응</button>
             <!-- 내보내기 -->
             <div style="position:relative">
               <button class="splitbtn" onclick="writingToggleExport(event)">⬇ 내보내기</button>
@@ -2089,7 +2149,7 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
         </div>
 
         <!-- 에디터 (단일/분할) -->
-        <div style="flex:1;display:flex;overflow:hidden;min-height:0">
+        <div id="writing-editor-main">
           <!-- 에디터 1 -->
           <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0" id="writing-pane1">
             <div id="writing-tb1" class="mbtb"></div>
@@ -2105,6 +2165,28 @@ input[type=number].deadline-inp{-moz-appearance:textfield;appearance:textfield}
             <div id="writing-xpanel-menu" style="display:none;position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:9999;min-width:200px;max-height:400px;overflow-y:auto;padding:4px"></div>
             <!-- pane2 에디터 영역 -->
             <div id="writing-ce2" class="mbedit" style="font-family:'맑은 고딕',Georgia,serif;font-size:14pt;line-height:2.0;padding:32px 48px;max-width:800px;margin:0 auto;width:100%" contenteditable="false" spellcheck="true" data-ph="가져오기 버튼으로 문서를 선택하세요"></div>
+          </div>
+
+          <div id="writing-reaction-panel" aria-hidden="true">
+            <div class="writing-reaction-hdr">
+              <div class="writing-reaction-title">💬 독자 반응 메모</div>
+              <button class="icobtn" onclick="writingClearReactionMemo()" title="메모 비우기">🧹</button>
+              <button class="icobtn" onclick="writingSetReactionPanelOpen(false)" title="닫기">✕</button>
+            </div>
+            <div class="writing-reaction-meta" id="writing-reaction-meta">회차를 먼저 선택하세요.</div>
+            <div class="writing-reaction-body">
+              <div class="writing-reaction-empty" id="writing-reaction-empty">
+                회차를 선택한 뒤 사용하세요.
+                <br>트리에는 메모가 있는 회차만 💬 표시됩니다.
+              </div>
+              <div id="writing-reaction-form" style="display:none;flex:1;min-height:0;flex-direction:column">
+                <textarea id="writing-reaction-text" placeholder="댓글 반응, 독자 피드백, 다음 회차에 반영할 포인트 등을 자유롭게 적어두세요..." oninput="writingOnReactionInput(this.value)"></textarea>
+                <div class="writing-reaction-foot">
+                  <span>자동 저장됨</span>
+                  <span id="writing-reaction-summary">메모 없음</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2918,6 +3000,7 @@ async function enterApp(){
   startClock();
   initResponsiveTabs();
   initSchedTrackerResize();
+  initWritingTreeResize();
   initLongPress();   // 롱탭 → contextmenu
   initTouchDnD();    // 터치 드래그앤드롭
   renderHome();
@@ -3914,7 +3997,7 @@ function syncWritingToWorks(){
   wWorks().forEach(wn=>{
     const existing = S.works.find(sw=>sw.id===wn.id);
     if(!existing){
-      S.works.push({id:wn.id,name:wn.name,color:wn.color,genre:wn.genre||'',platform:'',status:'writing'});
+      S.works.push({id:wn.id,name:wn.name,color:wn.color,genre:wn.genre||'',platform:'',status:'writing',submitDate:'',contractStatus:'',editorContact:''});
     } else {
       existing.name = wn.name;
       existing.color = wn.color;
@@ -5439,16 +5522,27 @@ function renderWorks(){
     const card=document.createElement('div');card.className='work-card';
     card.innerHTML=`
       <input type="color" value="${w.color||'#388bfd'}" style="width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;padding:0;flex-shrink:0" onchange="S.works[${i}].color=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
-      <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
         <input type="text" class="sinput" value="${w.name}" placeholder="작품명" style="max-width:none;font-weight:600" oninput="S.works[${i}].name=this.value;dsave();renderSched();renderArchive();renderHome();writingRenderTree()"/>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <input type="text" class="sinput" value="${w.genre||''}" placeholder="장르" style="max-width:100px;font-size:11px" oninput="S.works[${i}].genre=this.value;dsave()"/>
-          <input type="text" class="sinput" value="${w.platform||''}" placeholder="연재 플랫폼" style="max-width:120px;font-size:11px" oninput="S.works[${i}].platform=this.value;dsave()"/>
+          <input type="text" class="sinput" value="${w.platform||''}" placeholder="연재/투고 플랫폼" style="max-width:140px;font-size:11px" oninput="S.works[${i}].platform=this.value;dsave()"/>
           <select class="sinput" style="max-width:90px;font-size:11px" onchange="S.works[${i}].status=this.value;dsave()">
             <option value="writing" ${w.status==='writing'?'selected':''}>집필중</option>
             <option value="hiatus" ${w.status==='hiatus'?'selected':''}>휴재</option>
             <option value="done" ${w.status==='done'?'selected':''}>완결</option>
           </select>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <input type="date" class="sinput" value="${w.submitDate||''}" title="투고일" style="max-width:150px;font-size:11px" oninput="S.works[${i}].submitDate=this.value;dsave()"/>
+          <select class="sinput" title="계약 상태" style="max-width:120px;font-size:11px" onchange="S.works[${i}].contractStatus=this.value;dsave()">
+            <option value="" ${!w.contractStatus?'selected':''}>계약 상태</option>
+            <option value="planned" ${w.contractStatus==='planned'?'selected':''}>투고 예정</option>
+            <option value="review" ${w.contractStatus==='review'?'selected':''}>검토 중</option>
+            <option value="rejected" ${w.contractStatus==='rejected'?'selected':''}>거절</option>
+            <option value="contracted" ${w.contractStatus==='contracted'?'selected':''}>계약</option>
+          </select>
+          <input type="text" class="sinput" value="${w.editorContact||''}" placeholder="담당자 연락처" style="flex:1;min-width:180px;font-size:11px;max-width:none" oninput="S.works[${i}].editorContact=this.value;dsave()"/>
         </div>
       </div>
       <button class="btn btnr" style="padding:4px 8px;font-size:11px;flex-shrink:0" onclick="removeWork(${i})">삭제</button>
@@ -5458,7 +5552,7 @@ function renderWorks(){
 }
 
 function addWork(){
-  S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
+  S.works.push({id:uid(),name:'새 작품',genre:'',platform:'',status:'writing',submitDate:'',contractStatus:'',editorContact:'',color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});
   syncWorksToWriting();
   dsave(); refreshAllTabs();
   toast('작품이 추가되었습니다.');
@@ -6596,6 +6690,73 @@ class MBEditor{
   _wrapExistingImages(){this.ce.querySelectorAll('img:not(.mb-resizable img)').forEach(img=>{const wrap=document.createElement('span');wrap.className='mb-resizable';wrap.contentEditable='false';const handle=document.createElement('span');handle.className='mb-rhandle';img.replaceWith(wrap);wrap.appendChild(img);wrap.appendChild(handle);});}
 }
 
+function initWritingTreeResize(){
+  const sidebar=document.getElementById('writing-sidebar');
+  const handle=document.getElementById('writing-tree-resize');
+  if(!sidebar||!handle)return;
+
+  const applySavedWidth=()=>{
+    if(window.innerWidth<=600){
+      handle.style.display='none';
+      sidebar.style.width='';
+      return;
+    }
+    handle.style.display='block';
+    const saved=parseInt(localStorage.getItem('ws_writing_sidebar_width')||'260',10);
+    const max=Math.max(260,Math.min(520,Math.floor(window.innerWidth*0.45)));
+    const width=Math.max(220,Math.min(max,Number.isFinite(saved)?saved:260));
+    sidebar.style.width=width+'px';
+  };
+
+  applySavedWidth();
+  if(handle._bound)return;
+  handle._bound=true;
+
+  let dragging=false,startX=0,startW=0;
+  const onMouseMove=e=>{
+    if(!dragging)return;
+    const max=Math.max(260,Math.min(520,Math.floor(window.innerWidth*0.45)));
+    const next=Math.max(220,Math.min(max,startW+(e.clientX-startX)));
+    sidebar.style.width=next+'px';
+  };
+  const onTouchMove=e=>{
+    if(!dragging||!e.touches[0])return;
+    e.preventDefault();
+    const max=Math.max(260,Math.min(520,Math.floor(window.innerWidth*0.45)));
+    const next=Math.max(220,Math.min(max,startW+(e.touches[0].clientX-startX)));
+    sidebar.style.width=next+'px';
+  };
+  const stop=()=>{
+    if(!dragging)return;
+    dragging=false;
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+    const width=parseInt(sidebar.style.width||'260',10);
+    if(width&&window.innerWidth>600)localStorage.setItem('ws_writing_sidebar_width',String(width));
+    window.removeEventListener('mousemove',onMouseMove);
+    window.removeEventListener('mouseup',stop);
+    window.removeEventListener('touchmove',onTouchMove);
+    window.removeEventListener('touchend',stop);
+  };
+
+  handle.addEventListener('mousedown',e=>{
+    if(window.innerWidth<=600)return;
+    dragging=true;startX=e.clientX;startW=sidebar.offsetWidth;
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+    window.addEventListener('mousemove',onMouseMove);
+    window.addEventListener('mouseup',stop);
+  });
+  handle.addEventListener('touchstart',e=>{
+    if(window.innerWidth<=600||!e.touches[0])return;
+    dragging=true;startX=e.touches[0].clientX;startW=sidebar.offsetWidth;
+    document.body.style.userSelect='none';
+    window.addEventListener('touchmove',onTouchMove,{passive:false});
+    window.addEventListener('touchend',stop);
+  },{passive:true});
+  window.addEventListener('resize',applySavedWidth);
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  WRITING TAB
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -6608,6 +6769,8 @@ let _writingSelCh=null;    // 선택된 회차 id
 let _writingSaveTimer=null;
 let _ttsUtterance=null;
 let _ttsPlaying=false;
+let _writingReactionPanelOpen=false;
+let _writingReactionSaveTimer=null;
 
 // ── 집필 노드 helpers ──
 function wNodes(){return S.writingNodes||[];}
@@ -6638,7 +6801,6 @@ function writingRenderTree(){
   works.forEach(w=>{
     const chs=wChapters(w.id);
     const isOpen=w.open!==false;
-    // 작품 행
     const item=document.createElement('div');item.className='wt-work-item'+(w.id===_writingSelWork?' sel':'');item.dataset.id=w.id;
     const dot=document.createElement('span');dot.className='wt-work-dot';dot.style.background=w.color||'var(--ac)';
     const arrow=document.createElement('span');arrow.className='wt-work-arrow'+(isOpen?' open':'');arrow.textContent='▶';
@@ -6648,7 +6810,6 @@ function writingRenderTree(){
 
     item.onclick=e=>{e.stopPropagation();_writingSelWork=w.id;w.open=!isOpen;dsave();writingRenderTree();writingShowChList(w.id);};
 
-    // ── 작품 드래그앤드롭 순서 변경
     item.draggable=true;
     item.addEventListener('dragstart',e=>{
       _workDragId=w.id;
@@ -6701,11 +6862,22 @@ function writingRenderTree(){
     });
     tree.appendChild(item);
 
-    // 회차 목록 (펼침)
     if(isOpen){
       let dragChId=null,dragOverChId=null,dragPos=null;
       chs.forEach((ch,ci)=>{
-        const chItem=document.createElement('div');chItem.className='wt-ch-item'+(ch.id===_writingSelCh?' active':'')+(ch.done?' done':'');chItem.dataset.id=ch.id;chItem.draggable=true;
+        const chItem=document.createElement('div');
+        chItem.className='wt-ch-item'+(ch.id===_writingSelCh?' active':'')+(ch.done?' done':'');
+        chItem.dataset.id=ch.id;
+        chItem.draggable=true;
+
+        if(((ch.readerMemo)||'').trim()){
+          const memoMark=document.createElement('span');
+          memoMark.className='wt-ch-reaction-indicator';
+          memoMark.textContent='💬';
+          memoMark.setAttribute('aria-hidden','true');
+          chItem.appendChild(memoMark);
+        }
+
         const dragH=document.createElement('span');dragH.className='wt-ch-drag';dragH.textContent='⠿';dragH.onmousedown=e=>e.stopPropagation();
         const chkbox=document.createElement('input');chkbox.type='checkbox';chkbox.className='wt-ch-done';chkbox.checked=!!ch.done;chkbox.title='완성 표시';
         chkbox.onclick=e=>{e.stopPropagation();ch.done=chkbox.checked;if(ch.done)logActivity('writing',w.id,w.name,ch.title||'(제목없음)','완성 처리됨');dsave();writingRenderTree();writingUpdateProgress(w.id);};
@@ -6726,7 +6898,6 @@ function writingRenderTree(){
           ]);
         });
 
-        // DnD
         chItem.addEventListener('dragstart',e=>{dragChId=ch.id;e.dataTransfer.setData('text/plain',ch.id);e.dataTransfer.effectAllowed='move';setTimeout(()=>chItem.classList.add('dragging'),0);});
         chItem.addEventListener('dragend',()=>{dragChId=null;dragOverChId=null;dragPos=null;chItem.classList.remove('dragging');tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));});
         chItem.addEventListener('dragover',e=>{if(!dragChId||dragChId===ch.id)return;e.preventDefault();tree.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el=>el.classList.remove('drag-over-above','drag-over-below'));const rect=chItem.getBoundingClientRect();dragOverChId=ch.id;if(e.clientY<rect.top+rect.height/2){chItem.classList.add('drag-over-above');dragPos='before';}else{chItem.classList.add('drag-over-below');dragPos='after';}});
@@ -6985,6 +7156,80 @@ function writingLogToday(){
   writingUpdateProgress(_writingSelWork);
 }
 
+function writingGetCurrentChapter(){
+  return wNodes().find(n=>n.id===_writingSelCh&&n.t==='CH'&&!n.deleted)||null;
+}
+function writingHasReactionMemo(ch){
+  return !!(((ch&&ch.readerMemo)||'').trim());
+}
+function writingSetReactionPanelOpen(open){
+  _writingReactionPanelOpen=!!open;
+  const panel=document.getElementById('writing-reaction-panel');
+  const btn=document.getElementById('writing-reaction-btn');
+  if(panel){
+    panel.classList.toggle('open',_writingReactionPanelOpen);
+    panel.setAttribute('aria-hidden',_writingReactionPanelOpen?'false':'true');
+  }
+  if(btn)btn.classList.toggle('on',_writingReactionPanelOpen);
+  if(_writingReactionPanelOpen)writingSyncReactionPanel();
+}
+function writingToggleReactionPanel(){
+  if(!_writingSelCh){toast('먼저 회차를 선택하세요.',true);return;}
+  writingSetReactionPanelOpen(!_writingReactionPanelOpen);
+}
+function writingUpdateReactionSummary(){
+  const ch=writingGetCurrentChapter();
+  const sum=document.getElementById('writing-reaction-summary');
+  const meta=document.getElementById('writing-reaction-meta');
+  if(sum)sum.textContent=!ch?'회차 미선택':(writingHasReactionMemo(ch)?`메모 ${ch.readerMemo.trim().length}자`:'메모 없음');
+  if(meta){
+    if(!ch){
+      meta.textContent='회차를 먼저 선택하세요.';
+    }else{
+      const w=wNodes().find(n=>n.id===_writingSelWork);
+      const updated=ch.readerMemoUpdatedAt?new Date(ch.readerMemoUpdatedAt).toLocaleString('ko-KR'):'아직 메모 없음';
+      meta.textContent=`${w?.name||''} · ${ch.title||'(제목 없음)'} · ${updated}`;
+    }
+  }
+}
+function writingSyncReactionPanel(){
+  const ch=writingGetCurrentChapter();
+  const btn=document.getElementById('writing-reaction-btn');
+  const empty=document.getElementById('writing-reaction-empty');
+  const form=document.getElementById('writing-reaction-form');
+  const ta=document.getElementById('writing-reaction-text');
+  if(btn)btn.disabled=!ch;
+  if(!empty||!form||!ta){writingUpdateReactionSummary();return;}
+  if(!ch){
+    empty.style.display='flex';
+    form.style.display='none';
+    ta.value='';
+    writingUpdateReactionSummary();
+    return;
+  }
+  empty.style.display='none';
+  form.style.display='flex';
+  if(ta.value!==(ch.readerMemo||''))ta.value=ch.readerMemo||'';
+  writingUpdateReactionSummary();
+}
+function writingOnReactionInput(val){
+  const ch=writingGetCurrentChapter();if(!ch)return;
+  ch.readerMemo=val;
+  ch.readerMemoUpdatedAt=new Date().toISOString();
+  clearTimeout(_writingReactionSaveTimer);
+  _writingReactionSaveTimer=setTimeout(()=>{dsave();writingRenderTree();writingUpdateReactionSummary();},250);
+  writingUpdateReactionSummary();
+}
+function writingClearReactionMemo(){
+  const ch=writingGetCurrentChapter();if(!ch)return;
+  if(!writingHasReactionMemo(ch)){toast('비울 메모가 없습니다.',true);return;}
+  if(!confirm('이 회차의 독자 반응 메모를 비울까요?'))return;
+  ch.readerMemo='';
+  ch.readerMemoUpdatedAt='';
+  const ta=document.getElementById('writing-reaction-text');if(ta)ta.value='';
+  dsave();writingRenderTree();writingSyncReactionPanel();
+}
+
 // ── 에디터 열기 ──
 function writingNavChapter(dir){
   if(!_writingSelWork||!_writingSelCh) return;
@@ -7017,7 +7262,7 @@ function writingOpenChapter(workId,chId){
 
   // 타이틀 입력
   const titleInp=document.getElementById('writing-ch-title-inp');
-  if(titleInp){titleInp.value=ch.title||'';titleInp.oninput=()=>{ch.title=titleInp.value;writingRenderTree();writingUpdateProgress(workId);clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);};}
+  if(titleInp){titleInp.value=ch.title||'';titleInp.oninput=()=>{ch.title=titleInp.value;writingRenderTree();writingUpdateProgress(workId);writingUpdateReactionSummary();clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);};}
 
   // 이전/다음
   const prevBtn=document.getElementById('writing-prev-btn');const nextBtn=document.getElementById('writing-next-btn');
@@ -7056,6 +7301,7 @@ function writingOpenChapter(workId,chId){
 
   // 맞춤법 패널 숨김
   const spellPanel=document.getElementById('writing-spell-panel');if(spellPanel)spellPanel.style.display='none';
+  writingSyncReactionPanel();
 
   // 트리 갱신
   writingRenderTree();
@@ -7105,7 +7351,7 @@ function writingDeleteWork(workId){
   if(!confirm(`"${w.name}" 작품과 모든 회차를 삭제하시겠습니까?`))return;
   // 해당 작품 및 회차 모두 소프트 삭제
   S.writingNodes=S.writingNodes.filter(n=>n.id!==workId&&n.workId!==workId);
-  if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';}
+  if(_writingSelWork===workId){_writingSelWork=null;_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';writingSyncReactionPanel();}
   syncWritingToWorks();dsave();refreshAllTabs();toast(`"${w.name}" 삭제됨`);
 }
 
@@ -7127,7 +7373,7 @@ function writingDuplicateCh(workId,chId){
 function writingTrashCh(chId){
   const ch=wNodes().find(n=>n.id===chId);if(!ch)return;
   ch.deleted=true;ch.deletedAt=new Date().toISOString();
-  if(_writingSelCh===chId){_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';}
+  if(_writingSelCh===chId){_writingSelCh=null;document.getElementById('writing-empty-state').style.display='flex';document.getElementById('writing-editor-wrap').style.display='none';writingSyncReactionPanel();}
   dsave();writingRenderTree();if(_writingSelWork)writingUpdateProgress(_writingSelWork);toast('회차가 휴지통으로 이동됐습니다.');
 }
 
@@ -7153,7 +7399,7 @@ function writingOpenTrash(){
 function writingUpdateChTitle(val){
   const ch=wNodes().find(n=>n.id===_writingSelCh);if(!ch)return;
   ch.title=val;clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>dsave(),400);
-  writingRenderTree();if(_writingSelWork)writingUpdateProgress(_writingSelWork);
+  writingRenderTree();writingUpdateReactionSummary();if(_writingSelWork)writingUpdateProgress(_writingSelWork);
 }
 
 // ── 분할 보기 ──
@@ -7694,6 +7940,7 @@ function _adjustEditorForMobile(){
   });
 }
 function initWritingTab(){
+  initWritingTreeResize();
   writingRenderTree();
   // 마지막 화면 복원
   if(S._lastWritingWork && S._lastWritingCh){
