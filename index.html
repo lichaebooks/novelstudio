@@ -7595,9 +7595,59 @@ function _spellShowPopup(errors, skipped, ch, rawText){
     const newRaw=(ch.content||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     _spellShowPopup(errors,skipped,ch,newRaw);
   };
-  btns.append(skipBtn,fixBtn);
+  // 전체 바꾸기 버튼
+  const allBtn=document.createElement('button');allBtn.className='spell-popup-fix';
+  allBtn.style.cssText='background:var(--gn)';
+  allBtn.textContent='전체 바꾸기';allBtn.disabled=!err.suggest;
+  allBtn.onclick=()=>{
+    const ce=document.getElementById('writing-ce1');
+    if(ce&&err.suggest){
+      // 텍스트 노드 전체 순회하며 모두 교체
+      const walker=document.createTreeWalker(ce,NodeFilter.SHOW_TEXT);
+      const nodes=[];let nd;
+      while((nd=walker.nextNode()))nodes.push(nd);
+      let count=0;
+      nodes.forEach(node=>{
+        if(node.textContent.includes(err.pattern)){
+          node.textContent=node.textContent.split(err.pattern).join(err.suggest);
+          count++;
+        }
+      });
+      ch.content=ce.innerHTML;dsave();
+      // 해당 패턴 전체 skip 처리
+      errors.filter(e=>e.pattern===err.pattern).forEach(e=>skipped.add(e.pattern+'@'+e.index));
+      toast(err.pattern+' → '+err.suggest+' 전체 교체 완료');
+      const newRaw=(ch.content||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+      _spellShowPopup(errors,skipped,ch,newRaw);
+    }
+  };
+  btns.append(skipBtn,fixBtn,allBtn);
   popup.append(head,words,desc,btns);
   document.body.appendChild(popup);
+  // 현재 오류 위치 하이라이트 + 스크롤
+  _spellHighlight(err.pattern);
+}
+function _spellHighlight(pattern){
+  const ce=document.getElementById('writing-ce1');
+  if(!ce||!pattern)return;
+  const walker=document.createTreeWalker(ce,NodeFilter.SHOW_TEXT);
+  let node;
+  while((node=walker.nextNode())){
+    const idx=node.textContent.indexOf(pattern);
+    if(idx>=0){
+      try{
+        const range=document.createRange();
+        range.setStart(node,idx);
+        range.setEnd(node,idx+pattern.length);
+        const sel=window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        // 해당 위치로 스크롤
+        node.parentElement?.scrollIntoView({block:'center',behavior:'smooth'});
+      }catch(e){}
+      break;
+    }
+  }
 }
 function _spellClose(){
   document.getElementById('spell-popup')?.remove();
