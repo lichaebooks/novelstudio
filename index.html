@@ -3459,6 +3459,9 @@ async function load(){
     if(!S.profile.homeBoards) S.profile.homeBoards = _hmDefaultBoards();
     if(!S.profile.utilOpen) S.profile.utilOpen = {};
     if(!S.profile.utilOrder) S.profile.utilOrder = [];
+    if(!S.profile.inKwOpen) S.profile.inKwOpen = false;
+    if(!S.profile.inKwCatOpen) S.profile.inKwCatOpen = {};
+    if(S.profile.plRightCollapsed===undefined) S.profile.plRightCollapsed = false;
 if(!S.profile.spellExcept) S.profile.spellExcept = [];
     S.writingNodes= data.writingNodes || [];
     S._lastWritingWork = data.lastWritingWork || null;
@@ -5353,6 +5356,8 @@ const IN_SHEETS=[
 let _inSheet='romance'; // 현재 선택 시트
 
 function renderInputNote(){
+  // 저장된 접기/펼치기 상태 복원
+  if(S.profile.inKwOpen !== undefined) _inKwOpen = S.profile.inKwOpen;
   _renderInSheetBar();
   _renderInSummary();
   _renderInFilterBar();
@@ -6328,6 +6333,8 @@ let _inKwTab='romance'; // romance / bl / fantasy
 let _inKwCatOpen={}; // 카테고리 접기/펼치기 상태
 function _inToggleKwEditor(){
   _inKwOpen=!_inKwOpen;
+  S.profile.inKwOpen = _inKwOpen;
+  dsave();
   const body=document.getElementById('in-kw-body');
   const arrow=document.getElementById('in-kw-arrow');
   if(body) body.classList.toggle('open',_inKwOpen);
@@ -6373,8 +6380,8 @@ function _renderInKwEditor(){
   const cats=document.createElement('div');
   cats.className='in-kw-cats';
 
-  // 카테고리별 열림 상태
-  if(!_inKwCatOpen) _inKwCatOpen={};
+  if(!S.profile.inKwCatOpen) S.profile.inKwCatOpen={};
+  const _inKwCatOpen = S.profile.inKwCatOpen;
 
   grpDef.cats.forEach(cat=>{
     const store=S.inputNote.keywords[_inKwTab];
@@ -6403,6 +6410,7 @@ function _renderInKwEditor(){
       const nowOpen=catBody.classList.toggle('open');
       arrow.classList.toggle('open',nowOpen);
       _inKwCatOpen[_inKwTab+'_'+cat.key]=nowOpen;
+      dsave();
     });
     catDiv.appendChild(catHead);
 
@@ -15486,6 +15494,8 @@ let _plRightCollapsed = false;
 
 function renderToolsPL(node, container){
   container.innerHTML = '';
+  // 저장된 우측 패널 접기 상태 복원
+  if(S.profile.plRightCollapsed !== undefined) _plRightCollapsed = S.profile.plRightCollapsed;
   const d = node.data || {};
   if(!d.pl_volumes) d.pl_volumes = [];
   if(!d.pl_chars)   d.pl_chars   = [];
@@ -15783,7 +15793,6 @@ function renderToolsPL(node, container){
   renderMain();
   wrap.appendChild(main);
 
-  // ── 우: 섹션 관리 패널 ──
   const right = document.createElement('div');
   right.className = 'pl-right' + (_plRightCollapsed ? ' collapsed' : '');
 
@@ -15796,6 +15805,8 @@ function renderToolsPL(node, container){
   toggleBtn.textContent = _plRightCollapsed ? '◄' : '►';
   toggleBtn.onclick = () => {
     _plRightCollapsed = !_plRightCollapsed;
+    S.profile.plRightCollapsed = _plRightCollapsed;
+    dsave();
     right.classList.toggle('collapsed', _plRightCollapsed);
     toggleBtn.textContent = _plRightCollapsed ? '◄' : '►';
   };
