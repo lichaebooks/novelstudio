@@ -2202,17 +2202,24 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
 .in-kw-tabs{display:flex;gap:4px;padding:8px 0 4px}
 .in-kw-tab{background:none;border:1px solid var(--bdr);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer}
 .in-kw-tab.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.in-kw-cats{display:flex;flex-direction:column;gap:8px}
-.in-kw-cat{display:flex;flex-direction:column;gap:4px}
-.in-kw-cat-label{font-size:11px;font-weight:700;color:var(--tx2)}
-.in-kw-cat-chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.in-kw-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:11px;background:var(--surf3,var(--surf));color:var(--tx2);border:1px solid var(--bdr)}
+.in-kw-cats{display:flex;flex-direction:column;gap:6px}
+.in-kw-cat{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
+.in-kw-cat-head{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;user-select:none;background:var(--surf2)}
+.in-kw-cat-head:hover{background:var(--surf3,var(--surf2))}
+.in-kw-cat-label{font-size:11px;font-weight:700;color:var(--tx2);flex:1}
+.in-kw-cat-count{font-size:10px;color:var(--tx3);background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:1px 7px}
+.in-kw-cat-arrow{font-size:9px;color:var(--tx3);transition:transform .15s}
+.in-kw-cat-arrow.open{transform:rotate(180deg)}
+.in-kw-cat-body{display:none;padding:8px 10px}
+.in-kw-cat-body.open{display:flex;flex-direction:row;gap:10px;align-items:flex-start}
+.in-kw-add-wrap{display:flex;flex-direction:column;gap:4px;flex-shrink:0;width:130px}
+.in-kw-add-inp{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:11px;color:var(--tx);outline:none;width:100%;box-sizing:border-box}
+.in-kw-add-inp:focus{border-color:var(--ac)}
+.in-kw-add-btn{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:4px 0;font-size:11px;cursor:pointer;font-weight:600;width:100%}
+.in-kw-chips-area{flex:1;display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start;min-height:28px}
+.in-kw-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:11px;background:var(--surf3,var(--surf2));color:var(--tx2);border:1px solid var(--bdr)}
 .in-kw-chip-del{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:10px;padding:0;line-height:1}
 .in-kw-chip-del:hover{color:var(--rd)}
-.in-kw-add-wrap{display:flex;gap:4px;align-items:center;margin-top:2px}
-.in-kw-add-inp{background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--tx);outline:none;width:120px}
-.in-kw-add-inp:focus{border-color:var(--ac)}
-.in-kw-add-btn{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600}
 /* ── 유틸 탭 ── */
 .util-header{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:2px solid var(--bdr);background:var(--surf2);flex-shrink:0}
 .util-header-title{font-size:14px;font-weight:700;color:var(--tx)}
@@ -6222,6 +6229,7 @@ function _inOpenTagModal(w, tagKey, onClose){
 // ── 키워드 편집기 토글
 let _inKwOpen=false;
 let _inKwTab='romance'; // romance / bl / fantasy
+let _inKwCatOpen={}; // 카테고리 접기/펼치기 상태
 function _inToggleKwEditor(){
   _inKwOpen=!_inKwOpen;
   const body=document.getElementById('in-kw-body');
@@ -6264,29 +6272,66 @@ function _renderInKwEditor(){
   });
   body.appendChild(tabBar);
 
-  // 카테고리 목록
   const grpDef=IN_KW_GROUPS.find(g=>g.id===_inKwTab);
   if(!grpDef)return;
   const cats=document.createElement('div');
   cats.className='in-kw-cats';
 
+  // 카테고리별 열림 상태
+  if(!_inKwCatOpen) _inKwCatOpen={};
+
   grpDef.cats.forEach(cat=>{
-    const catDiv=document.createElement('div');
-    catDiv.className='in-kw-cat';
-    const lbl=document.createElement('span');
-    lbl.className='in-kw-cat-label';
-    lbl.textContent=cat.label;
-    catDiv.appendChild(lbl);
-
-    const chipsWrap=document.createElement('div');
-    chipsWrap.className='in-kw-cat-chips';
-
     const store=S.inputNote.keywords[_inKwTab];
     if(!store[cat.key]) store[cat.key]=[];
     const kwList=store[cat.key];
 
+    const isOpen=_inKwCatOpen[_inKwTab+'_'+cat.key]!==false;
+
+    const catDiv=document.createElement('div');
+    catDiv.className='in-kw-cat';
+
+    // 헤더 (접기/펼치기)
+    const catHead=document.createElement('div');
+    catHead.className='in-kw-cat-head';
+    const lbl=document.createElement('span');
+    lbl.className='in-kw-cat-label';
+    lbl.textContent=cat.label;
+    const cnt=document.createElement('span');
+    cnt.className='in-kw-cat-count';
+    cnt.textContent=kwList.length;
+    const arrow=document.createElement('span');
+    arrow.className='in-kw-cat-arrow'+(isOpen?' open':'');
+    arrow.textContent='▼';
+    catHead.append(lbl,cnt,arrow);
+    catHead.addEventListener('click',()=>{
+      const nowOpen=catBody.classList.toggle('open');
+      arrow.classList.toggle('open',nowOpen);
+      _inKwCatOpen[_inKwTab+'_'+cat.key]=nowOpen;
+    });
+    catDiv.appendChild(catHead);
+
+    // 본문
+    const catBody=document.createElement('div');
+    catBody.className='in-kw-cat-body'+(isOpen?' open':'');
+
+    // 왼쪽: 입력창 + 추가 버튼 (고정)
+    const addWrap=document.createElement('div');
+    addWrap.className='in-kw-add-wrap';
+    const inp=document.createElement('input');
+    inp.className='in-kw-add-inp';
+    inp.placeholder='새 키워드...';
+    inp.autocomplete='off';
+    const addBtn=document.createElement('button');
+    addBtn.className='in-kw-add-btn';
+    addBtn.textContent='추가';
+
+    // 오른쪽: 칩 영역
+    const chipsArea=document.createElement('div');
+    chipsArea.className='in-kw-chips-area';
+
     const renderChips=()=>{
-      chipsWrap.innerHTML='';
+      chipsArea.innerHTML='';
+      cnt.textContent=kwList.length;
       kwList.forEach((kw,i)=>{
         const chip=document.createElement('span');
         chip.className='in-kw-chip';
@@ -6295,43 +6340,30 @@ function _renderInKwEditor(){
         del.className='in-kw-chip-del';
         del.textContent='✕';
         del.title='삭제';
-        del.onclick=()=>{
-          kwList.splice(i,1);
-          dsave();
-          renderChips();
-        };
+        del.onclick=()=>{kwList.splice(i,1);dsave();renderChips();};
         chip.appendChild(del);
-        chipsWrap.appendChild(chip);
+        chipsArea.appendChild(chip);
       });
-      // 추가 인풋
-      const addWrap=document.createElement('div');
-      addWrap.className='in-kw-add-wrap';
-      const inp=document.createElement('input');
-      inp.className='in-kw-add-inp';
-      inp.placeholder='새 키워드...';
-      inp.autocomplete='off';
-      inp.addEventListener('keydown',e=>{
-        e.stopPropagation();
-        if(e.key==='Enter'){addKw();}
-      });
-      const addBtn=document.createElement('button');
-      addBtn.className='in-kw-add-btn';
-      addBtn.textContent='추가';
-      const addKw=()=>{
-        const v=inp.value.trim();
-        if(!v)return;
-        if(kwList.includes(v)){toast('이미 있는 키워드입니다.',true);return;}
-        kwList.push(v);
-        dsave();
-        inp.value='';
-        renderChips();
-      };
-      addBtn.onclick=addKw;
-      addWrap.append(inp,addBtn);
-      chipsWrap.appendChild(addWrap);
+      if(!kwList.length){
+        const empty=document.createElement('span');
+        empty.style.cssText='font-size:11px;color:var(--tx3)';
+        empty.textContent='아직 없음';
+        chipsArea.appendChild(empty);
+      }
     };
+
+    const addKw=()=>{
+      const v=inp.value.trim();
+      if(!v)return;
+      if(kwList.includes(v)){toast('이미 있는 키워드입니다.',true);return;}
+      kwList.push(v);dsave();inp.value='';renderChips();
+    };
+    inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')addKw();});
+    addBtn.onclick=addKw;
+    addWrap.append(inp,addBtn);
     renderChips();
-    catDiv.appendChild(chipsWrap);
+    catBody.append(addWrap,chipsArea);
+    catDiv.appendChild(catBody);
     cats.appendChild(catDiv);
   });
   body.appendChild(cats);
@@ -15322,7 +15354,7 @@ function renderToolsPL(node, container){
   const tb = document.createElement('div');
   tb.className = 'writing-toolbar';
   tb.setAttribute('data-type','WPL');
-  tb.innerHTML = '<span class="writing-toolbar-title">\uD83D\uDCDD \uAE30\ud68d\uc548</span>';
+  tb.innerHTML = '<span class="writing-toolbar-title">\uD83D\uDCDD 기획안</span>';
   container.appendChild(tb);
 
   // 좌우 컨테이너
@@ -15339,19 +15371,19 @@ function renderToolsPL(node, container){
     main.innerHTML = '';
 
     // ── 1. 작품 개요
-    main.appendChild(_plSection(node, '\uC791\ud488 \uAC1C\uc694', 'pl_overview', d, save, {
-      type:'textarea', rows:4, placeholder:'\ub300\ub7b5\uc801\uc778 \uc791\ud488 \ud5a5\ubc29, \uc608\uc0c1 \ubd84\ub7c9, \uc5f0\uc7ac \ud615\ud0dc, \ud53c\ub4dc\ubc31 \ud2b9\uc9d5 \ub4f1 \uc791\ud488 \uc811\uadfc\uc758 \ub098\uce68\ubc18'
+    main.appendChild(_plSection(node, '작품 개요', 'pl_overview', d, save, {
+      type:'textarea', rows:4, placeholder:'대략적인 작품 향방, 예상 분량, 연재 형태, 피드백 특징 등 작품 접근의 나침반'
     }));
 
     // ── 2. 서사 줄기
-    main.appendChild(_plSection(node, '\uc11c\uc0ac \uc904\uae30', 'pl_story', d, save, {
-      type:'textarea', rows:6, placeholder:'\uc774 \uc791\ud488\uc758 \ud575\uc2ec \uc11c\uc0ac\ub97c \ud750\ub974\ub294 \uc8fc\uc694 \ucd95 \uc815\ub9ac'
+    main.appendChild(_plSection(node, '서사 줄기', 'pl_story', d, save, {
+      type:'textarea', rows:6, placeholder:'이 작품의 핵심 서사를 흐르는 주요 축 정리'
     }));
 
     // ── 3. 권별 구성
     const volSec = document.createElement('div');
     volSec.className = 'pl-section';
-    const volHead = _plSectionHead('\uad8c\ubcc4 \uad6c\uc131');
+    const volHead = _plSectionHead('권별 구성');
     let volOpen = true;
     const volBody = document.createElement('div');
     volBody.className = 'pl-section-body';
@@ -15364,23 +15396,23 @@ function renderToolsPL(node, container){
         row.className = 'pl-vol-row';
         const lbl = document.createElement('span');
         lbl.className = 'pl-vol-label';
-        lbl.textContent = (i+1) + '\uad8c';
+        lbl.textContent = (i+1) + '권';
         const ta = document.createElement('textarea');
         ta.style.cssText = 'flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;line-height:1.7;min-height:60px';
         ta.value = vol.content || '';
-        ta.placeholder = (i+1) + '\uad8c\uc758 \uc5ed\ud560\uacfc \ud750\ub984...';
+        ta.placeholder = (i+1) + '권의 역할과 흐름...';
         ta.addEventListener('input', () => { vol.content = ta.value; save(); });
         ta.addEventListener('keydown', e => e.stopPropagation());
         const del = document.createElement('button');
         del.className = 'pl-vol-del';
-        del.textContent = '\u2715';
+        del.textContent = '✕';
         del.onclick = () => { d.pl_volumes.splice(i, 1); save(); renderVols(); };
         row.append(lbl, ta, del);
         volBody.appendChild(row);
       });
       const addBtn = document.createElement('button');
       addBtn.className = 'pl-add-btn';
-      addBtn.innerHTML = '\uff0b \uad8c \ucd94\uac00';
+      addBtn.innerHTML = '＋ 권 추가';
       addBtn.onclick = () => { d.pl_volumes.push({content:''}); save(); renderVols(); };
       volBody.appendChild(addBtn);
     };
@@ -15397,7 +15429,7 @@ function renderToolsPL(node, container){
     // ── 4. 캐릭터 기능 메모
     const charSec = document.createElement('div');
     charSec.className = 'pl-section';
-    const charHead = _plSectionHead('\uce90\ub9ad\ud130 \uae30\ub2a5 \uba54\ubaa8');
+    const charHead = _plSectionHead('캐릭터 기능 메모');
     let charOpen = true;
     const charBody = document.createElement('div');
     charBody.className = 'pl-section-body';
@@ -15411,26 +15443,26 @@ function renderToolsPL(node, container){
         const nameInp = document.createElement('input');
         nameInp.className = 'pl-char-name';
         nameInp.value = ch.name || '';
-        nameInp.placeholder = '\uc778\ubb3c\uba85';
+        nameInp.placeholder = '인물명';
         nameInp.addEventListener('input', () => { ch.name = nameInp.value; save(); });
         nameInp.addEventListener('keydown', e => e.stopPropagation());
         const roleTA = document.createElement('textarea');
         roleTA.className = 'pl-char-role';
         roleTA.rows = 2;
         roleTA.value = ch.role || '';
-        roleTA.placeholder = '\uc774 \uc778\ubb3c\uc774 \uc804\uccb4 \uc11c\uc0ac\uc5d0\uc11c \ub2f4\ub2f9\ud558\ub294 \uc5ed\ud560\uacfc \uae30\ub2a5';
+        roleTA.placeholder = '이 인물이 전체 서사에서 담당하는 역할과 기능';
         roleTA.addEventListener('input', () => { ch.role = roleTA.value; save(); });
         roleTA.addEventListener('keydown', e => e.stopPropagation());
         const del = document.createElement('button');
         del.className = 'pl-char-del';
-        del.textContent = '\u2715';
+        del.textContent = '✕';
         del.onclick = () => { d.pl_chars.splice(i, 1); save(); renderChars(); };
         row.append(nameInp, roleTA, del);
         charBody.appendChild(row);
       });
       const addBtn = document.createElement('button');
       addBtn.className = 'pl-add-btn';
-      addBtn.innerHTML = '\uff0b \uc778\ubb3c \ucd94\uac00';
+      addBtn.innerHTML = '＋ 인물 추가';
       addBtn.onclick = () => { d.pl_chars.push({name:'', role:''}); save(); renderChars(); setTimeout(() => { const inps = charBody.querySelectorAll('.pl-char-name'); inps[inps.length-1]?.focus(); }, 50); };
       charBody.appendChild(addBtn);
     };
@@ -15447,7 +15479,7 @@ function renderToolsPL(node, container){
     // ── 5. 씬 배치
     const sceneSec = document.createElement('div');
     sceneSec.className = 'pl-section';
-    const sceneHead = _plSectionHead('\uc528 \ubc30\uce58');
+    const sceneHead = _plSectionHead('씬 배치');
     let sceneOpen = true;
     const sceneBody = document.createElement('div');
     sceneBody.className = 'pl-section-body';
@@ -15461,7 +15493,7 @@ function renderToolsPL(node, container){
         const numInp = document.createElement('input');
         numInp.className = 'pl-scene-num';
         numInp.value = sc.num || '';
-        numInp.placeholder = '\uc528 #';
+        numInp.placeholder = '씨 #';
         numInp.addEventListener('input', () => { sc.num = numInp.value; save(); });
         numInp.addEventListener('keydown', e => e.stopPropagation());
         const col = document.createElement('div');
@@ -15469,14 +15501,14 @@ function renderToolsPL(node, container){
         const titleInp = document.createElement('input');
         titleInp.className = 'pl-scene-title-inp';
         titleInp.value = sc.title || '';
-        titleInp.placeholder = '\uc528/\ud68c\ucc28 \uc81c\ubaa9';
+        titleInp.placeholder = '씨/회차 제목';
         titleInp.addEventListener('input', () => { sc.title = titleInp.value; save(); });
         titleInp.addEventListener('keydown', e => e.stopPropagation());
         const memoTA = document.createElement('textarea');
         memoTA.className = 'pl-scene-memo-inp';
         memoTA.rows = 2;
         memoTA.value = sc.memo || '';
-        memoTA.placeholder = '\uba54\ubaa8 (\uc120\ud0dd\uc0ac\ud56d)';
+        memoTA.placeholder = '메모 (선택사항)';
         memoTA.addEventListener('input', () => { sc.memo = memoTA.value; save(); });
         memoTA.addEventListener('keydown', e => e.stopPropagation());
         col.append(titleInp, memoTA);
@@ -15490,17 +15522,17 @@ function renderToolsPL(node, container){
           fixedLbl.className = 'pl-scene-fixed' + (sc.fixed ? ' on' : '');
           save();
         });
-        fixedLbl.append(fixedCb, '\ud53d\uc2a4');
+        fixedLbl.append(fixedCb, '픽스');
         const del = document.createElement('button');
         del.className = 'pl-scene-del';
-        del.textContent = '\u2715';
+        del.textContent = '✕';
         del.onclick = () => { d.pl_scenes.splice(i, 1); save(); renderScenes(); };
         row.append(numInp, col, fixedLbl, del);
         sceneBody.appendChild(row);
       });
       const addBtn = document.createElement('button');
       addBtn.className = 'pl-add-btn';
-      addBtn.innerHTML = '\uff0b \uc528 \ucd94\uac00';
+      addBtn.innerHTML = '＋ 씨 추가';
       addBtn.onclick = () => { d.pl_scenes.push({num:'', title:'', memo:'', fixed:false}); save(); renderScenes(); setTimeout(() => { const inps = sceneBody.querySelectorAll('.pl-scene-num'); inps[inps.length-1]?.focus(); }, 50); };
       sceneBody.appendChild(addBtn);
     };
@@ -15517,7 +15549,7 @@ function renderToolsPL(node, container){
     // ── 6. 할 일
     const todoSec = document.createElement('div');
     todoSec.className = 'pl-section';
-    const todoHead = _plSectionHead('\ud560 \uc77c');
+    const todoHead = _plSectionHead('할 일');
     let todoOpen = true;
     const todoBody = document.createElement('div');
     todoBody.className = 'pl-section-body';
@@ -15536,20 +15568,20 @@ function renderToolsPL(node, container){
         inp.type = 'text';
         inp.className = 'pl-todo-inp' + (t.done ? ' done' : '');
         inp.value = t.text || '';
-        inp.placeholder = '\ud560 \uc77c \uc785\ub825...';
+        inp.placeholder = '할 일 입력...';
         cb.addEventListener('change', () => { t.done = cb.checked; inp.className = 'pl-todo-inp' + (t.done ? ' done' : ''); save(); });
         inp.addEventListener('input', () => { t.text = inp.value; save(); });
         inp.addEventListener('keydown', e => { e.stopPropagation(); if(e.key === 'Enter') { d.pl_todos.splice(i+1, 0, {text:'', done:false}); save(); renderTodos(); setTimeout(() => { const inps = todoBody.querySelectorAll('.pl-todo-inp'); inps[i+1]?.focus(); }, 30); } });
         const del = document.createElement('button');
         del.className = 'pl-todo-del';
-        del.textContent = '\u2715';
+        del.textContent = '✕';
         del.onclick = () => { d.pl_todos.splice(i, 1); save(); renderTodos(); };
         row.append(cb, inp, del);
         todoBody.appendChild(row);
       });
       const addBtn = document.createElement('button');
       addBtn.className = 'pl-add-btn';
-      addBtn.innerHTML = '\uff0b \ud560 \uc77c \ucd94\uac00';
+      addBtn.innerHTML = '＋ 할 일 추가';
       addBtn.onclick = () => { d.pl_todos.push({text:'', done:false}); save(); renderTodos(); setTimeout(() => { const inps = todoBody.querySelectorAll('.pl-todo-inp'); inps[inps.length-1]?.focus(); }, 50); };
       todoBody.appendChild(addBtn);
     };
@@ -15564,15 +15596,15 @@ function renderToolsPL(node, container){
     main.appendChild(todoSec);
 
     // ── 7. 작가 메모
-    main.appendChild(_plSection(node, '\uc791\uac00 \uba54\ubaa8', 'pl_memo', d, save, {
-      type:'textarea', rows:4, placeholder:'\ubc14\ub00c\ub294 \ubc29\ud5a5, \ud3ec\uae30\ud55c \uc124\uc815, \ub2e4\uc74c\uc5d0 \ud574\uc57c \ud560 \uc77c \ub4f1 \uc790\uc720\ub86d\uac8c'
+    main.appendChild(_plSection(node, '작가 메모', 'pl_memo', d, save, {
+      type:'textarea', rows:4, placeholder:'바뀌는 방향, 포기한 설정, 다음에 해야 할 일 등 자유롭게'
     }));
 
     // ── 8. 자유 섹션
     (node.plSections || []).forEach((sec, i) => {
       const freeSec = document.createElement('div');
       freeSec.className = 'pl-section';
-      const freeHead = _plSectionHead(sec.title || '\uc139\uc158 ' + (i+1));
+      const freeHead = _plSectionHead(sec.title || '섹션 ' + (i+1));
       let freeOpen = true;
       const freeBody = document.createElement('div');
       freeBody.className = 'pl-section-body';
@@ -15581,7 +15613,7 @@ function renderToolsPL(node, container){
       ta.style.cssText = 'width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical;line-height:1.7;box-sizing:border-box';
       ta.rows = 4;
       ta.value = sec.content || '';
-      ta.placeholder = sec.title ? sec.title + ' \ub0b4\uc6a9 \uc785\ub825...' : '\uc790\uc720\ub86d\uac8c \uc785\ub825...';
+      ta.placeholder = sec.title ? sec.title + ' 내용 입력...' : '자유롭게 입력...';
       ta.addEventListener('input', () => { sec.content = ta.value; dsave(); });
       ta.addEventListener('keydown', e => e.stopPropagation());
       freeBody.appendChild(ta);
@@ -15606,15 +15638,15 @@ function renderToolsPL(node, container){
 
   const rightHdr = document.createElement('div');
   rightHdr.className = 'pl-right-hdr';
-  rightHdr.innerHTML = '<span>\uc139\uc158 \uad00\ub9ac</span>';
+  rightHdr.innerHTML = '<span>섹션 관리</span>';
   const toggleBtn = document.createElement('button');
   toggleBtn.className = 'pl-right-toggle';
-  toggleBtn.title = '\ud328\ub110 \uc811\uae30/\ud3fc\uce58\uae30';
-  toggleBtn.textContent = _plRightCollapsed ? '\u25C4' : '\u25BA';
+  toggleBtn.title = '패널 접기/폼치기';
+  toggleBtn.textContent = _plRightCollapsed ? '◄' : '►';
   toggleBtn.onclick = () => {
     _plRightCollapsed = !_plRightCollapsed;
     right.classList.toggle('collapsed', _plRightCollapsed);
-    toggleBtn.textContent = _plRightCollapsed ? '\u25C4' : '\u25BA';
+    toggleBtn.textContent = _plRightCollapsed ? '◄' : '►';
   };
   rightHdr.appendChild(toggleBtn);
   right.appendChild(rightHdr);
@@ -15624,9 +15656,9 @@ function renderToolsPL(node, container){
   fixedList.style.cssText = 'padding:8px 6px 4px;border-bottom:1px solid var(--bdr)';
   const fixedLabel = document.createElement('div');
   fixedLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--tx3);padding:2px 8px 6px;text-transform:uppercase;letter-spacing:.04em';
-  fixedLabel.textContent = '\uace0\uc815 \uc139\uc158';
+  fixedLabel.textContent = '고정 섹션';
   fixedList.appendChild(fixedLabel);
-  ['\uc791\ud488 \uac1c\uc694','\uc11c\uc0ac \uc904\uae30','\uad8c\ubcc4 \uad6c\uc131','\uce90\ub9ad\ud130 \uae30\ub2a5 \uba54\ubaa8','\uc528 \ubc30\uce58','\ud560 \uc77c','\uc791\uac00 \uba54\ubaa8'].forEach(name => {
+  ['작품 개요','서사 줄기','권별 구성','캐릭터 기능 메모','씬 배치','할 일','작가 메모'].forEach(name => {
     const item = document.createElement('div');
     item.className = 'pl-right-sec-item';
     item.style.cursor = 'default';
@@ -15640,7 +15672,7 @@ function renderToolsPL(node, container){
   freeList.style.cssText = 'padding:8px 6px 4px;flex:1;overflow-y:auto';
   const freeLabel = document.createElement('div');
   freeLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--tx3);padding:2px 8px 6px;text-transform:uppercase;letter-spacing:.04em';
-  freeLabel.textContent = '\uc790\uc720 \uc139\uc158';
+  freeLabel.textContent = '자유 섹션';
   freeList.appendChild(freeLabel);
 
   const renderFreeList = () => {
@@ -15651,13 +15683,13 @@ function renderToolsPL(node, container){
       item.className = 'pl-right-sec-item';
       const drag = document.createElement('span');
       drag.className = 'pl-sec-drag';
-      drag.textContent = '\u22BF';
-      drag.title = '\ub4dc\ub798\uadf8\ud558\uc5ec \uc21c\uc11c \ubcc0\uacbd';
+      drag.textContent = '⊿';
+      drag.title = '드래그하여 순서 변경';
       // 제목 편집
       const nameSpan = document.createElement('span');
       nameSpan.style.cssText = 'flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-      nameSpan.textContent = sec.title || '\uc139\uc158 ' + (i+1);
-      nameSpan.title = '\ub354\ube14\ud074\ub9ad\ud558\uc5ec \uc774\ub984 \ubcc0\uacbd';
+      nameSpan.textContent = sec.title || '섹션 ' + (i+1);
+      nameSpan.title = '더블클릭하여 이름 변경';
       nameSpan.addEventListener('dblclick', (e) => {
         e.stopPropagation();
         const inp = document.createElement('input');
@@ -15670,11 +15702,11 @@ function renderToolsPL(node, container){
       });
       const del = document.createElement('button');
       del.className = 'pl-sec-del';
-      del.textContent = '\u2715';
-      del.title = '\uc139\uc158 \uc0ad\uc81c';
+      del.textContent = '✕';
+      del.title = '섹션 삭제';
       del.onclick = (e) => {
         e.stopPropagation();
-        if(!confirm((sec.title||'\uc139\uc158')+'을(를) 삭제하시겠습니까?')) return;
+        if(!confirm((sec.title||'섹션')+'을(를) 삭제하시겠습니까?')) return;
         node.plSections.splice(i, 1);
         dsave();
         renderFreeList();
@@ -15684,20 +15716,35 @@ function renderToolsPL(node, container){
       freeList.appendChild(item);
     });
 
-    // 추가 버튼
-    const addBtn = document.createElement('button');
-    addBtn.className = 'pl-add-btn';
-    addBtn.style.cssText = 'margin:6px 8px;width:calc(100% - 16px);box-sizing:border-box';
-    addBtn.innerHTML = '\uff0b \uc139\uc158 \ucd94\uac00';
-    addBtn.onclick = () => {
-      const title = prompt('\uc0c8 \uc139\uc158 \uc774\ub984:');
-      if(!title) return;
-      node.plSections.push({title, content:''});
-      dsave();
-      renderFreeList();
-      renderMain();
+    // 추가 버튼 + 인라인 입력
+    const addArea = document.createElement('div');
+    addArea.style.cssText = 'margin:6px 8px;display:flex;gap:4px;align-items:center';
+    const addInp = document.createElement('input');
+    addInp.type = 'text';
+    addInp.placeholder = '새 섹션 이름...';
+    addInp.style.cssText = 'flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--tx);outline:none;min-width:0';
+    addInp.addEventListener('keydown', e => {
+      e.stopPropagation();
+      if(e.key==='Enter'){
+        const t=addInp.value.trim();
+        if(!t)return;
+        node.plSections.push({title:t,content:''});
+        dsave();addInp.value='';renderFreeList();renderMain();
+      }
+    });
+    addInp.addEventListener('focus', ()=>addInp.style.borderColor='var(--ac)');
+    addInp.addEventListener('blur', ()=>addInp.style.borderColor='var(--bdr)');
+    const addConfirm = document.createElement('button');
+    addConfirm.style.cssText = 'background:var(--ac);color:#fff;border:none;border-radius:5px;padding:5px 8px;font-size:12px;cursor:pointer;flex-shrink:0';
+    addConfirm.textContent = '＋';
+    addConfirm.onclick = () => {
+      const t=addInp.value.trim();
+      if(!t)return;
+      node.plSections.push({title:t,content:''});
+      dsave();addInp.value='';renderFreeList();renderMain();
     };
-    freeList.appendChild(addBtn);
+    addArea.append(addInp, addConfirm);
+    freeList.appendChild(addArea);
   };
   renderFreeList();
   right.appendChild(freeList);
@@ -15710,7 +15757,7 @@ function renderToolsPL(node, container){
 function _plSectionHead(title){
   const head = document.createElement('div');
   head.className = 'pl-section-head';
-  head.innerHTML = '<span class="pl-section-title">' + title + '</span><span class="pl-section-arrow">\u25B2</span>';
+  head.innerHTML = '<span class="pl-section-title">' + title + '</span><span class="pl-section-arrow">▲</span>';
   return head;
 }
 
