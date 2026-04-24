@@ -2350,13 +2350,27 @@ tr:hover .pub-row-del{color:var(--tx3)}
 .pub-action-btn.danger{color:var(--rd);border-color:var(--rd)}
 .pub-action-btn.danger:hover{background:rgba(248,81,73,.08)}
 .pub-action-btn:disabled{opacity:.4;cursor:default}
-/* 선택 모드 */
-.pub-sel-cb{display:none}
-.pub-select-mode .pub-sel-cb{display:inline-block}
+/* 투고 양식 */
+.pub-form-chip{display:inline-block;background:none;color:var(--tx3);border:1px solid var(--bdr);border-radius:3px;padding:0px 5px;font-size:10px;cursor:pointer;white-space:nowrap;line-height:1.7}
+.pub-form-chip:hover{color:var(--tx);border-color:var(--tx3)}
+.pub-form-chip.has{color:var(--ac);border-color:var(--ac)}
+/* 투고 양식 모달 */
+.pub-form-modal-bg{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px}
+.pub-form-modal{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);width:660px;max-width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden}
+.pub-form-modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.pub-form-modal-title{font-size:14px;font-weight:700;color:var(--tx)}
+.pub-form-modal-close{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:18px;line-height:1;padding:0}
+.pub-form-modal-hint{font-size:11px;color:var(--tx3);padding:6px 16px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.pub-form-editor{flex:1;overflow-y:auto;padding:14px 16px;font-size:13px;color:var(--tx);line-height:1.8;outline:none;font-family:inherit;min-height:200px}
+.pub-form-editor:empty::before{content:attr(data-ph);color:var(--tx3);pointer-events:none}
+.pub-form-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
 @media(max-width:600px){
   .pub-sheet-bar{padding:6px 8px 0;gap:1px}
   .pub-sheet-tab{padding:5px 10px;font-size:12px}
 }
+/* 선택 모드 */
+.pub-sel-cb{display:none}
+.pub-select-mode .pub-sel-cb{display:inline-block}
 .util-names-empty{font-size:12px;color:var(--tx3);padding:8px 0}
 @media(max-width:600px){
   .util-body{padding:10px 12px}
@@ -5090,7 +5104,7 @@ function _renderPubBody(){
     _pubUpdateActions();
   });
   thCb.appendChild(allCb);htr.appendChild(thCb);
-  [['출판사명','120px'],['레이블명','100px'],['투고메일','150px'],['최소분량','90px'],['계약조건','130px'],['비고','180px'],['','28px']].forEach(([l,w])=>{
+  [['출판사명','120px'],['레이블명','100px'],['투고메일','150px'],['최소분량','90px'],['투고 양식','70px'],['계약조건','130px'],['비고','160px'],['','28px']].forEach(([l,w])=>{
     const th=document.createElement('th');th.style.width=w;th.textContent=l;htr.appendChild(th);
   });
   thead.appendChild(htr);table.appendChild(thead);
@@ -5130,7 +5144,7 @@ function _renderPubBody(){
   const rows=_pubRows();
   if(!rows.length){
     const et=document.createElement('tr');et.id='pub-empty-row';
-    et.innerHTML='<td colspan="8" style="text-align:center;padding:32px;color:var(--tx3);font-size:13px">＋ 아래 버튼으로 출판사를 추가해보세요</td>';
+    et.innerHTML='<td colspan="9" style="text-align:center;padding:32px;color:var(--tx3);font-size:13px">＋ 아래 버튼으로 출판사를 추가해보세요</td>';
     tbody.appendChild(et);
   } else {
     rows.forEach(row=>tbody.appendChild(_pubCreateRow(row,tbody)));
@@ -5152,7 +5166,32 @@ function _pubCreateRow(row,tbody){
   const cb=document.createElement('input');cb.type='checkbox';cb.className='pub-sel-cb';cb.checked=_pubSelectedIds.has(row.id);
   cb.addEventListener('change',()=>{if(cb.checked)_pubSelectedIds.add(row.id);else _pubSelectedIds.delete(row.id);_pubUpdateActions();});
   tdCb.appendChild(cb);tr.appendChild(tdCb);
-  [{key:'name',ph:'출판사명'},{key:'label',ph:'레이블명'},{key:'email',ph:'투고메일'},{key:'minWords',ph:'예: 200자 이상'},{key:'contract',ph:'계약 조건'},{key:'memo',ph:'비고'}].forEach(({key,ph})=>{
+  [{key:'name',ph:'출판사명'},{key:'label',ph:'레이블명'},{key:'email',ph:'투고메일'},{key:'minWords',ph:'예: 200자 이상'}].forEach(({key,ph})=>{
+    const td=document.createElement('td');
+    const inp=document.createElement('input');inp.className='pub-cell-input';inp.type='text';inp.value=row[key]||'';inp.placeholder=ph;
+    inp.addEventListener('input',()=>{row[key]=inp.value;dsave();});
+    inp.addEventListener('keydown',e=>e.stopPropagation());
+    td.appendChild(inp);tr.appendChild(td);
+  });
+  // 투고 양식 셀
+  const tdForm=document.createElement('td');tdForm.style.cssText='text-align:center;padding:3px 6px;width:70px';
+  const mkFormChip=()=>{
+    tdForm.innerHTML='';
+    if(row.form){
+      const chip=document.createElement('span');
+      chip.className='pub-form-chip has';chip.textContent='작성됨';
+      chip.onclick=(e)=>{e.stopPropagation();_pubOpenFormModal(row,mkFormChip);};
+      tdForm.appendChild(chip);
+    } else {
+      const chip=document.createElement('span');
+      chip.className='pub-form-chip';chip.textContent='작성';
+      chip.onclick=(e)=>{e.stopPropagation();_pubOpenFormModal(row,mkFormChip);};
+      tdForm.appendChild(chip);
+    }
+  };
+  mkFormChip();
+  tr.appendChild(tdForm);
+  [{key:'contract',ph:'계약 조건'},{key:'memo',ph:'비고'}].forEach(({key,ph})=>{
     const td=document.createElement('td');
     const inp=document.createElement('input');inp.className='pub-cell-input';inp.type='text';inp.value=row[key]||'';inp.placeholder=ph;
     inp.addEventListener('input',()=>{row[key]=inp.value;dsave();});
@@ -5167,7 +5206,7 @@ function _pubCreateRow(row,tbody){
     dsave();tr.remove();_renderPubSummary();
     if(!tbody.querySelector('tr[data-id]')){
       const et=document.createElement('tr');et.id='pub-empty-row';
-      et.innerHTML='<td colspan="8" style="text-align:center;padding:32px;color:var(--tx3);font-size:13px">＋ 아래 버튼으로 출판사를 추가해보세요</td>';
+      et.innerHTML='<td colspan="9" style="text-align:center;padding:32px;color:var(--tx3);font-size:13px">＋ 아래 버튼으로 출판사를 추가해보세요</td>';
       tbody.appendChild(et);
     }
   };
@@ -5180,6 +5219,52 @@ function _pubUpdateActions(){
   const delBtn=document.getElementById('pub-action-del');
   if(selBtn)selBtn.textContent=_pubSelectMode?'선택해제':'선택';
   if(delBtn)delBtn.disabled=!(_pubSelectMode&&_pubSelectedIds.size>0);
+}
+
+function _pubOpenFormModal(row, refreshChip){
+  document.getElementById('pub-form-modal-bg')?.remove();
+  const bg=document.createElement('div');
+  bg.id='pub-form-modal-bg';bg.className='pub-form-modal-bg';
+
+  const modal=document.createElement('div');modal.className='pub-form-modal';
+
+  const head=document.createElement('div');head.className='pub-form-modal-head';
+  const title=document.createElement('span');title.className='pub-form-modal-title';
+  title.textContent=(row.name||'출판사')+' — 투고 양식';
+  const closeBtn=document.createElement('button');closeBtn.className='pub-form-modal-close';closeBtn.textContent='✕';
+  closeBtn.onclick=()=>bg.remove();
+  head.append(title,closeBtn);modal.appendChild(head);
+
+  const hint=document.createElement('div');hint.className='pub-form-modal-hint';
+  hint.textContent='투고 양식 원문을 붙여넣거나 직접 작성하세요. 표·들여쓰기 서식이 유지됩니다.';
+  modal.appendChild(hint);
+
+  const editor=document.createElement('div');
+  editor.className='pub-form-editor';
+  editor.contentEditable='true';
+  editor.setAttribute('data-ph','투고 양식 내용을 여기에 붙여넣거나 직접 작성하세요...');
+  editor.spellcheck=false;
+  if(row.form) editor.innerHTML=row.form;
+  editor.addEventListener('keydown',e=>e.stopPropagation());
+  modal.appendChild(editor);
+
+  const foot=document.createElement('div');foot.className='pub-form-modal-foot';
+  const cancelBtn=document.createElement('button');cancelBtn.className='pub-form-cancel';cancelBtn.textContent='취소';
+  cancelBtn.onclick=()=>bg.remove();
+  const saveBtn=document.createElement('button');saveBtn.className='pub-form-save';saveBtn.textContent='저장';
+  saveBtn.onclick=()=>{
+    row.form=editor.innerHTML.trim();
+    dsave();
+    refreshChip();
+    bg.remove();
+    toast('투고 양식이 저장되었습니다.');
+  };
+  foot.append(cancelBtn,saveBtn);modal.appendChild(foot);
+
+  bg.appendChild(modal);
+  document.body.appendChild(bg);
+  bg.onclick=(e)=>{if(e.target===bg)bg.remove();};
+  setTimeout(()=>editor.focus(),50);
 }
 
 
@@ -9147,6 +9232,8 @@ async function gdPull(){
     initWritingTab();renderToolsTree();
     if(typeof initSettleTab==='function') initSettleTab();
     if(S.curTab==='inputnote') renderInputNote();
+    if(S.curTab==='pub') renderPub();
+    if(S.curTab==='util') renderUtil();
     // GD 불러오기 후 오늘 글자수 스냅샷 재설정 (다른 기기 데이터와 혼재 방지)
     try{ saveWcSnapshot(); }catch(e){}
     gdBar('✅ Drive 데이터 불러오기 완료!','ok');
