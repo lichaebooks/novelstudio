@@ -6198,7 +6198,7 @@ function _inTagKeyToStore(sheet, tagKey){
   const keyMap={
     genreTags:'genre', moodTags:'mood',
     char1Tags:(sheet==='bl')?'top':(sheet==='fantasy')?'protagonist':'male',
-    char2Tags:(sheet==='bl')?'bottom':'female',
+    char2Tags:(sheet==='bl')?'bottom':(sheet==='fantasy')?'job':'female',
   };
   return {grp, storeKey: keyMap[tagKey]||'genre'};
 }
@@ -6212,7 +6212,11 @@ function _inTagLabel(sheet, tagKey){
     if(sheet==='fantasy') return '주인공';
     return '남주';
   }
-  if(tagKey==='char2Tags') return (sheet==='bl')?'수':'여주';
+  if(tagKey==='char2Tags'){
+    if(sheet==='bl') return '수';
+    if(sheet==='fantasy') return '직업';
+    return '여주';
+  }
   return tagKey;
 }
 
