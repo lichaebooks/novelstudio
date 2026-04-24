@@ -2218,9 +2218,11 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
 .util-header-title{font-size:14px;font-weight:700;color:var(--tx)}
 .util-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
 /* 유틸 섹션 */
-.util-sec{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
-.util-sec-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--surf2)}
+.util-sec{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;overflow:visible}
+.util-sec-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--surf2);border-radius:10px}
 .util-sec-head:hover{background:var(--surf3,var(--surf2))}
+.util-sec.drag-open .util-sec-head,.util-sec-body:not(.collapsed)~.util-sec-head{border-radius:10px 10px 0 0}
+.util-drag-over{outline:2px dashed var(--ac);outline-offset:2px}
 .util-sec-head-left{display:flex;align-items:center;gap:8px}
 .util-sec-icon{font-size:16px}
 .util-sec-title{font-size:13px;font-weight:700;color:var(--tx)}
@@ -2249,6 +2251,23 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
 .util-dict-more:hover{background:var(--surf3,var(--surf2))}
 .util-dict-empty{font-size:13px;color:var(--tx3);text-align:center;padding:20px 0}
 .util-dict-loading{font-size:13px;color:var(--tx3);text-align:center;padding:20px 0}
+/* 이름짓기 */
+.util-names-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.util-names-group{display:flex;flex-direction:column;gap:4px}
+.util-names-label{font-size:11px;font-weight:600;color:var(--tx3)}
+.util-names-select{background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none;cursor:pointer;min-width:110px}
+.util-names-select:focus{border-color:var(--ac)}
+.util-names-count{width:60px;background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none;text-align:center}
+.util-names-count:focus{border-color:var(--ac)}
+.util-names-sep{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);cursor:pointer;padding:4px 0;align-self:flex-end}
+.util-names-sep input{width:14px;height:14px;cursor:pointer;accent-color:var(--ac)}
+.util-names-btn{background:var(--ac);color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;align-self:flex-end}
+.util-names-btn:hover{opacity:.88}
+.util-names-results{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.util-names-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surf2);border:1px solid var(--bdr);border-radius:20px;font-size:13px;color:var(--tx);cursor:pointer;transition:all .1s}
+.util-names-chip:hover{border-color:var(--ac);color:var(--ac)}
+.util-names-chip-copy{font-size:10px;color:var(--tx3)}
+.util-names-empty{font-size:12px;color:var(--tx3);padding:8px 0}
 @media(max-width:600px){
   .util-body{padding:10px 12px}
   .util-dict-btn{padding:9px 12px;font-size:12px}
@@ -3317,6 +3336,7 @@ async function load(){
     if(S.profile.homeMemo === undefined) S.profile.homeMemo = '';
     if(!S.profile.homeBoards) S.profile.homeBoards = _hmDefaultBoards();
     if(!S.profile.utilOpen) S.profile.utilOpen = {};
+    if(!S.profile.utilOrder) S.profile.utilOrder = [];
 if(!S.profile.spellExcept) S.profile.spellExcept = [];
     S.writingNodes= data.writingNodes || [];
     S._lastWritingWork = data.lastWritingWork || null;
@@ -6063,7 +6083,8 @@ function _renderInKwEditor(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const UTIL_API_KEY = 'B646B34DB27824136A6E0205DF2CB9DC';
 const UTIL_SECTIONS = [
-  {id:'dict', icon:'📖', title:'사전 검색'},
+  {id:'dict',  icon:'📖', title:'사전 검색'},
+  {id:'names', icon:'✍️', title:'이름짓기'},
 ];
 let _utilDictPage = 1;
 let _utilDictQuery = '';
@@ -6074,28 +6095,72 @@ function renderUtil(){
   if(!body) return;
   body.innerHTML = '';
 
-  // 섹션 순서 (향후 드래그 앤 드롭으로 변경 가능하게 profile에 저장)
   if(!S.profile.utilOpen) S.profile.utilOpen = {};
+  if(!S.profile.utilOrder) S.profile.utilOrder = UTIL_SECTIONS.map(s=>s.id);
 
-  UTIL_SECTIONS.forEach(sec => {
-    const isOpen = S.profile.utilOpen[sec.id] !== false; // 기본 열림
+  // 순서 적용 (새 섹션이 추가됐을 때 누락 없게)
+  const order = [...S.profile.utilOrder];
+  UTIL_SECTIONS.forEach(s=>{ if(!order.includes(s.id)) order.push(s.id); });
+  const orderedSections = order.map(id=>UTIL_SECTIONS.find(s=>s.id===id)).filter(Boolean);
+
+  let _dragSrc = null;
+
+  orderedSections.forEach(sec => {
+    const isOpen = S.profile.utilOpen[sec.id] !== false;
     const wrap = document.createElement('div');
     wrap.className = 'util-sec';
+    wrap.dataset.secId = sec.id;
+    wrap.draggable = true;
+
+    // 드래그 이벤트
+    wrap.addEventListener('dragstart', e => {
+      _dragSrc = sec.id;
+      wrap.style.opacity = '0.4';
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    wrap.addEventListener('dragend', () => {
+      wrap.style.opacity = '';
+      body.querySelectorAll('.util-sec').forEach(el => el.classList.remove('util-drag-over'));
+    });
+    wrap.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if(_dragSrc && _dragSrc !== sec.id) wrap.classList.add('util-drag-over');
+    });
+    wrap.addEventListener('dragleave', () => wrap.classList.remove('util-drag-over'));
+    wrap.addEventListener('drop', e => {
+      e.preventDefault();
+      wrap.classList.remove('util-drag-over');
+      if(!_dragSrc || _dragSrc === sec.id) return;
+      const newOrder = S.profile.utilOrder.filter(id => id !== _dragSrc);
+      const toIdx = newOrder.indexOf(sec.id);
+      newOrder.splice(toIdx, 0, _dragSrc);
+      S.profile.utilOrder = newOrder;
+      dsave();
+      renderUtil();
+    });
 
     // 헤더
     const head = document.createElement('div');
     head.className = 'util-sec-head';
     const left = document.createElement('div');
     left.className = 'util-sec-head-left';
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'util-sec-drag';
+    dragHandle.textContent = '⠿';
+    dragHandle.title = '드래그하여 순서 변경';
+    dragHandle.addEventListener('mousedown', e => e.stopPropagation());
     left.innerHTML = `<span class="util-sec-icon">${sec.icon}</span><span class="util-sec-title">${sec.title}</span>`;
+    left.prepend(dragHandle);
     const arrow = document.createElement('span');
     arrow.className = 'util-sec-arrow' + (isOpen ? ' open' : '');
     arrow.textContent = '▼';
     head.append(left, arrow);
-    head.addEventListener('click', () => {
-      const nowOpen = secBody.classList.toggle('collapsed');
-      arrow.classList.toggle('open', !nowOpen);
-      S.profile.utilOpen[sec.id] = !nowOpen;
+    head.addEventListener('click', e => {
+      if(e.target === dragHandle) return;
+      const nowCollapsed = secBody.classList.toggle('collapsed');
+      arrow.classList.toggle('open', !nowCollapsed);
+      S.profile.utilOpen[sec.id] = !nowCollapsed;
       dsave();
     });
 
@@ -6104,6 +6169,7 @@ function renderUtil(){
     secBody.className = 'util-sec-body' + (isOpen ? '' : ' collapsed');
 
     if(sec.id === 'dict') _renderUtilDict(secBody);
+    if(sec.id === 'names') _renderUtilNames(secBody);
 
     wrap.append(head, secBody);
     body.appendChild(wrap);
@@ -6242,6 +6308,135 @@ async function _fetchDict(query, page, container, clearPrev){
   } catch(e) {
     container.innerHTML = `<div class="util-dict-empty">검색 중 오류가 발생했습니다. 인터넷 연결을 확인해주세요.</div>`;
   }
+}
+
+// ── 이름짓기
+let _namesData = null;
+
+async function _loadNamesData(){
+  if(_namesData) return _namesData;
+  try {
+    const res = await fetch('names.json');
+    _namesData = await res.json();
+  } catch(e) {
+    _namesData = {categories:[]};
+  }
+  return _namesData;
+}
+
+function _renderUtilNames(container){
+  container.innerHTML = '';
+
+  // 컨트롤
+  const controls = document.createElement('div');
+  controls.className = 'util-names-controls';
+
+  // 성별
+  const genderGrp = document.createElement('div');
+  genderGrp.className = 'util-names-group';
+  genderGrp.innerHTML = '<span class="util-names-label">성별</span>';
+  const genderSel = document.createElement('select');
+  genderSel.className = 'util-names-select';
+  [['any','무작위'],['female','여성'],['male','남성'],['neutral','중성']].forEach(([v,l])=>{
+    const o = document.createElement('option'); o.value=v; o.textContent=l; genderSel.appendChild(o);
+  });
+  genderGrp.appendChild(genderSel);
+
+  // 국가/계열
+  const catGrp = document.createElement('div');
+  catGrp.className = 'util-names-group';
+  catGrp.innerHTML = '<span class="util-names-label">국가/계열</span>';
+  const catSel = document.createElement('select');
+  catSel.className = 'util-names-select';
+  const catAny = document.createElement('option'); catAny.value='any'; catAny.textContent='무작위'; catSel.appendChild(catAny);
+  catGrp.appendChild(catSel);
+
+  // 카운트
+  const cntGrp = document.createElement('div');
+  cntGrp.className = 'util-names-group';
+  cntGrp.innerHTML = '<span class="util-names-label">카운트</span>';
+  const cntInp = document.createElement('input');
+  cntInp.type = 'number'; cntInp.min=1; cntInp.max=20; cntInp.value=5;
+  cntInp.className = 'util-names-count';
+  cntInp.addEventListener('keydown', e=>e.stopPropagation());
+  cntGrp.appendChild(cntInp);
+
+  // 성/이름 출처 분리
+  const sepLabel = document.createElement('label');
+  sepLabel.className = 'util-names-sep';
+  const sepCb = document.createElement('input'); sepCb.type='checkbox';
+  sepLabel.append(sepCb, '성/이름 출처 분리');
+
+  // 생성 버튼
+  const genBtn = document.createElement('button');
+  genBtn.className = 'util-names-btn';
+  genBtn.textContent = '✨ 이름 생성';
+
+  controls.append(genderGrp, catGrp, cntGrp, sepLabel, genBtn);
+  container.appendChild(controls);
+
+  // 결과 영역
+  const resultArea = document.createElement('div');
+  resultArea.className = 'util-names-results';
+  resultArea.innerHTML = `<span class="util-names-empty">위에서 설정 후 이름 생성 버튼을 눌러보세요.</span>`;
+  container.appendChild(resultArea);
+
+  // 카테고리 로드
+  _loadNamesData().then(data => {
+    (data.categories||[]).forEach(cat => {
+      const o = document.createElement('option'); o.value=cat.id; o.textContent=cat.label; catSel.appendChild(o);
+    });
+  });
+
+  // 생성 실행
+  genBtn.onclick = async () => {
+    const data = await _loadNamesData();
+    const cats = data.categories || [];
+    if(!cats.length){ resultArea.innerHTML=`<span class="util-names-empty">이름 데이터를 불러올 수 없습니다.</span>`; return; }
+
+    const gender = genderSel.value;
+    const catId = catSel.value;
+    const count = Math.min(20, Math.max(1, parseInt(cntInp.value)||5));
+    const separate = sepCb.checked;
+
+    // 사용할 카테고리 목록
+    const useCats = catId==='any' ? cats : cats.filter(c=>c.id===catId);
+    if(!useCats.length) return;
+
+    const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+
+    const results = [];
+    for(let i=0; i<count; i++){
+      // 성 출처 카테고리
+      const surnCat = separate ? pick(useCats) : pick(useCats);
+      // 이름 출처 카테고리 (분리 시 다른 카테고리 가능)
+      const nameCat = separate ? pick(useCats) : surnCat;
+
+      const surname = pick(surnCat.surnames || ['']);
+
+      let namePool = [];
+      if(gender==='any'){
+        namePool = [...(nameCat.female||[]), ...(nameCat.male||[]), ...(nameCat.neutral||[])];
+      } else {
+        namePool = nameCat[gender] || nameCat.female || [];
+      }
+      if(!namePool.length) namePool = [...(nameCat.female||[]), ...(nameCat.male||[])];
+      const givenName = pick(namePool) || '';
+      results.push(surname + givenName);
+    }
+
+    resultArea.innerHTML = '';
+    results.forEach(name => {
+      const chip = document.createElement('div');
+      chip.className = 'util-names-chip';
+      chip.title = '클릭하여 복사';
+      chip.innerHTML = `<span>${name}</span><span class="util-names-chip-copy">복사</span>`;
+      chip.onclick = () => {
+        navigator.clipboard?.writeText(name).then(()=>toast(name+' 복사됨')).catch(()=>{});
+      };
+      resultArea.appendChild(chip);
+    });
+  };
 }
 
 function initSettleTab(){
