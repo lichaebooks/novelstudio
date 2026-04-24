@@ -168,6 +168,11 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit
 /* ── STATUS BAR (bottom) ── */
 .statusbar{height:26px;background:var(--surf);border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 14px;gap:16px;flex-shrink:0;font-size:11px;color:var(--tx3)}
 .statusbar-time{margin-left:auto;font-variant-numeric:tabular-nums}
+.statusbar-tools{display:flex;align-items:center;gap:2px}
+.sb-tool-btn{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;position:relative}
+.sb-tool-btn:hover{background:var(--surf2);color:var(--tx)}
+.sb-tool-btn .sb-tooltip{display:none;position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--surf3,var(--surf2));border:1px solid var(--bdr);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--tx);white-space:nowrap;z-index:100;pointer-events:none}
+.sb-tool-btn:hover .sb-tooltip{display:block}
 
 /* ── SHARED SIDEBAR ── */
 .sidebar{width:220px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
@@ -3124,6 +3129,10 @@ tr:hover .pub-row-del{color:var(--tx3)}
 
 <!-- STATUS BAR -->
 <div class="statusbar">
+  <div class="statusbar-tools">
+    <button class="sb-tool-btn" onclick="writingPrint()" title="인쇄/출력">🖨️<span class="sb-tooltip">인쇄/출력</span></button>
+    <button class="sb-tool-btn" onclick="writingTypeset()" title="조판">📐<span class="sb-tooltip">조판</span></button>
+  </div>
   <span id="sb-wc" style="font-size:11px;color:var(--tx3)"></span>
   <span class="statusbar-time" id="sb-time"></span>
 </div>
@@ -8964,6 +8973,53 @@ function loadEditorDefaults(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SETTINGS — BACKUP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── 인쇄/출력
+function writingPrint(){
+  // 현재 열린 회차 내용 가져오기
+  const ce = document.getElementById('writing-ce1');
+  if(!ce){toast('집필 탭에서 회차를 열어주세요.', true); return;}
+
+  const titleEl = document.querySelector('#writing-pane1 .writing-ch-title-inp, #writing-pane1 [id^="ch-title-"]');
+  const chTitle = titleEl?.value || document.querySelector('.writing-ch-sel-label')?.textContent || '원고';
+  const workTitle = document.querySelector('.writing-work-label')?.textContent || '';
+
+  const content = ce.innerHTML;
+  if(!content.trim()){toast('내용이 없습니다.', true); return;}
+
+  const printWin = window.open('', '_blank');
+  printWin.document.write(`<!DOCTYPE html><html lang="ko"><head>
+<meta charset="UTF-8">
+<title>${workTitle} - ${chTitle}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',serif;font-size:11pt;line-height:2;color:#000;padding:20mm 20mm 20mm 25mm}
+  p{margin-bottom:0.5em;text-indent:1em}
+  br{display:block;margin-bottom:0.3em}
+  h1,h2,h3{font-size:13pt;margin:1em 0 0.5em}
+  .print-header{text-align:center;margin-bottom:2em;padding-bottom:1em;border-bottom:1px solid #ccc}
+  .print-work{font-size:10pt;color:#666;margin-bottom:4px}
+  .print-title{font-size:14pt;font-weight:700}
+  @media print{
+    body{padding:15mm 15mm 15mm 20mm}
+    @page{margin:15mm}
+  }
+</style>
+</head><body>
+<div class="print-header">
+  ${workTitle ? `<div class="print-work">${workTitle}</div>` : ''}
+  <div class="print-title">${chTitle}</div>
+</div>
+<div class="print-body">${content}</div>
+<script>window.onload=()=>{window.print();}<\/script>
+</body></html>`);
+  printWin.document.close();
+}
+
+// 조판 함수 (플레이스홀더 — 다음 단계에서 구현)
+function writingTypeset(){
+  toast('조판 기능은 준비 중입니다.');
+}
+
 function exportData(){
   const d={works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,settle:S.settle,lastWritingWork:S._lastWritingWork,lastWritingCh:S._lastWritingCh,v:1,date:new Date().toISOString()};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
