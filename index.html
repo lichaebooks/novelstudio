@@ -6159,7 +6159,7 @@ async function _fetchDict(query, page, container, clearPrev){
   if(clearPrev) container.innerHTML = `<div class="util-dict-loading">🔍 검색 중...</div>`;
 
   const start = (page - 1) * 10 + 1;
-  const url = `https://opendict.korean.go.kr/api/search?certkey_no=6341&key=${UTIL_API_KEY}&target_type=search&req_type=json&q=${encodeURIComponent(query)}&start=${start}&num=10&part=word`;
+  const url = `https://corsproxy.io/?${encodeURIComponent(`https://opendict.korean.go.kr/api/search?certkey_no=6341&key=${UTIL_API_KEY}&target_type=search&req_type=json&q=${encodeURIComponent(query)}&start=${start}&num=10&part=word`)}`;
 
   try {
     const res = await fetch(url);
