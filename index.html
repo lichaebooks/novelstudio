@@ -2213,6 +2213,46 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
 .in-kw-add-inp{background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--tx);outline:none;width:120px}
 .in-kw-add-inp:focus{border-color:var(--ac)}
 .in-kw-add-btn{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600}
+/* ── 유틸 탭 ── */
+.util-header{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:2px solid var(--bdr);background:var(--surf2);flex-shrink:0}
+.util-header-title{font-size:14px;font-weight:700;color:var(--tx)}
+.util-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+/* 유틸 섹션 */
+.util-sec{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
+.util-sec-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--surf2)}
+.util-sec-head:hover{background:var(--surf3,var(--surf2))}
+.util-sec-head-left{display:flex;align-items:center;gap:8px}
+.util-sec-icon{font-size:16px}
+.util-sec-title{font-size:13px;font-weight:700;color:var(--tx)}
+.util-sec-arrow{font-size:10px;color:var(--tx3);transition:transform .2s}
+.util-sec-arrow.open{transform:rotate(180deg)}
+.util-sec-drag{color:var(--tx3);font-size:13px;cursor:grab;padding:0 4px}
+.util-sec-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.util-sec-body.collapsed{display:none}
+/* 사전 검색 */
+.util-dict-search-row{display:flex;gap:8px}
+.util-dict-inp{flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:9px 14px;font-size:13px;color:var(--tx);outline:none;font-family:inherit}
+.util-dict-inp:focus{border-color:var(--ac)}
+.util-dict-btn{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0}
+.util-dict-btn:hover{opacity:.88}
+.util-dict-results{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.util-dict-item{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px}
+.util-dict-word{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.util-dict-pos{font-size:11px;color:var(--ac);font-weight:600;margin-bottom:6px}
+.util-dict-def{font-size:12px;color:var(--tx2);line-height:1.7;padding:4px 0}
+.util-dict-def+.util-dict-def{border-top:1px solid var(--bdr);padding-top:6px;margin-top:2px}
+.util-dict-def-num{font-size:10px;color:var(--tx3);margin-right:4px}
+.util-dict-link{font-size:11px;color:var(--ac);cursor:pointer;margin-top:6px;display:inline-block}
+.util-dict-link:hover{text-decoration:underline}
+.util-dict-total{font-size:11px;color:var(--tx3);margin-bottom:4px}
+.util-dict-more{text-align:center;padding:8px;font-size:12px;color:var(--ac);cursor:pointer;border-top:1px solid var(--bdr);margin-top:4px}
+.util-dict-more:hover{background:var(--surf3,var(--surf2))}
+.util-dict-empty{font-size:13px;color:var(--tx3);text-align:center;padding:20px 0}
+.util-dict-loading{font-size:13px;color:var(--tx3);text-align:center;padding:20px 0}
+@media(max-width:600px){
+  .util-body{padding:10px 12px}
+  .util-dict-btn{padding:9px 12px;font-size:12px}
+}
 /* ── 작품 가이드 (WG) ── */
 .wg-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
 .wg-type-btn{padding:5px 14px;border-radius:16px;border:1px solid var(--bdr);background:var(--surf2);color:var(--tx3);font-size:12px;cursor:pointer;transition:all .15s}
@@ -2337,6 +2377,7 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
     <button class="tbtn"    id="tb-tools"    onclick="switchTab('tools')">🛠 작품도구</button>
     <button class="tbtn"    id="tb-inputnote" onclick="switchTab('inputnote')">📚 인풋노트</button>
     <button class="tbtn"    id="tb-settle"   onclick="switchTab('settle')">💰 정산관리</button>
+    <button class="tbtn"    id="tb-util"     onclick="switchTab('util')">🔧 유틸</button>
     <button class="tbtn"    id="tb-settings" onclick="switchTab('settings')">⚙️ 설정</button>
   </div>
   <div class="tab-overflow-menu" id="overflow-menu"></div>
@@ -2707,6 +2748,14 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
       </div>
       <div class="in-kw-body" id="in-kw-body"></div>
     </div>
+  </div>
+
+  <!-- ── UTIL ── -->
+  <div class="panel" id="putil" style="flex-direction:column;overflow:hidden">
+    <div class="util-header">
+      <span class="util-header-title">🔧 유틸</span>
+    </div>
+    <div class="util-body" id="util-body"></div>
   </div>
 
   <!-- ── SETTINGS ── -->
@@ -3267,6 +3316,7 @@ async function load(){
     if(!S.profile.todos)       S.profile.todos = [];
     if(S.profile.homeMemo === undefined) S.profile.homeMemo = '';
     if(!S.profile.homeBoards) S.profile.homeBoards = _hmDefaultBoards();
+    if(!S.profile.utilOpen) S.profile.utilOpen = {};
 if(!S.profile.spellExcept) S.profile.spellExcept = [];
     S.writingNodes= data.writingNodes || [];
     S._lastWritingWork = data.lastWritingWork || null;
@@ -3410,9 +3460,9 @@ async function changePw(){
 const TAB_PANELS={
   home:'phome',writing:'pwriting',schedule:'pschedule',
   archive:'parchive',tools:'ptools',inputnote:'pinputnote',settle:'psettle',
-  settings:'psettings',
+  util:'putil',settings:'psettings',
 };
-const TAB_ORDER=['home','writing','schedule','archive','tools','inputnote','settle','settings'];
+const TAB_ORDER=['home','writing','schedule','archive','tools','inputnote','settle','util','settings'];
 
 function switchTab(t){
   S.curTab=t;
@@ -3431,6 +3481,7 @@ function switchTab(t){
   if(t==='tools'){renderToolsTree();}
   if(t==='settle'){initSettleTab();}
   if(t==='inputnote'){renderInputNote();}
+  if(t==='util'){renderUtil();}
 }
 
 
@@ -6005,6 +6056,192 @@ function _renderInKwEditor(){
     cats.appendChild(catDiv);
   });
   body.appendChild(cats);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  UTIL TAB
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const UTIL_API_KEY = 'B646B34DB27824136A6E0205DF2CB9DC';
+const UTIL_SECTIONS = [
+  {id:'dict', icon:'📖', title:'사전 검색'},
+];
+let _utilDictPage = 1;
+let _utilDictQuery = '';
+let _utilDictTotal = 0;
+
+function renderUtil(){
+  const body = document.getElementById('util-body');
+  if(!body) return;
+  body.innerHTML = '';
+
+  // 섹션 순서 (향후 드래그 앤 드롭으로 변경 가능하게 profile에 저장)
+  if(!S.profile.utilOpen) S.profile.utilOpen = {};
+
+  UTIL_SECTIONS.forEach(sec => {
+    const isOpen = S.profile.utilOpen[sec.id] !== false; // 기본 열림
+    const wrap = document.createElement('div');
+    wrap.className = 'util-sec';
+
+    // 헤더
+    const head = document.createElement('div');
+    head.className = 'util-sec-head';
+    const left = document.createElement('div');
+    left.className = 'util-sec-head-left';
+    left.innerHTML = `<span class="util-sec-icon">${sec.icon}</span><span class="util-sec-title">${sec.title}</span>`;
+    const arrow = document.createElement('span');
+    arrow.className = 'util-sec-arrow' + (isOpen ? ' open' : '');
+    arrow.textContent = '▼';
+    head.append(left, arrow);
+    head.addEventListener('click', () => {
+      const nowOpen = secBody.classList.toggle('collapsed');
+      arrow.classList.toggle('open', !nowOpen);
+      S.profile.utilOpen[sec.id] = !nowOpen;
+      dsave();
+    });
+
+    // 섹션 본문
+    const secBody = document.createElement('div');
+    secBody.className = 'util-sec-body' + (isOpen ? '' : ' collapsed');
+
+    if(sec.id === 'dict') _renderUtilDict(secBody);
+
+    wrap.append(head, secBody);
+    body.appendChild(wrap);
+  });
+}
+
+// ── 사전 검색 렌더
+function _renderUtilDict(container){
+  container.innerHTML = '';
+
+  // 검색창
+  const searchRow = document.createElement('div');
+  searchRow.className = 'util-dict-search-row';
+  const inp = document.createElement('input');
+  inp.className = 'util-dict-inp';
+  inp.type = 'text';
+  inp.placeholder = '검색할 단어를 입력하세요...';
+  inp.value = _utilDictQuery;
+  inp.setAttribute('autocomplete', 'off');
+  inp.addEventListener('keydown', e => {
+    e.stopPropagation();
+    if(e.key === 'Enter') doSearch();
+  });
+  const btn = document.createElement('button');
+  btn.className = 'util-dict-btn';
+  btn.textContent = '검색';
+  btn.onclick = doSearch;
+  searchRow.append(inp, btn);
+  container.appendChild(searchRow);
+
+  // 결과 영역
+  const resultArea = document.createElement('div');
+  resultArea.id = 'util-dict-result';
+  container.appendChild(resultArea);
+
+  // 이전 검색 결과 복원
+  if(_utilDictQuery) _fetchDict(_utilDictQuery, _utilDictPage, resultArea, false);
+
+  function doSearch(){
+    const q = inp.value.trim();
+    if(!q) return;
+    _utilDictQuery = q;
+    _utilDictPage = 1;
+    _fetchDict(q, 1, resultArea, true);
+  }
+
+  // 포커스
+  setTimeout(() => inp.focus(), 50);
+}
+
+// ── API 호출
+async function _fetchDict(query, page, container, clearPrev){
+  if(clearPrev) container.innerHTML = `<div class="util-dict-loading">🔍 검색 중...</div>`;
+
+  const start = (page - 1) * 10 + 1;
+  const url = `https://opendict.korean.go.kr/api/search?certkey_no=6341&key=${UTIL_API_KEY}&target_type=search&req_type=json&q=${encodeURIComponent(query)}&start=${start}&num=10&part=word`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const channel = data?.channel;
+
+    if(!channel || !channel.item || channel.item.length === 0){
+      container.innerHTML = `<div class="util-dict-empty">검색 결과가 없습니다.</div>`;
+      return;
+    }
+
+    _utilDictTotal = channel.total || 0;
+
+    if(clearPrev) container.innerHTML = '';
+
+    // 총 결과 수
+    if(clearPrev){
+      const totalEl = document.createElement('div');
+      totalEl.className = 'util-dict-total';
+      totalEl.textContent = `"${query}" 검색 결과 ${_utilDictTotal.toLocaleString()}개`;
+      container.appendChild(totalEl);
+    }
+
+    // 결과 아이템
+    const items = Array.isArray(channel.item) ? channel.item : [channel.item];
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'util-dict-item';
+
+      const wordEl = document.createElement('div');
+      wordEl.className = 'util-dict-word';
+      wordEl.textContent = item.word || '';
+
+      const senses = Array.isArray(item.sense) ? item.sense : (item.sense ? [item.sense] : []);
+      const posSet = [...new Set(senses.map(s => s.pos).filter(Boolean))];
+      const posEl = document.createElement('div');
+      posEl.className = 'util-dict-pos';
+      posEl.textContent = posSet.join(' · ') || '';
+
+      card.append(wordEl);
+      if(posSet.length) card.appendChild(posEl);
+
+      // 뜻풀이 (최대 5개)
+      senses.slice(0, 5).forEach((sense, i) => {
+        if(!sense.definition) return;
+        const defEl = document.createElement('div');
+        defEl.className = 'util-dict-def';
+        defEl.innerHTML = `<span class="util-dict-def-num">${i + 1}.</span>${sense.definition}`;
+        card.appendChild(defEl);
+      });
+
+      // 더 많은 뜻 있으면 링크
+      if(senses.length > 5){
+        const moreLink = document.createElement('div');
+        moreLink.className = 'util-dict-link';
+        moreLink.textContent = `+${senses.length - 5}개 뜻 더 보기 →`;
+        moreLink.onclick = () => window.open(senses[0]?.link || 'https://opendict.korean.go.kr', '_blank');
+        card.appendChild(moreLink);
+      }
+
+      container.appendChild(card);
+    });
+
+    // 더 보기 버튼
+    const loadedCount = start + items.length - 1;
+    if(loadedCount < _utilDictTotal){
+      // 기존 더 보기 버튼 제거
+      container.querySelector('.util-dict-more')?.remove();
+      const moreBtn = document.createElement('div');
+      moreBtn.className = 'util-dict-more';
+      moreBtn.textContent = `더 보기 (${loadedCount}/${_utilDictTotal})`;
+      moreBtn.onclick = () => {
+        _utilDictPage++;
+        moreBtn.textContent = '불러오는 중...';
+        _fetchDict(query, _utilDictPage, container, false);
+      };
+      container.appendChild(moreBtn);
+    }
+
+  } catch(e) {
+    container.innerHTML = `<div class="util-dict-empty">검색 중 오류가 발생했습니다. 인터넷 연결을 확인해주세요.</div>`;
+  }
 }
 
 function initSettleTab(){
