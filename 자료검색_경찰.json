@@ -1,0 +1,23 @@
+{
+  "field": "경찰",
+  "icon": "🚔",
+  "jobs": [
+    {
+      "name": "경찰",
+      "aliases": [],
+      "description": "",
+      "terms": [],
+      "appearance": "",
+      "workplace": "",
+      "speech": []
+    }
+  ],
+  "terms": [
+    {
+      "word": "",
+      "definition": "",
+      "example": "",
+      "related": []
+    }
+  ]
+}

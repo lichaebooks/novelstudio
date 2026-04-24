@@ -1,0 +1,23 @@
+{
+  "field": "검사",
+  "icon": "🔍",
+  "jobs": [
+    {
+      "name": "검사",
+      "aliases": [],
+      "description": "",
+      "terms": [],
+      "appearance": "",
+      "workplace": "",
+      "speech": []
+    }
+  ],
+  "terms": [
+    {
+      "word": "",
+      "definition": "",
+      "example": "",
+      "related": []
+    }
+  ]
+}

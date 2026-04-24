@@ -1,0 +1,23 @@
+{
+  "field": "교도관",
+  "icon": "🏛",
+  "jobs": [
+    {
+      "name": "교도관",
+      "aliases": [],
+      "description": "",
+      "terms": [],
+      "appearance": "",
+      "workplace": "",
+      "speech": []
+    }
+  ],
+  "terms": [
+    {
+      "word": "",
+      "definition": "",
+      "example": "",
+      "related": []
+    }
+  ]
+}

@@ -2267,6 +2267,34 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
 .util-names-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surf2);border:1px solid var(--bdr);border-radius:20px;font-size:13px;color:var(--tx);cursor:pointer;transition:all .1s}
 .util-names-chip:hover{border-color:var(--ac);color:var(--ac)}
 .util-names-chip-copy{font-size:10px;color:var(--tx3)}
+/* 자료 검색 */
+.util-ref-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.util-ref-inp{flex:1;min-width:160px;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:9px 14px;font-size:13px;color:var(--tx);outline:none;font-family:inherit}
+.util-ref-inp:focus{border-color:var(--ac)}
+.util-ref-field-sel{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:9px 10px;font-size:12px;color:var(--tx);outline:none;cursor:pointer}
+.util-ref-field-sel:focus{border-color:var(--ac)}
+.util-ref-btn{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0}
+.util-ref-btn:hover{opacity:.88}
+.util-ref-results{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.util-ref-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
+.util-ref-card-head{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bdr);background:var(--surf3,var(--surf2))}
+.util-ref-card-icon{font-size:16px}
+.util-ref-card-name{font-size:14px;font-weight:700;color:var(--tx)}
+.util-ref-card-field{font-size:11px;color:var(--tx3);margin-left:auto;background:var(--surf);padding:2px 8px;border-radius:8px;border:1px solid var(--bdr)}
+.util-ref-card-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.util-ref-row{display:flex;gap:8px;font-size:12px}
+.util-ref-row-label{color:var(--tx3);font-weight:600;flex-shrink:0;min-width:64px}
+.util-ref-row-val{color:var(--tx2);line-height:1.7}
+.util-ref-tags{display:flex;flex-wrap:wrap;gap:4px}
+.util-ref-tag{font-size:11px;padding:2px 8px;border-radius:8px;background:var(--surf);border:1px solid var(--bdr);color:var(--tx2)}
+.util-ref-speech{font-size:12px;color:var(--tx2);line-height:1.7;font-style:italic;border-left:2px solid var(--ac);padding-left:8px;margin:2px 0}
+.util-ref-term-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:10px 14px}
+.util-ref-term-word{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:3px}
+.util-ref-term-def{font-size:12px;color:var(--tx2);line-height:1.7}
+.util-ref-term-ex{font-size:11px;color:var(--tx3);margin-top:4px;font-style:italic}
+.util-ref-term-related{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.util-ref-empty{font-size:13px;color:var(--tx3);text-align:center;padding:24px 0}
+.util-ref-section-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 .util-names-empty{font-size:12px;color:var(--tx3);padding:8px 0}
 @media(max-width:600px){
   .util-body{padding:10px 12px}
@@ -6085,6 +6113,7 @@ const UTIL_API_KEY = 'B646B34DB27824136A6E0205DF2CB9DC';
 const UTIL_SECTIONS = [
   {id:'dict',  icon:'📖', title:'사전 검색'},
   {id:'names', icon:'✍️', title:'이름짓기'},
+  {id:'ref',   icon:'🗂', title:'자료 검색'},
 ];
 let _utilDictPage = 1;
 let _utilDictQuery = '';
@@ -6170,6 +6199,7 @@ function renderUtil(){
 
     if(sec.id === 'dict') _renderUtilDict(secBody);
     if(sec.id === 'names') _renderUtilNames(secBody);
+    if(sec.id === 'ref') _renderUtilRef(secBody);
 
     wrap.append(head, secBody);
     body.appendChild(wrap);
@@ -6437,6 +6467,217 @@ function _renderUtilNames(container){
       resultArea.appendChild(chip);
     });
   };
+}
+
+// ── 자료 검색
+let _refData = null;
+
+async function _loadRefData(){
+  if(_refData) return _refData;
+  try {
+    const idx = await fetch('자료검색_메인.json');
+    const idxData = await idx.json();
+    const files = idxData.files || [];
+    const all = await Promise.allSettled(files.map(f=>fetch(f).then(r=>r.json())));
+    _refData = all.filter(r=>r.status==='fulfilled').map(r=>r.value);
+  } catch(e) {
+    _refData = [];
+  }
+  return _refData;
+}
+
+function _renderUtilRef(container){
+  container.innerHTML = '';
+
+  // 툴바
+  const toolbar = document.createElement('div');
+  toolbar.className = 'util-ref-toolbar';
+
+  const inp = document.createElement('input');
+  inp.className = 'util-ref-inp';
+  inp.type = 'text';
+  inp.placeholder = '직업명, 용어 검색...';
+  inp.setAttribute('autocomplete','off');
+  inp.addEventListener('keydown', e => { e.stopPropagation(); if(e.key==='Enter') doSearch(); });
+
+  const fieldSel = document.createElement('select');
+  fieldSel.className = 'util-ref-field-sel';
+  const allOpt = document.createElement('option'); allOpt.value='all'; allOpt.textContent='전체 분야'; fieldSel.appendChild(allOpt);
+
+  const btn = document.createElement('button');
+  btn.className = 'util-ref-btn';
+  btn.textContent = '검색';
+  btn.onclick = doSearch;
+
+  toolbar.append(inp, fieldSel, btn);
+  container.appendChild(toolbar);
+
+  const resultArea = document.createElement('div');
+  resultArea.className = 'util-ref-results';
+  resultArea.innerHTML = `<div class="util-ref-empty">검색어를 입력하거나 분야를 선택해 탐색하세요.</div>`;
+  container.appendChild(resultArea);
+
+  // 분야 목록 로드
+  _loadRefData().then(data => {
+    if(!data.length){
+      resultArea.innerHTML = `<div class="util-ref-empty">등록된 자료가 없습니다.<br><span style="font-size:11px">자료검색_메인.json 파일을 확인해주세요.</span></div>`;
+      return;
+    }
+    data.forEach(d => {
+      if(!d.field) return;
+      const o = document.createElement('option');
+      o.value = d.field; o.textContent = (d.icon||'') + ' ' + d.field;
+      fieldSel.appendChild(o);
+    });
+  });
+
+  // 분야 선택만 해도 탐색
+  fieldSel.addEventListener('change', () => {
+    if(fieldSel.value !== 'all') doSearch();
+  });
+
+  async function doSearch(){
+    const q = inp.value.trim().toLowerCase();
+    const field = fieldSel.value;
+    const data = await _loadRefData();
+    if(!data.length) return;
+
+    // 필터링
+    const filtered = data.filter(d => field==='all' || d.field===field);
+    const jobResults = [];
+    const termResults = [];
+
+    filtered.forEach(d => {
+      // 직업 검색
+      (d.jobs||[]).forEach(job => {
+        if(!job.name) return;
+        const searchable = [job.name,...(job.aliases||[]),job.description||'',job.appearance||'',job.workplace||'',...(job.terms||[])].join(' ').toLowerCase();
+        if(!q || searchable.includes(q)){
+          jobResults.push({field:d.field, icon:d.icon||'📄', job});
+        }
+      });
+      // 용어 검색
+      (d.terms||[]).forEach(term => {
+        if(!term.word) return;
+        const searchable = [term.word, term.definition||'', term.example||'', ...(term.related||[])].join(' ').toLowerCase();
+        if(q && searchable.includes(q)){
+          termResults.push({field:d.field, icon:d.icon||'📄', term});
+        }
+      });
+    });
+
+    resultArea.innerHTML = '';
+
+    if(!jobResults.length && !termResults.length){
+      resultArea.innerHTML = `<div class="util-ref-empty">검색 결과가 없습니다.</div>`;
+      return;
+    }
+
+    // 직업 결과
+    if(jobResults.length){
+      const sec = document.createElement('div');
+      sec.className = 'util-ref-section-title';
+      sec.textContent = `직업 (${jobResults.length})`;
+      resultArea.appendChild(sec);
+      jobResults.forEach(({field, icon, job}) => {
+        resultArea.appendChild(_mkRefJobCard(field, icon, job));
+      });
+    }
+
+    // 용어 결과
+    if(termResults.length){
+      const sec = document.createElement('div');
+      sec.className = 'util-ref-section-title';
+      sec.style.marginTop = '8px';
+      sec.textContent = `용어 (${termResults.length})`;
+      resultArea.appendChild(sec);
+      termResults.forEach(({field, icon, term}) => {
+        resultArea.appendChild(_mkRefTermCard(field, icon, term));
+      });
+    }
+  }
+
+  setTimeout(()=>inp.focus(), 50);
+}
+
+function _mkRefJobCard(field, icon, job){
+  const card = document.createElement('div');
+  card.className = 'util-ref-card';
+
+  const head = document.createElement('div');
+  head.className = 'util-ref-card-head';
+  head.innerHTML = `<span class="util-ref-card-icon">${icon}</span><span class="util-ref-card-name">${job.name}</span>`;
+  if(job.aliases?.length){
+    const alias = document.createElement('span');
+    alias.style.cssText='font-size:11px;color:var(--tx3)';
+    alias.textContent = job.aliases.join(' · ');
+    head.appendChild(alias);
+  }
+  const fieldBadge = document.createElement('span');
+  fieldBadge.className = 'util-ref-card-field';
+  fieldBadge.textContent = field;
+  head.appendChild(fieldBadge);
+  card.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'util-ref-card-body';
+
+  const rows = [
+    ['설명', job.description],
+    ['복장/장비', job.appearance],
+    ['근무환경', job.workplace],
+  ];
+  rows.forEach(([label, val]) => {
+    if(!val) return;
+    const row = document.createElement('div');
+    row.className = 'util-ref-row';
+    row.innerHTML = `<span class="util-ref-row-label">${label}</span><span class="util-ref-row-val">${val}</span>`;
+    body.appendChild(row);
+  });
+
+  if(job.terms?.length){
+    const row = document.createElement('div');
+    row.className = 'util-ref-row';
+    const lbl = document.createElement('span'); lbl.className='util-ref-row-label'; lbl.textContent='관련 용어';
+    const tags = document.createElement('div'); tags.className='util-ref-tags';
+    job.terms.forEach(t=>{ const tag=document.createElement('span'); tag.className='util-ref-tag'; tag.textContent=t; tags.appendChild(tag); });
+    row.append(lbl, tags);
+    body.appendChild(row);
+  }
+
+  if(job.speech?.length){
+    const row = document.createElement('div');
+    row.className = 'util-ref-row';
+    const lbl = document.createElement('span'); lbl.className='util-ref-row-label'; lbl.textContent='대사 예시';
+    const speeches = document.createElement('div'); speeches.style.cssText='display:flex;flex-direction:column;gap:4px';
+    job.speech.forEach(s=>{ const el=document.createElement('div'); el.className='util-ref-speech'; el.textContent='"'+s+'"'; speeches.appendChild(el); });
+    row.append(lbl, speeches);
+    body.appendChild(row);
+  }
+
+  card.appendChild(body);
+  return card;
+}
+
+function _mkRefTermCard(field, icon, term){
+  const card = document.createElement('div');
+  card.className = 'util-ref-term-card';
+  const word = document.createElement('div');
+  word.className = 'util-ref-term-word';
+  word.textContent = `${icon} ${term.word}`;
+  const fieldBadge = document.createElement('span');
+  fieldBadge.style.cssText='font-size:10px;color:var(--tx3);margin-left:6px;font-weight:400';
+  fieldBadge.textContent = field;
+  word.appendChild(fieldBadge);
+  card.appendChild(word);
+  if(term.definition){ const d=document.createElement('div'); d.className='util-ref-term-def'; d.textContent=term.definition; card.appendChild(d); }
+  if(term.example){ const e=document.createElement('div'); e.className='util-ref-term-ex'; e.textContent='예) '+term.example; card.appendChild(e); }
+  if(term.related?.length){
+    const rel=document.createElement('div'); rel.className='util-ref-term-related';
+    term.related.forEach(r=>{ const t=document.createElement('span'); t.className='util-ref-tag'; t.textContent=r; rel.appendChild(t); });
+    card.appendChild(rel);
+  }
+  return card;
 }
 
 function initSettleTab(){
