@@ -3389,7 +3389,7 @@ const S={
   writingNodes:[], // 집필 트리 (2단계)
   toolNodes:[],   // 작품도구 (3단계)
   settle:{platforms:['리디','카카페','시리즈','문피아'],works:[]}, // 정산관리 (income: {year: {platform: [12개월]}})
-  inputNote:{works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}}, // 인풋노트
+  inputNote:{works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[],job:[]}}}, // 인풋노트
   publishers:{genres:{}}, // 출판사 탭
   sy:new Date().getFullYear(),
   sm:new Date().getMonth()+1,
@@ -3479,9 +3479,11 @@ if(!S.profile.spellExcept) S.profile.spellExcept = [];
     if(!S.settle.platforms) S.settle.platforms=['리디','카카페','시리즈','문피아'];
     if(!S.settle.works) S.settle.works=[];
     // ── inputNote 복원 ──
-    S.inputNote = data.inputNote || {works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}};
+    S.inputNote = data.inputNote || {works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[],job:[]}}};
     if(!S.inputNote.works) S.inputNote.works=[];
-    if(!S.inputNote.keywords) S.inputNote.keywords={romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}};
+    if(!S.inputNote.keywords) S.inputNote.keywords={romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[],job:[]}};
+    if(!S.inputNote.keywords.fantasy) S.inputNote.keywords.fantasy={genre:[],mood:[],protagonist:[],job:[]};
+    if(!S.inputNote.keywords.fantasy.job) S.inputNote.keywords.fantasy.job=[];
     // ── publishers 복원 ──
     S.publishers = data.publishers || {genres:{}};
     if(!S.publishers.genres) S.publishers.genres={};
@@ -6345,7 +6347,7 @@ const IN_KW_GROUPS=[
   ]},
   {id:'fantasy', label:'판타지', cats:[
     {key:'genre',label:'세부장르'},{key:'mood',label:'분위기'},
-    {key:'protagonist',label:'주인공'}
+    {key:'protagonist',label:'주인공'},{key:'job',label:'직업'}
   ]},
 ];
 
@@ -8975,34 +8977,36 @@ function loadEditorDefaults(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ── 인쇄/출력
 function writingPrint(){
-  // 현재 열린 회차 내용 가져오기
   const ce = document.getElementById('writing-ce1');
   if(!ce){toast('집필 탭에서 회차를 열어주세요.', true); return;}
+  const content = ce.innerHTML;
+  if(!content.trim()){toast('내용이 없습니다.', true); return;}
 
   const titleEl = document.querySelector('#writing-pane1 .writing-ch-title-inp, #writing-pane1 [id^="ch-title-"]');
   const chTitle = titleEl?.value || document.querySelector('.writing-ch-sel-label')?.textContent || '원고';
   const workTitle = document.querySelector('.writing-work-label')?.textContent || '';
 
-  const content = ce.innerHTML;
-  if(!content.trim()){toast('내용이 없습니다.', true); return;}
+  // 기존 iframe 제거
+  document.getElementById('print-iframe')?.remove();
+  const iframe = document.createElement('iframe');
+  iframe.id = 'print-iframe';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;visibility:hidden';
+  document.body.appendChild(iframe);
 
-  const printWin = window.open('', '_blank');
-  printWin.document.write(`<!DOCTYPE html><html lang="ko"><head>
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html lang="ko"><head>
 <meta charset="UTF-8">
 <title>${workTitle} - ${chTitle}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Malgun Gothic','Apple SD Gothic Neo',serif;font-size:11pt;line-height:2;color:#000;padding:20mm 20mm 20mm 25mm}
   p{margin-bottom:0.5em;text-indent:1em}
-  br{display:block;margin-bottom:0.3em}
   h1,h2,h3{font-size:13pt;margin:1em 0 0.5em}
   .print-header{text-align:center;margin-bottom:2em;padding-bottom:1em;border-bottom:1px solid #ccc}
   .print-work{font-size:10pt;color:#666;margin-bottom:4px}
   .print-title{font-size:14pt;font-weight:700}
-  @media print{
-    body{padding:15mm 15mm 15mm 20mm}
-    @page{margin:15mm}
-  }
+  @media print{body{padding:15mm 15mm 15mm 20mm}@page{margin:15mm}}
 </style>
 </head><body>
 <div class="print-header">
@@ -9010,9 +9014,13 @@ function writingPrint(){
   <div class="print-title">${chTitle}</div>
 </div>
 <div class="print-body">${content}</div>
-<script>window.onload=()=>{window.print();}<\/script>
 </body></html>`);
-  printWin.document.close();
+  doc.close();
+
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  };
 }
 
 // 조판 함수 (플레이스홀더 — 다음 단계에서 구현)
@@ -9052,7 +9060,7 @@ async function resetAll(){
   if(!confirm('⚠️ 모든 데이터가 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.'))return;
   S.works=[];S.scheds={};S.archives=[];S.profile={};S.writingNodes=[];S.toolNodes=[];
   S.settle={platforms:['리디','카카페','시리즈','문피아'],works:[]};
-  S.inputNote={works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}};
+  S.inputNote={works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[],job:[]}}};
   S.publishers={genres:{}};
   _settleSelId=null;
   await save();renderSettings();renderHome();renderSched();renderArchive();toast('초기화 완료.');
@@ -9273,9 +9281,9 @@ async function gdPull(){
     if(!S.settle.works) S.settle.works=[];
     // inputNote 복원
     if(d.inputNote) S.inputNote=d.inputNote;
-    if(!S.inputNote) S.inputNote={works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}};
+    if(!S.inputNote) S.inputNote={works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[],job:[]}}};
     if(!S.inputNote.works) S.inputNote.works=[];
-    if(!S.inputNote.keywords) S.inputNote.keywords={romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}};
+    if(!S.inputNote.keywords) S.inputNote.keywords={romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[],job:[]}};
     if(d.publishers) S.publishers=d.publishers;
     if(!S.publishers) S.publishers={genres:{}};
     if(!S.publishers.genres) S.publishers.genres={};    if(!S.profile.activityLog) S.profile.activityLog=[];
