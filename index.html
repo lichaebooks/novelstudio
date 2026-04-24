@@ -2312,6 +2312,44 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
 .util-calc-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);cursor:pointer;margin-bottom:8px}
 .util-calc-toggle input{width:14px;height:14px;cursor:pointer;accent-color:var(--ac)}
 @media(max-width:600px){.util-calc-grid{grid-template-columns:1fr}}
+/* ── 출판사 탭 */
+.pub-sheet-bar{display:flex;gap:2px;padding:8px 14px 0;flex-shrink:0;border-bottom:2px solid var(--bdr);background:var(--surf2)}
+.pub-sheet-tab{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;border-radius:4px 4px 0 0;transition:color .15s}
+.pub-sheet-tab:hover{color:var(--tx)}
+.pub-sheet-tab.on{color:var(--ac);border-bottom-color:var(--ac);background:var(--bg)}
+.pub-summary-bar{display:flex;gap:20px;padding:7px 18px;flex-shrink:0;font-size:12px;color:var(--tx3);border-bottom:1px solid var(--bdr);background:var(--surf2)}
+.pub-summary-bar b{color:var(--tx);font-weight:700}
+.pub-body{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative}
+/* 출판사 표 */
+.pub-table-wrap{flex:1;overflow:auto;display:flex;flex-direction:column}
+.pub-table{width:100%;border-collapse:collapse;font-size:12px}
+.pub-table thead th{position:sticky;top:0;z-index:2;background:var(--surf2);padding:7px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--tx3);border-bottom:2px solid var(--bdr);white-space:nowrap;user-select:none}
+.pub-table tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s}
+.pub-table tbody tr:hover{background:var(--surf2)}
+.pub-table td{padding:5px 6px;vertical-align:middle;overflow:hidden}
+.pub-cell-input{width:100%;background:transparent;border:none;outline:none;font-size:12px;font-family:inherit;color:var(--tx);padding:2px 4px;border-radius:3px;min-width:0}
+.pub-cell-input:focus{background:var(--surf3,var(--surf2));box-shadow:inset 0 0 0 1.5px var(--ac)}
+.pub-cell-input::placeholder{color:var(--tx3)}
+.pub-sel-cb{width:14px;height:14px;cursor:pointer;accent-color:var(--ac)}
+.pub-row-del{background:none;border:none;cursor:pointer;color:transparent;font-size:12px;padding:2px 5px;border-radius:3px;line-height:1}
+tr:hover .pub-row-del{color:var(--tx3)}
+.pub-row-del:hover{color:var(--rd)!important}
+/* 표 하단 액션 바 */
+.pub-actions{display:flex;align-items:center;gap:8px;padding:7px 12px;border-top:1px solid var(--bdr);flex-shrink:0;background:var(--bg)}
+.pub-add-row{display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;color:var(--tx3);font-size:12px;border-top:1px solid var(--bdr);flex-shrink:0;background:var(--bg)}
+.pub-add-row:hover{color:var(--ac);background:var(--surf2)}
+.pub-action-btn{background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:4px 12px;font-size:12px;color:var(--tx2);cursor:pointer}
+.pub-action-btn:hover{background:var(--surf3,var(--surf2));color:var(--tx)}
+.pub-action-btn.danger{color:var(--rd);border-color:var(--rd)}
+.pub-action-btn.danger:hover{background:rgba(248,81,73,.08)}
+.pub-action-btn:disabled{opacity:.4;cursor:default}
+/* 선택 모드 */
+.pub-sel-cb{display:none}
+.pub-select-mode .pub-sel-cb{display:inline-block}
+@media(max-width:600px){
+  .pub-sheet-bar{padding:6px 8px 0;gap:1px}
+  .pub-sheet-tab{padding:5px 10px;font-size:12px}
+}
 .util-names-empty{font-size:12px;color:var(--tx3);padding:8px 0}
 @media(max-width:600px){
   .util-body{padding:10px 12px}
@@ -2442,6 +2480,7 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
     <button class="tbtn"    id="tb-inputnote" onclick="switchTab('inputnote')">📚 인풋노트</button>
     <button class="tbtn"    id="tb-settle"   onclick="switchTab('settle')">💰 정산관리</button>
     <button class="tbtn"    id="tb-util"     onclick="switchTab('util')">🔧 유틸</button>
+    <button class="tbtn"    id="tb-pub"      onclick="switchTab('pub')">🏢 출판사</button>
     <button class="tbtn"    id="tb-settings" onclick="switchTab('settings')">⚙️ 설정</button>
   </div>
   <div class="tab-overflow-menu" id="overflow-menu"></div>
@@ -2820,6 +2859,13 @@ body.th-dark .in-platform-chip.mun,body:not([class*='th-']) .in-platform-chip.mu
       <span class="util-header-title">🔧 유틸</span>
     </div>
     <div class="util-body" id="util-body"></div>
+  </div>
+
+  <!-- ── PUB ── -->
+  <div class="panel" id="ppub" style="flex-direction:column;overflow:hidden">
+    <div class="pub-sheet-bar" id="pub-sheet-bar"></div>
+    <div class="pub-summary-bar" id="pub-summary-bar"></div>
+    <div class="pub-body" id="pub-body"></div>
   </div>
 
   <!-- ── SETTINGS ── -->
@@ -3314,6 +3360,7 @@ const S={
   toolNodes:[],   // 작품도구 (3단계)
   settle:{platforms:['리디','카카페','시리즈','문피아'],works:[]}, // 정산관리 (income: {year: {platform: [12개월]}})
   inputNote:{works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}}, // 인풋노트
+  publishers:{genres:{}}, // 출판사 탭
   sy:new Date().getFullYear(),
   sm:new Date().getMonth()+1,
   curTab:'home',
@@ -3330,7 +3377,7 @@ async function save(){
     await IDB.setAll({
       works:S.works,scheds:S.scheds,archives:S.archives,
       profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,
-      toolsOpenMap:S._toolsOpenMap,settle:S.settle,inputNote:S.inputNote,
+      toolsOpenMap:S._toolsOpenMap,settle:S.settle,inputNote:S.inputNote,publishers:S.publishers,
       ts:new Date().toISOString(),
     });
     const si=document.getElementById('saveind');
@@ -3405,6 +3452,9 @@ if(!S.profile.spellExcept) S.profile.spellExcept = [];
     S.inputNote = data.inputNote || {works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}};
     if(!S.inputNote.works) S.inputNote.works=[];
     if(!S.inputNote.keywords) S.inputNote.keywords={romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}};
+    // ── publishers 복원 ──
+    S.publishers = data.publishers || {genres:{}};
+    if(!S.publishers.genres) S.publishers.genres={};
     // ── 데이터 마이그레이션: 구버전 toolNodes (id 필드 없음) 처리 ──
     S.toolNodes.forEach((n,i)=>{
       if(!n.id) n.id = uid();
@@ -3525,9 +3575,9 @@ async function changePw(){
 const TAB_PANELS={
   home:'phome',writing:'pwriting',schedule:'pschedule',
   archive:'parchive',tools:'ptools',inputnote:'pinputnote',settle:'psettle',
-  util:'putil',settings:'psettings',
+  util:'putil',pub:'ppub',settings:'psettings',
 };
-const TAB_ORDER=['home','writing','schedule','archive','tools','inputnote','settle','util','settings'];
+const TAB_ORDER=['home','writing','schedule','archive','tools','inputnote','settle','util','pub','settings'];
 
 function switchTab(t){
   S.curTab=t;
@@ -3547,6 +3597,7 @@ function switchTab(t){
   if(t==='settle'){initSettleTab();}
   if(t==='inputnote'){renderInputNote();}
   if(t==='util'){renderUtil();}
+  if(t==='pub'){renderPub();}
 }
 
 
@@ -4959,6 +5010,169 @@ function makeSVGDonut(segments, size=80, thickness=16){
   svg.appendChild(txt);
 
   return svg;
+}
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  PUB TAB (출판사)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const PUB_GENRES=[
+  {id:'romance',label:'현로'},
+  {id:'dongro', label:'동로'},
+  {id:'ropan',  label:'로판'},
+  {id:'bl',     label:'BL'},
+  {id:'fantasy',label:'판타지'},
+];
+let _pubGenre='romance';
+let _pubSelectMode=false;
+let _pubSelectedIds=new Set();
+
+function renderPub(){
+  if(!S.publishers)S.publishers={genres:{}};
+  if(!S.publishers.genres)S.publishers.genres={};
+  _renderPubSheetBar();
+  _renderPubSummary();
+  _renderPubBody();
+}
+
+function _renderPubSheetBar(){
+  const bar=document.getElementById('pub-sheet-bar');if(!bar)return;
+  bar.innerHTML='';
+  PUB_GENRES.forEach(g=>{
+    const btn=document.createElement('button');
+    btn.className='pub-sheet-tab'+(g.id===_pubGenre?' on':'');
+    btn.textContent=g.label;
+    btn.onclick=()=>{_pubGenre=g.id;_pubSelectMode=false;_pubSelectedIds.clear();renderPub();};
+    bar.appendChild(btn);
+  });
+}
+
+function _renderPubSummary(){
+  const bar=document.getElementById('pub-summary-bar');if(!bar)return;
+  const rows=_pubRows();
+  const label=PUB_GENRES.find(g=>g.id===_pubGenre)?.label||'';
+  bar.innerHTML=`<span><b>${label}</b></span><span>총 <b>${rows.length}</b>개</span>`;
+}
+
+function _pubRows(){
+  if(!S.publishers.genres[_pubGenre])S.publishers.genres[_pubGenre]=[];
+  return S.publishers.genres[_pubGenre];
+}
+
+function _renderPubBody(){
+  const body=document.getElementById('pub-body');if(!body)return;
+  body.innerHTML='';
+
+  const wrap=document.createElement('div');
+  wrap.className='pub-table-wrap';
+  if(_pubSelectMode)wrap.classList.add('pub-select-mode');
+
+  const table=document.createElement('table');
+  table.className='pub-table';table.id='pub-table-main';
+
+  const thead=document.createElement('thead');
+  const htr=document.createElement('tr');
+  const thCb=document.createElement('th');thCb.style.width='28px';
+  const allCb=document.createElement('input');allCb.type='checkbox';allCb.className='pub-sel-cb';
+  allCb.addEventListener('change',()=>{
+    document.querySelectorAll('#pub-table-main tbody .pub-sel-cb').forEach(cb=>{
+      cb.checked=allCb.checked;
+      const id=cb.closest('tr')?.dataset.id;
+      if(id){if(allCb.checked)_pubSelectedIds.add(id);else _pubSelectedIds.delete(id);}
+    });
+    _pubUpdateActions();
+  });
+  thCb.appendChild(allCb);htr.appendChild(thCb);
+  [['출판사명','120px'],['레이블명','100px'],['투고메일','150px'],['최소분량','90px'],['계약조건','130px'],['비고','180px'],['','28px']].forEach(([l,w])=>{
+    const th=document.createElement('th');th.style.width=w;th.textContent=l;htr.appendChild(th);
+  });
+  thead.appendChild(htr);table.appendChild(thead);
+
+  const tbody=document.createElement('tbody');
+  table.appendChild(tbody);wrap.appendChild(table);
+
+  const addRow=document.createElement('div');
+  addRow.className='pub-add-row';
+  addRow.innerHTML='<span style="font-size:14px">＋</span> 출판사 추가';
+  addRow.onclick=()=>_pubAddRow(tbody);
+  wrap.appendChild(addRow);
+
+  const actions=document.createElement('div');
+  actions.className='pub-actions';
+  const selBtn=document.createElement('button');
+  selBtn.className='pub-action-btn';selBtn.id='pub-action-sel';
+  selBtn.textContent=_pubSelectMode?'선택해제':'선택';
+  selBtn.onclick=()=>{
+    _pubSelectMode=!_pubSelectMode;_pubSelectedIds.clear();
+    wrap.classList.toggle('pub-select-mode',_pubSelectMode);
+    document.querySelectorAll('#pub-table-main .pub-sel-cb').forEach(cb=>cb.checked=false);
+    _pubUpdateActions();
+  };
+  const delBtn=document.createElement('button');
+  delBtn.className='pub-action-btn danger';delBtn.id='pub-action-del';
+  delBtn.textContent='삭제';delBtn.disabled=true;
+  delBtn.onclick=()=>{
+    if(!_pubSelectedIds.size)return;
+    if(!confirm(`선택한 ${_pubSelectedIds.size}개를 삭제하시겠습니까?`))return;
+    S.publishers.genres[_pubGenre]=_pubRows().filter(r=>!_pubSelectedIds.has(r.id));
+    _pubSelectedIds.clear();_pubSelectMode=false;dsave();renderPub();
+  };
+  actions.append(selBtn,delBtn);wrap.appendChild(actions);
+  body.appendChild(wrap);
+
+  const rows=_pubRows();
+  if(!rows.length){
+    const et=document.createElement('tr');et.id='pub-empty-row';
+    et.innerHTML='<td colspan="8" style="text-align:center;padding:32px;color:var(--tx3);font-size:13px">＋ 아래 버튼으로 출판사를 추가해보세요</td>';
+    tbody.appendChild(et);
+  } else {
+    rows.forEach(row=>tbody.appendChild(_pubCreateRow(row,tbody)));
+  }
+}
+
+function _pubAddRow(tbody){
+  const row={id:uid(),name:'',label:'',email:'',minWords:'',contract:'',memo:'',createdAt:new Date().toISOString()};
+  _pubRows().push(row);dsave();_renderPubSummary();
+  document.getElementById('pub-empty-row')?.remove();
+  const tr=_pubCreateRow(row,tbody);
+  tbody.appendChild(tr);
+  tr.querySelector('.pub-cell-input')?.focus();
+}
+
+function _pubCreateRow(row,tbody){
+  const tr=document.createElement('tr');tr.dataset.id=row.id;
+  const tdCb=document.createElement('td');tdCb.style.cssText='text-align:center;padding:0 4px;width:28px';
+  const cb=document.createElement('input');cb.type='checkbox';cb.className='pub-sel-cb';cb.checked=_pubSelectedIds.has(row.id);
+  cb.addEventListener('change',()=>{if(cb.checked)_pubSelectedIds.add(row.id);else _pubSelectedIds.delete(row.id);_pubUpdateActions();});
+  tdCb.appendChild(cb);tr.appendChild(tdCb);
+  [{key:'name',ph:'출판사명'},{key:'label',ph:'레이블명'},{key:'email',ph:'투고메일'},{key:'minWords',ph:'예: 200자 이상'},{key:'contract',ph:'계약 조건'},{key:'memo',ph:'비고'}].forEach(({key,ph})=>{
+    const td=document.createElement('td');
+    const inp=document.createElement('input');inp.className='pub-cell-input';inp.type='text';inp.value=row[key]||'';inp.placeholder=ph;
+    inp.addEventListener('input',()=>{row[key]=inp.value;dsave();});
+    inp.addEventListener('keydown',e=>e.stopPropagation());
+    td.appendChild(inp);tr.appendChild(td);
+  });
+  const tdDel=document.createElement('td');tdDel.style.cssText='text-align:center;padding:0;width:28px';
+  const delBtn=document.createElement('button');delBtn.className='pub-row-del';delBtn.textContent='✕';delBtn.title='삭제';
+  delBtn.onclick=(e)=>{
+    e.stopPropagation();
+    S.publishers.genres[_pubGenre]=_pubRows().filter(r=>r.id!==row.id);
+    dsave();tr.remove();_renderPubSummary();
+    if(!tbody.querySelector('tr[data-id]')){
+      const et=document.createElement('tr');et.id='pub-empty-row';
+      et.innerHTML='<td colspan="8" style="text-align:center;padding:32px;color:var(--tx3);font-size:13px">＋ 아래 버튼으로 출판사를 추가해보세요</td>';
+      tbody.appendChild(et);
+    }
+  };
+  tdDel.appendChild(delBtn);tr.appendChild(tdDel);
+  return tr;
+}
+
+function _pubUpdateActions(){
+  const selBtn=document.getElementById('pub-action-sel');
+  const delBtn=document.getElementById('pub-action-del');
+  if(selBtn)selBtn.textContent=_pubSelectMode?'선택해제':'선택';
+  if(delBtn)delBtn.disabled=!(_pubSelectMode&&_pubSelectedIds.size>0);
 }
 
 
@@ -6858,6 +7072,7 @@ function _mkCalcBtn(label){
   const btn=document.createElement('button');btn.className='util-calc-btn';btn.textContent=label;return btn;
 }
 
+function initSettleTab(){
   if(!_settleSelId && S.settle && S.settle.works && S.settle.works.length > 0){
     _settleSelId = S.settle.works[0].id;
   }
@@ -8665,6 +8880,7 @@ async function resetAll(){
   S.works=[];S.scheds={};S.archives=[];S.profile={};S.writingNodes=[];S.toolNodes=[];
   S.settle={platforms:['리디','카카페','시리즈','문피아'],works:[]};
   S.inputNote={works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}};
+  S.publishers={genres:{}};
   _settleSelId=null;
   await save();renderSettings();renderHome();renderSched();renderArchive();toast('초기화 완료.');
 }
@@ -8854,7 +9070,7 @@ async function gdPush(auto=false){
   if(_gdBusy){if(!auto)toast('저장 중입니다...');return;}
   _gdBusy=true;if(!auto)gdBar('💾 Google Drive에 저장 중...','ing',0);gdLog('저장 중...');
   try{
-    const payload=JSON.stringify({works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,settle:S.settle,inputNote:S.inputNote,v:1,date:new Date().toISOString()});
+    const payload=JSON.stringify({works:S.works,scheds:S.scheds,archives:S.archives,profile:S.profile,writingNodes:S.writingNodes,toolNodes:S.toolNodes,toolsOpenMap:S._toolsOpenMap,settle:S.settle,inputNote:S.inputNote,publishers:S.publishers,v:1,date:new Date().toISOString()});
     const existing=await gdFindFile(token,GD_FNAME);
     const boundary='-------wsstudio_boundary';const meta=JSON.stringify({name:GD_FNAME,mimeType:'application/json'});
     const body=`--${boundary}\r\nContent-Type: application/json\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${payload}\r\n--${boundary}--`;
@@ -8887,7 +9103,9 @@ async function gdPull(){
     if(!S.inputNote) S.inputNote={works:[],keywords:{romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}}};
     if(!S.inputNote.works) S.inputNote.works=[];
     if(!S.inputNote.keywords) S.inputNote.keywords={romance:{genre:[],mood:[],male:[],female:[]},ropan:{genre:[],mood:[],male:[],female:[]},dongro:{genre:[],mood:[],male:[],female:[]},bl:{genre:[],mood:[],top:[],bottom:[]},fantasy:{genre:[],mood:[],protagonist:[]}};
-    if(!S.profile.activityLog) S.profile.activityLog=[];
+    if(d.publishers) S.publishers=d.publishers;
+    if(!S.publishers) S.publishers={genres:{}};
+    if(!S.publishers.genres) S.publishers.genres={};    if(!S.profile.activityLog) S.profile.activityLog=[];
     if(!S.profile.todos)       S.profile.todos=[];
     if(S.profile.homeMemo===undefined) S.profile.homeMemo='';
     await save();_gdDirty=false;
