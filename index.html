@@ -174,6 +174,64 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit
 .sb-tool-btn:hover{background:var(--surf2);color:var(--tx)}
 .sb-tool-btn .sb-tooltip{display:none;position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--surf3,var(--surf2));border:1px solid var(--bdr);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--tx);white-space:nowrap;z-index:100;pointer-events:none}
 .sb-tool-btn:hover .sb-tooltip{display:block}
+/* ── 조판 설정 모달 */
+.ts-modal-bg{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.ts-modal{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,.6);width:400px;max-width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.ts-modal-head{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--bdr);background:var(--surf2);flex-shrink:0}
+.ts-modal-title{font-size:13px;font-weight:700;flex:1;color:var(--tx)}
+.ts-modal-close{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:15px;padding:2px;border-radius:3px;line-height:1}
+.ts-modal-close:hover{color:var(--tx)}
+.ts-modal-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.ts-modal-body::-webkit-scrollbar{width:4px}
+.ts-modal-body::-webkit-scrollbar-thumb{background:var(--surf3);border-radius:2px}
+.ts-kind-row{display:flex;align-items:center;gap:8px}
+.ts-kind-lbl{font-size:11px;font-weight:700;color:var(--tx3);white-space:nowrap;flex-shrink:0}
+.ts-kind-sel{flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--tx);outline:none;cursor:pointer}
+.ts-kind-sel:focus{border-color:var(--ac)}
+.ts-sg{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.ts-sg-title{font-size:10px;font-weight:700;color:var(--tx3);display:flex;align-items:center;gap:4px}
+.ts-font-row{display:grid;grid-template-columns:1fr 68px 68px;gap:6px;align-items:end}
+.ts-sr{display:flex;flex-direction:column;gap:3px}
+.ts-sl{font-size:10px;font-weight:600;color:var(--tx3)}
+.ts-ss{width:100%;background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--tx);outline:none;cursor:pointer;font-family:inherit}
+.ts-ss:focus{border-color:var(--ac)}
+.ts-ni-wrap{display:flex;align-items:center;gap:3px}
+.ts-ni{width:100%;background:var(--surf);border:1px solid var(--bdr);border-radius:5px;padding:5px 5px;font-size:12px;color:var(--tx);outline:none;text-align:center;font-family:inherit}
+.ts-ni:focus{border-color:var(--ac)}
+.ts-nu{font-size:10px;color:var(--tx3);white-space:nowrap;flex-shrink:0}
+.ts-margin-grid{display:grid;grid-template-columns:72px 1fr 72px;grid-template-rows:auto auto auto;gap:6px;align-items:center;justify-items:center}
+.ts-mg-top{grid-column:2;grid-row:1}.ts-mg-left{grid-column:1;grid-row:2}.ts-mg-preview{grid-column:2;grid-row:2}.ts-mg-right{grid-column:3;grid-row:2}.ts-mg-bottom{grid-column:2;grid-row:3}
+.ts-mg-cell{display:flex;align-items:center;gap:4px}
+.ts-mg-lbl{font-size:10px;color:var(--tx3);white-space:nowrap}
+.ts-mg-i{width:38px;background:var(--surf);border:1px solid var(--bdr);border-radius:4px;padding:4px 4px;font-size:11px;color:var(--tx);outline:none;text-align:center;font-family:inherit}
+.ts-mg-i:focus{border-color:var(--ac)}
+.ts-mg-u{font-size:9px;color:var(--tx3)}
+.ts-margin-preview{width:60px;height:74px;background:#fff;border:1px solid #bbb;border-radius:2px;box-shadow:2px 2px 5px rgba(0,0,0,.35);position:relative;flex-shrink:0}
+.ts-mp-inner{position:absolute;border:1px dashed rgba(167,139,250,.45);top:9px;bottom:9px;left:7px;right:7px}
+.ts-mp-lines{position:absolute;inset:10px 8px;display:flex;flex-direction:column;gap:3px}
+.ts-mp-line{height:2px;background:#ccc;border-radius:1px}
+.ts-mp-line:last-child{width:50%}
+.ts-para-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:end}
+.ts-apply-row{display:flex;flex-wrap:wrap;gap:8px;background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:8px 10px}
+.ts-apply-title{font-size:10px;font-weight:700;color:var(--tx3);width:100%;margin-bottom:1px}
+.ts-ai{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx2);cursor:pointer}
+.ts-ai input{width:13px;height:13px;accent-color:var(--ac);cursor:pointer}
+.ts-modal-foot{display:flex;align-items:center;gap:7px;padding:10px 14px;border-top:1px solid var(--bdr);background:var(--surf2);flex-shrink:0}
+.ts-foot-left{flex:1}
+.ts-btn-reset{background:none;border:1px solid var(--bdr);border-radius:5px;padding:5px 10px;font-size:10px;color:var(--tx3);cursor:pointer}
+.ts-btn-reset:hover{border-color:var(--rd);color:var(--rd)}
+.ts-btn-cancel{background:var(--surf3);color:var(--tx2);border:1px solid var(--bdr);border-radius:6px;padding:6px 13px;font-size:12px;cursor:pointer}
+.ts-btn-ok{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer}
+.sb-ts-chip{display:none;align-items:center;gap:4px;border-radius:10px;padding:1px 8px;font-size:10px;font-weight:700;border:1px solid;cursor:default}
+.sb-ts-chip.show{display:inline-flex}
+.sb-ts-chip-x{background:none;border:none;cursor:pointer;font-size:10px;padding:0 0 0 2px;line-height:1;opacity:.7}
+.sb-ts-chip-x:hover{opacity:1;color:var(--rd)!important}
+/* ── 조판 페이지 구분선 오버레이 */
+.ts-page-overlay{position:absolute;top:0;left:0;right:0;pointer-events:none;z-index:10}
+.ts-page-divider{position:absolute;left:0;right:0;display:flex;flex-direction:column;pointer-events:none}
+.ts-page-divider-bot{background:rgba(100,80,200,.04)}
+.ts-page-divider-line{border:none;border-top:2px dashed rgba(150,120,255,.32);margin:0;flex-shrink:0}
+.ts-page-divider-top{background:rgba(100,80,200,.04)}
 
 /* ── SHARED SIDEBAR ── */
 .sidebar{width:220px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
@@ -3136,7 +3194,8 @@ tr:hover .pub-row-del{color:var(--tx3)}
 <div class="statusbar">
   <div class="statusbar-tools">
     <button class="sb-tool-btn" onclick="writingPrint()" title="인쇄/출력">🖨️<span class="sb-tooltip">인쇄/출력</span></button>
-    <button class="sb-tool-btn" onclick="writingTypeset()" title="조판">📐<span class="sb-tooltip">조판</span></button>
+    <button class="sb-tool-btn" id="sb-typeset-btn" onclick="writingTypeset()" title="조판">📐<span class="sb-tooltip">조판 설정</span></button>
+    <div class="sb-ts-chip" id="sb-ts-chip"><span id="sb-ts-chip-label"></span><button class="sb-ts-chip-x" onclick="tsDeactivate()" title="조판 해제">✕</button></div>
   </div>
   <span id="sb-wc" style="font-size:11px;color:var(--tx3)"></span>
   <span class="statusbar-time" id="sb-time"></span>
@@ -3467,6 +3526,7 @@ async function load(){
     if(!S.profile.inKwOpen) S.profile.inKwOpen = false;
     if(!S.profile.inKwCatOpen) S.profile.inKwCatOpen = {};
     if(S.profile.plRightCollapsed===undefined) S.profile.plRightCollapsed = false;
+    if(!S.profile.typesetSettings) S.profile.typesetSettings = _tsDefaultSettings();
 if(!S.profile.spellExcept) S.profile.spellExcept = [];
     S.writingNodes= data.writingNodes || [];
     S._lastWritingWork = data.lastWritingWork || null;
@@ -3631,6 +3691,10 @@ function switchTab(t){
   _updateMenuActiveState();
   // 집필 탭 여부에 따라 보조기능 아이콘 표시
   document.body.classList.toggle('writing-tab-active', t==='writing');
+  // 탭 전환 시 조판 모달 닫기
+  document.getElementById('ts-modal-bg')?.remove();
+  // 집필 탭 진입 시 조판 칩 갱신
+  if(t==='writing') tsUpdateChip();
   if(t==='settings'){renderSettings();}
   if(t==='home'){renderHome();}
   if(t==='schedule'){renderSched();}
@@ -3654,7 +3718,7 @@ function initResponsiveTabs(){
   if(window.ResizeObserver){
     new ResizeObserver(()=>requestAnimationFrame(_applyTabMode)).observe(hdr);
   } else {
-    window.addEventListener('resize', ()=>{ _applyTabMode(); _adjustEditorForMobile(); });
+    window.addEventListener('resize', ()=>{ _applyTabMode(); _adjustEditorForMobile(); _schedulePageBreaks(); });
   }
   requestAnimationFrame(()=>requestAnimationFrame(_applyTabMode));
 }
@@ -4788,6 +4852,8 @@ function makeSVGRing(pct, color, size=44){
 function logActivity(type, workId, workName, title, sub){
   if(!S.profile) S.profile={};
   if(!S.profile.activityLog) S.profile.activityLog=[];
+  if(!S.profile.typesetSettings) S.profile.typesetSettings=_tsDefaultSettings();
+  else _tsMigrateSettings(S.profile.typesetSettings);
   const log = S.profile.activityLog;
   // 1분 이내 동일 workId+type → sub 업데이트만
   const last = log[0];
@@ -5054,6 +5120,101 @@ function makeSVGDonut(segments, size=80, thickness=16){
   return svg;
 }
 
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  TYPESET (조판)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 플랫폼별 원본 기본값 (수정 불가 — 기본값 복원용)
+const TS_ORIGIN = {
+  // 카카오: 72×109.8mm, 여백 위10/좌8/우8/아래10, 들여쓰기 10pt, 줄간격 160%, 문단간격 0
+  kakao:  {font:'맑은 고딕', size:10, leading:160,
+           pageW:72,  pageH:109.8,
+           mt:10, mb:10, ml:8,  mr:8,
+           indent:10, paraGapBefore:0, paraGapAfter:0},
+  // 시리즈: 102×152mm, 여백 위15/좌14/우14/아래15, 들여쓰기 0(보통=없음), 줄간격 200%, 문단 위3/아래3
+  series: {font:'맑은 고딕', size:10, leading:200,
+           pageW:102, pageH:152,
+           mt:15, mb:15, ml:14, mr:14,
+           indent:0, paraGapBefore:3, paraGapAfter:3},
+  // 리디: 70×136mm, 여백 위7/좌5/우5/아래7, 들여쓰기 0(보통=없음), 줄간격 145%, 문단간격 0
+  ridi:   {font:'맑은 고딕', size:10, leading:145,
+           pageW:70,  pageH:136,
+           mt:7,  mb:7,  ml:5,  mr:5,
+           indent:0, paraGapBefore:0, paraGapAfter:0},
+  // 문피아: 130×150mm, 여백 위12/좌13/우14/아래15, 들여쓰기 10pt, 줄간격 160%, 문단간격 0
+  munpia: {font:'맑은 고딕', size:10, leading:160,
+           pageW:130, pageH:150,
+           mt:12, mb:15, ml:13, mr:14,
+           indent:10, paraGapBefore:0, paraGapAfter:0},
+  // 사용자 설정 기본값 (A4 기준)
+  custom: {font:'맑은 고딕', size:11, leading:170,
+           pageW:210, pageH:297,
+           mt:20, mb:20, ml:25, mr:25,
+           indent:10, paraGapBefore:0, paraGapAfter:0},
+};
+
+const TS_COLORS = {
+  kakao:  {bg:'rgba(245,158,11,.15)',  color:'#d97706', border:'rgba(245,158,11,.35)'},
+  series: {bg:'rgba(132,204,22,.15)',  color:'#65a30d', border:'rgba(132,204,22,.35)'},
+  ridi:   {bg:'rgba(56,189,248,.15)',  color:'#38bdf8', border:'rgba(56,189,248,.35)'},
+  munpia: {bg:'rgba(15,23,42,.8)',     color:'#93c5fd', border:'rgba(59,130,246,.3)'},
+  custom: {bg:'rgba(240,171,252,.12)', color:'#e879f9', border:'rgba(240,171,252,.4)'},
+};
+
+const TS_LABELS = {
+  none:'에디터 기본값', kakao:'카카오 조판', series:'시리즈 조판',
+  ridi:'리디 조판', munpia:'문피아 조판', custom:'사용자 설정',
+};
+
+function _tsDefaultSettings(){
+  const presets = {};
+  Object.keys(TS_ORIGIN).forEach(k => presets[k] = {...TS_ORIGIN[k]});
+  return {active:'none', applyEditor:true, applyPrint:true, applyExport:true, presets};
+}
+
+function _tsMigrateSettings(ts){
+  if(!ts.presets) ts.presets = {};
+  // joara 제거 (기존 데이터에 있을 경우)
+  delete ts.presets.joara;
+  // active가 joara였으면 none으로 리셋
+  if(ts.active === 'joara') ts.active = 'none';
+  Object.keys(TS_ORIGIN).forEach(k => {
+    if(!ts.presets[k]){
+      // preset 자체가 없으면 원본값으로 생성
+      ts.presets[k] = {...TS_ORIGIN[k]};
+    } else if(k !== 'custom'){
+      // custom 제외 플랫폼은 TS_ORIGIN 기준으로 강제 초기화
+      // (플랫폼 실제 조판 기준이 바뀌었을 때 반영)
+      ts.presets[k] = {...TS_ORIGIN[k]};
+    } else {
+      // custom은 사용자 설정 유지하되 누락 키만 보정
+      const pr = ts.presets[k];
+      if(pr.paraGap !== undefined && pr.paraGapBefore === undefined){
+        pr.paraGapBefore = pr.paraGap;
+        pr.paraGapAfter  = pr.paraGap;
+        delete pr.paraGap;
+      }
+      if(pr.indent !== undefined && pr.indent <= 5 && Number.isInteger(pr.indent)){
+        pr.indent = pr.indent * 10;
+      }
+      Object.keys(TS_ORIGIN[k]).forEach(field => {
+        if(pr[field] === undefined) pr[field] = TS_ORIGIN[k][field];
+      });
+    }
+  });
+  if(ts.applyEditor  === undefined) ts.applyEditor  = true;
+  if(ts.applyPrint   === undefined) ts.applyPrint   = true;
+  if(ts.applyExport  === undefined) ts.applyExport  = true;
+  if(!ts.active) ts.active = 'none';
+}
+
+// 현재 활성 preset 반환 (active='none'이면 null)
+function _tsActivePreset(){
+  const ts = S.profile.typesetSettings;
+  if(!ts || ts.active === 'none') return null;
+  return ts.presets[ts.active] || null;
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  PUB TAB (출판사)
@@ -9005,7 +9166,26 @@ function writingPrint(){
   const chTitle = titleEl?.value || document.querySelector('.writing-ch-sel-label')?.textContent || '원고';
   const workTitle = document.querySelector('.writing-work-label')?.textContent || '';
 
-  // 기존 iframe 제거
+  // 조판 설정 반영
+  const ts = S.profile.typesetSettings;
+  const p = (ts && ts.applyPrint && ts.active !== 'none') ? ts.presets[ts.active] : null;
+
+  let bodyStyle, pageStyle, pStyle, fontFamily;
+  if(p){
+    fontFamily = p.font === '나눔고딕'
+      ? "'NanumGothic','나눔고딕','Malgun Gothic','Apple SD Gothic Neo',sans-serif"
+      : `'${p.font}','Malgun Gothic','Apple SD Gothic Neo',sans-serif`;
+    bodyStyle = `font-family:${fontFamily};font-size:${p.size}pt;line-height:${(p.leading/100).toFixed(2)};color:#000;margin:${p.mt}mm ${p.mr}mm ${p.mb}mm ${p.ml}mm`;
+    pageStyle  = `@page{size:${p.pageW}mm ${p.pageH}mm;margin:${p.mt}mm ${p.mr}mm ${p.mb}mm ${p.ml}mm}`;
+    pStyle     = `p{margin:${p.paraGapBefore}pt 0 ${p.paraGapAfter}pt 0;text-indent:${p.indent}pt}`;
+  } else {
+    fontFamily = "'Malgun Gothic','Apple SD Gothic Neo',serif";
+    bodyStyle  = `font-family:${fontFamily};font-size:11pt;line-height:2;color:#000;margin:20mm 20mm 20mm 25mm`;
+    pageStyle  = `@page{margin:20mm 20mm 20mm 25mm}`;
+    pStyle     = `p{margin:0;text-indent:1em}`;
+  }
+
+  // iframe 생성
   document.getElementById('print-iframe')?.remove();
   const iframe = document.createElement('iframe');
   iframe.id = 'print-iframe';
@@ -9019,13 +9199,17 @@ function writingPrint(){
 <title>${workTitle} - ${chTitle}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',serif;font-size:11pt;line-height:2;color:#000;padding:20mm 20mm 20mm 25mm}
-  p{margin-bottom:0.5em;text-indent:1em}
-  h1,h2,h3{font-size:13pt;margin:1em 0 0.5em}
+  ${pageStyle}
+  body{${bodyStyle}}
+  ${pStyle}
+  h1,h2,h3{font-size:${p ? p.size+2 : 13}pt;margin:1em 0 0.5em}
   .print-header{text-align:center;margin-bottom:2em;padding-bottom:1em;border-bottom:1px solid #ccc}
-  .print-work{font-size:10pt;color:#666;margin-bottom:4px}
-  .print-title{font-size:14pt;font-weight:700}
-  @media print{body{padding:15mm 15mm 15mm 20mm}@page{margin:15mm}}
+  .print-work{font-size:${p ? p.size-1 : 10}pt;color:#666;margin-bottom:4px}
+  .print-title{font-size:${p ? p.size+2 : 14}pt;font-weight:700}
+  @media print{
+    body{margin:0}
+    .print-header{page-break-after:avoid}
+  }
 </style>
 </head><body>
 <div class="print-header">
@@ -9043,8 +9227,400 @@ function writingPrint(){
 }
 
 // 조판 함수 (플레이스홀더 — 다음 단계에서 구현)
+// ── 조판 에디터 적용
+let _tsDebounceTimer = null;
+const _TS_EDITOR_DEFAULT = {
+  fontFamily: "'맑은 고딕',Georgia,serif",
+  fontSize: '14pt',
+  lineHeight: '2.0',
+  padding: '32px 48px',
+  maxWidth: '800px',
+};
+
+function _applyTypesetToEditor(){
+  const ce = document.getElementById('writing-ce1');
+  const ce2 = document.getElementById('writing-ce2');
+  if(!ce) return;
+  const ts = S.profile.typesetSettings;
+
+  if(!ts || ts.active === 'none' || !ts.applyEditor){
+    // 원복
+    const def = _TS_EDITOR_DEFAULT;
+    [ce, ce2].forEach(el => {
+      if(!el) return;
+      el.style.fontFamily = def.fontFamily;
+      el.style.fontSize   = def.fontSize;
+      el.style.lineHeight = def.lineHeight;
+      el.style.padding    = def.padding;
+      el.style.maxWidth   = def.maxWidth;
+      el.style.margin     = '0 auto';
+      el.style.width      = '100%';
+    });
+    _removePageOverlay();
+    return;
+  }
+
+  const p = ts.presets[ts.active];
+  if(!p) return;
+
+  const PX = 3.7795; // 1mm = 3.7795px
+  const fontFamily = p.font === '나눔고딕'
+    ? "'NanumGothic','나눔고딕','Malgun Gothic',sans-serif"
+    : `'${p.font}','Malgun Gothic',sans-serif`;
+
+  [ce, ce2].forEach(el => {
+    if(!el) return;
+    el.style.fontFamily = fontFamily;
+    el.style.fontSize   = p.size + 'pt';
+    el.style.lineHeight = (p.leading / 100).toFixed(2);
+    el.style.padding    = `${p.mt * PX}px ${p.mr * PX}px ${p.mb * PX}px ${p.ml * PX}px`;
+    el.style.maxWidth   = 'none';
+    el.style.margin     = '0';
+    el.style.width      = '100%';
+    // 들여쓰기 (pt 단위)
+    el.querySelectorAll('p').forEach(el2 => el2.style.textIndent = p.indent + 'pt');
+  });
+
+  // 구분선 그리기
+  _schedulePageBreaks();
+}
+
+function _schedulePageBreaks(){
+  clearTimeout(_tsDebounceTimer);
+  _tsDebounceTimer = setTimeout(_drawPageBreaks, 300);
+}
+
+function _drawPageBreaks(){
+  const ce = document.getElementById('writing-ce1');
+  const pane = document.getElementById('writing-pane1');
+  if(!ce || !pane) return;
+  const ts = S.profile.typesetSettings;
+  if(!ts || ts.active === 'none' || !ts.applyEditor){
+    _removePageOverlay(); return;
+  }
+  const p = ts.presets[ts.active];
+  if(!p) return;
+
+  const PX = 3.7795;
+  const pageH = (p.pageH - p.mt - p.mb) * PX; // 실제 용지 길이 기준 유효 높이
+  const lineH  = p.size * (96/72) * (p.leading / 100); // pt→px 후 줄간격 적용
+
+  // 오버레이 제거 후 새로 생성
+  _removePageOverlay();
+  const overlay = document.createElement('div');
+  overlay.className = 'ts-page-overlay';
+  overlay.id = 'ts-page-overlay';
+  pane.appendChild(overlay);
+
+  // 에디터 내 각 블록의 실제 offsetTop 기준으로 구분선 위치 계산
+  const ceRect = ce.getBoundingClientRect();
+  const paneRect = pane.getBoundingClientRect();
+  const ceOffsetTop = ceRect.top - paneRect.top + pane.scrollTop;
+  const mtPx = p.mt * PX;
+  const mbPx = p.mb * PX;
+
+  // 첫 페이지 하단 위치부터 시작
+  let pageBottom = ceOffsetTop + mtPx + pageH;
+  const totalH = ce.scrollHeight;
+
+  while(pageBottom < ceOffsetTop + totalH - mbPx){
+    const divider = document.createElement('div');
+    divider.className = 'ts-page-divider';
+    divider.style.top = pageBottom + 'px';
+
+    const bot = document.createElement('div');
+    bot.className = 'ts-page-divider-bot';
+    bot.style.height = mbPx + 'px';
+
+    const line = document.createElement('hr');
+    line.className = 'ts-page-divider-line';
+
+    const top = document.createElement('div');
+    top.className = 'ts-page-divider-top';
+    top.style.height = mtPx + 'px';
+
+    divider.append(bot, line, top);
+    overlay.appendChild(divider);
+
+    pageBottom += pageH + mtPx + mbPx;
+  }
+
+  // 오버레이 높이 = 에디터 전체 높이
+  overlay.style.height = (ceOffsetTop + totalH) + 'px';
+}
+
+function _removePageOverlay(){
+  document.getElementById('ts-page-overlay')?.remove();
+}
+
+// ── 조판 모달 열기
 function writingTypeset(){
-  toast('조판 기능은 준비 중입니다.');
+  document.getElementById('ts-modal-bg')?.remove();
+  const ts = S.profile.typesetSettings;
+  // 모달 열기 전 migrate 실행 — 구버전 데이터 보정
+  _tsMigrateSettings(ts);
+  // 현재 설정 복사본 (취소 시 복원용)
+  const snapshot = JSON.parse(JSON.stringify(ts));
+
+  const bg = document.createElement('div');
+  bg.id = 'ts-modal-bg';
+  bg.className = 'ts-modal-bg';
+
+  const modal = document.createElement('div');
+  modal.className = 'ts-modal';
+
+  // 헤더
+  const head = document.createElement('div');
+  head.className = 'ts-modal-head';
+  head.innerHTML = `<span style="font-size:14px">📐</span><span class="ts-modal-title">조판 설정</span>`;
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'ts-modal-close';
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = () => { Object.assign(S.profile.typesetSettings, snapshot); bg.remove(); };
+  head.appendChild(closeBtn);
+  modal.appendChild(head);
+
+  // 본문
+  const body = document.createElement('div');
+  body.className = 'ts-modal-body';
+
+  // 조판 종류 드롭다운
+  const kindRow = document.createElement('div');
+  kindRow.className = 'ts-kind-row';
+  const kindLbl = document.createElement('span');
+  kindLbl.className = 'ts-kind-lbl';
+  kindLbl.textContent = '조판 종류';
+  const kindSel = document.createElement('select');
+  kindSel.className = 'ts-kind-sel';
+  ['none','kakao','series','ridi','munpia','custom'].forEach(k => {
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = TS_LABELS[k];
+    if(k === ts.active) o.selected = true;
+    kindSel.appendChild(o);
+  });
+  kindRow.append(kindLbl, kindSel);
+  body.appendChild(kindRow);
+
+  // 현재 편집 중인 preset을 가리키는 변수 (none이면 ridi 기본으로 표시)
+  let editKey = ts.active === 'none' ? 'ridi' : ts.active;
+
+  // 설정 폼 렌더 함수
+  const renderForm = () => {
+    formArea.innerHTML = '';
+    if(kindSel.value === 'none'){
+      formArea.innerHTML = `<div style="font-size:12px;color:var(--tx3);text-align:center;padding:10px 0">에디터 기본 설정으로 표시됩니다.<br>조판 없음.</div>`;
+      return;
+    }
+    editKey = kindSel.value;
+    const p = ts.presets[editKey];
+
+    // 용지 크기 섹션
+    const pageSg = _tsMkSg('📄 용지 크기');
+    const pageRow = document.createElement('div');
+    pageRow.className = 'ts-font-row'; // 3열 재활용
+    const wSr = _tsMkSr('폭');
+    wSr.appendChild(_tsMkNi(p.pageW, 50, 300, 1, 'mm', v => p.pageW=v));
+    const hSr = _tsMkSr('길이');
+    hSr.appendChild(_tsMkNi(p.pageH, 80, 500, 1, 'mm', v => p.pageH=v));
+    const blankSr = document.createElement('div'); // 3열 맞추기용 빈칸
+    pageRow.append(wSr, hSr, blankSr);
+    pageSg.appendChild(pageRow);
+    formArea.appendChild(pageSg);
+
+    // 폰트 섹션
+    const fontSg = _tsMkSg('🔤 폰트');
+    const fontRow = document.createElement('div');
+    fontRow.className = 'ts-font-row';
+    const fontSr = _tsMkSr('서체');
+    const fontSel = document.createElement('select');
+    fontSel.className = 'ts-ss';
+    ['맑은 고딕','나눔고딕','나눔명조','함초롬바탕','굴림'].forEach(f => {
+      const o = document.createElement('option'); o.value=f; o.textContent=f;
+      if(f===p.font) o.selected=true;
+      fontSel.appendChild(o);
+    });
+    fontSel.addEventListener('change', () => { p.font=fontSel.value; });
+    fontSel.addEventListener('keydown', e=>e.stopPropagation());
+    fontSr.appendChild(fontSel); fontRow.appendChild(fontSr);
+    const sizeSr = _tsMkSr('크기');
+    sizeSr.appendChild(_tsMkNi(p.size, 8, 20, 0.5, 'pt', v => p.size=v));
+    fontRow.appendChild(sizeSr);
+    const ldSr = _tsMkSr('줄간격');
+    ldSr.appendChild(_tsMkNi(p.leading, 100, 300, 5, '%', v => p.leading=v));
+    fontRow.appendChild(ldSr);
+    fontSg.appendChild(fontRow);
+    formArea.appendChild(fontSg);
+
+    // 여백 섹션
+    const marginSg = _tsMkSg('📏 용지 여백');
+    const mgGrid = document.createElement('div');
+    mgGrid.className = 'ts-margin-grid';
+    const mpDiv = document.createElement('div');
+    mpDiv.className = 'ts-mg-preview';
+    mpDiv.innerHTML = `<div class="ts-margin-preview"><div class="ts-mp-inner"><div class="ts-mp-lines">${'<div class="ts-mp-line"></div>'.repeat(7)}</div></div></div>`;
+    const mkMgCell = (lbl, val, cls, cb) => {
+      const cell = document.createElement('div');
+      cell.className = `ts-mg-cell ${cls}`;
+      const l = document.createElement('span'); l.className='ts-mg-lbl'; l.textContent=lbl;
+      const inp = document.createElement('input'); inp.className='ts-mg-i'; inp.type='number';
+      inp.value=val; inp.min=0; inp.max=60; inp.step=1;
+      inp.addEventListener('input', () => cb(parseFloat(inp.value)||0));
+      inp.addEventListener('keydown', e=>e.stopPropagation());
+      const u = document.createElement('span'); u.className='ts-mg-u'; u.textContent='mm';
+      cell.append(l, inp, u);
+      return cell;
+    };
+    mgGrid.append(
+      mkMgCell('위쪽',   p.mt, 'ts-mg-top',    v=>p.mt=v),
+      mkMgCell('왼쪽',   p.ml, 'ts-mg-left',   v=>p.ml=v),
+      mpDiv,
+      mkMgCell('오른쪽', p.mr, 'ts-mg-right',  v=>p.mr=v),
+      mkMgCell('아래쪽', p.mb, 'ts-mg-bottom', v=>p.mb=v),
+    );
+    marginSg.appendChild(mgGrid);
+    formArea.appendChild(marginSg);
+
+    // 문단 섹션 - 들여쓰기(pt) + 문단 위/아래 간격
+    const paraSg = _tsMkSg('¶ 문단');
+    const paraRow = document.createElement('div');
+    paraRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:end';
+    const indSr = _tsMkSr('들여쓰기');
+    indSr.appendChild(_tsMkNi(p.indent, 0, 50, 1, 'pt', v => p.indent=v));
+    paraRow.appendChild(indSr);
+    const pgbSr = _tsMkSr('문단 위');
+    pgbSr.appendChild(_tsMkNi(p.paraGapBefore, 0, 30, 1, 'pt', v => p.paraGapBefore=v));
+    paraRow.appendChild(pgbSr);
+    const pgaSr = _tsMkSr('문단 아래');
+    pgaSr.appendChild(_tsMkNi(p.paraGapAfter, 0, 30, 1, 'pt', v => p.paraGapAfter=v));
+    paraRow.appendChild(pgaSr);
+    paraSg.appendChild(paraRow);
+    formArea.appendChild(paraSg);
+  };
+
+  const formArea = document.createElement('div');
+  formArea.style.cssText = 'display:flex;flex-direction:column;gap:10px';
+  body.appendChild(formArea);
+
+  // 조판 종류 변경 이벤트
+  kindSel.addEventListener('change', () => { renderForm(); });
+  kindSel.addEventListener('keydown', e=>e.stopPropagation());
+
+  // 적용 대상
+  const applyRow = document.createElement('div');
+  applyRow.className = 'ts-apply-row';
+  const applyTitle = document.createElement('span');
+  applyTitle.className = 'ts-apply-title';
+  applyTitle.textContent = '적용 대상';
+  applyRow.appendChild(applyTitle);
+  const mkApplyItem = (label, key) => {
+    const lbl = document.createElement('label'); lbl.className = 'ts-ai';
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=ts[key];
+    cb.addEventListener('change', () => ts[key]=cb.checked);
+    lbl.append(cb, document.createTextNode(' '+label));
+    return lbl;
+  };
+  applyRow.append(
+    mkApplyItem('✍️ 에디터 (페이지 구분선)', 'applyEditor'),
+    mkApplyItem('🖨️ 인쇄/출력', 'applyPrint'),
+    mkApplyItem('📄 파일 내보내기', 'applyExport'),
+  );
+  body.appendChild(applyRow);
+  modal.appendChild(body);
+
+  // 푸터
+  const foot = document.createElement('div');
+  foot.className = 'ts-modal-foot';
+  const footLeft = document.createElement('div');
+  footLeft.className = 'ts-foot-left';
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'ts-btn-reset';
+  resetBtn.textContent = '↺ 기본값으로';
+  resetBtn.onclick = () => {
+    const k = kindSel.value;
+    if(k !== 'none' && TS_ORIGIN[k]){
+      ts.presets[k] = {...TS_ORIGIN[k]};
+      renderForm();
+    }
+  };
+  footLeft.appendChild(resetBtn);
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'ts-btn-cancel';
+  cancelBtn.textContent = '취소';
+  cancelBtn.onclick = () => { Object.assign(S.profile.typesetSettings, snapshot); bg.remove(); };
+  const okBtn = document.createElement('button');
+  okBtn.className = 'ts-btn-ok';
+  okBtn.textContent = '적용';
+  okBtn.onclick = () => {
+    ts.active = kindSel.value;
+    dsave();
+    tsUpdateChip();
+    bg.remove();
+  };
+  foot.append(footLeft, cancelBtn, okBtn);
+  modal.appendChild(foot);
+
+  bg.appendChild(modal);
+  document.body.appendChild(bg);
+  bg.onclick = e => { if(e.target===bg){ Object.assign(S.profile.typesetSettings, snapshot); bg.remove(); } };
+  document.addEventListener('keydown', function escHandler(e){
+    if(e.key==='Escape'){ Object.assign(S.profile.typesetSettings, snapshot); bg.remove(); document.removeEventListener('keydown', escHandler); }
+  });
+
+  renderForm();
+}
+
+// 조판 모달 헬퍼
+function _tsMkSg(title){
+  const sg = document.createElement('div'); sg.className='ts-sg';
+  const t = document.createElement('div'); t.className='ts-sg-title'; t.textContent=title;
+  sg.appendChild(t); return sg;
+}
+function _tsMkSr(label){
+  const sr = document.createElement('div'); sr.className='ts-sr';
+  const sl = document.createElement('span'); sl.className='ts-sl'; sl.textContent=label;
+  sr.appendChild(sl); return sr;
+}
+function _tsMkNi(val, min, max, step, unit, onChange){
+  const wrap = document.createElement('div'); wrap.className='ts-ni-wrap';
+  const inp = document.createElement('input'); inp.className='ts-ni'; inp.type='number';
+  inp.value = (val !== undefined && val !== null) ? val : 0;
+  inp.min=min; inp.max=max; inp.step=step;
+  inp.addEventListener('input', () => onChange(parseFloat(inp.value)||0));
+  inp.addEventListener('keydown', e=>e.stopPropagation());
+  const u = document.createElement('span'); u.className='ts-nu'; u.textContent=unit;
+  wrap.append(inp, u); return wrap;
+}
+
+// 조판 칩 갱신 + 에디터 적용
+function tsUpdateChip(){
+  const chip = document.getElementById('sb-ts-chip');
+  const label = document.getElementById('sb-ts-chip-label');
+  if(!chip||!label) return;
+  const ts = S.profile.typesetSettings;
+  const key = ts?.active;
+  if(!key || key==='none'){
+    chip.className = 'sb-ts-chip';
+    chip.removeAttribute('style');
+  } else {
+    const c = TS_COLORS[key];
+    if(c){
+      chip.style.cssText = `background:${c.bg};color:${c.color};border-color:${c.border}`;
+      chip.querySelector('.sb-ts-chip-x').style.color = c.color;
+      label.textContent = TS_LABELS[key]||key;
+      chip.className = 'sb-ts-chip show';
+    }
+  }
+  // 에디터에 조판 적용
+  _applyTypesetToEditor();
+}
+
+// 조판 해제
+function tsDeactivate(){
+  if(!S.profile.typesetSettings) return;
+  S.profile.typesetSettings.active = 'none';
+  dsave();
+  tsUpdateChip();
 }
 
 function exportData(){
@@ -9308,6 +9884,8 @@ async function gdPull(){
     if(!S.publishers.genres) S.publishers.genres={};    if(!S.profile.activityLog) S.profile.activityLog=[];
     if(!S.profile.todos)       S.profile.todos=[];
     if(S.profile.homeMemo===undefined) S.profile.homeMemo='';
+    if(!S.profile.typesetSettings) S.profile.typesetSettings=_tsDefaultSettings();
+    else _tsMigrateSettings(S.profile.typesetSettings);
     await save();_gdDirty=false;
     // Drive에서 불러온 settle도 별도 백업
     try{ localStorage.setItem('ws_fallback_settle', JSON.stringify(S.settle)); }catch(_){}
@@ -9621,6 +10199,8 @@ class MBEditor{
     this._st=setTimeout(()=>{
       try{if(this.ce)this.cb(this.ce.innerHTML);}catch(e){console.warn('editor _change err:',e);}
     },400);
+    // 조판 구분선 재계산 (타이핑 중 debounce)
+    if(typeof _schedulePageBreaks === 'function') _schedulePageBreaks();
   }
   get html(){return this.ce.innerHTML;}
   set html(v){this.ce.innerHTML=v||'';this._syncBtns();this._wrapExistingImages();this._initResize(this.ce);this._initTableResize(this.ce);}
@@ -10084,6 +10664,8 @@ function writingOpenChapter(workId,chId){
     clearTimeout(_writingSaveTimer);_writingSaveTimer=setTimeout(()=>{dsave();writingUpdateProgress(workId);},600);
   });
   _writingEditor.html=ch.content||'';
+  // 회차 로드 후 조판 적용 (에디터 렌더 완료 후)
+  setTimeout(()=>{ _applyTypesetToEditor(); }, 120);
   // 문단 메모 아이콘 복원
   setTimeout(()=>{ const _ce2=document.getElementById('writing-ce1'); if(_ce2)_restoreParaNoteIcons(_ce2,ch); },80);
   // 문단 메모: 새 ce1에 contextmenu 리스너 등록 (매번 새 요소이므로 누적 없음)
@@ -11182,82 +11764,56 @@ function writingExport(type){
   const ch=wNodes().find(n=>n.id===_writingSelCh);if(!ch){toast('내보낼 회차를 선택하세요.',true);return;}
   const title=ch.title||'회차';const html=ch.content||'';
   const text=html.replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
-  if(type==='txt'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.download=title+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('TXT 파일 저장 완료');}
-  else if(type==='html'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:'맑은 고딕',sans-serif;font-size:14pt;line-height:2;max-width:800px;margin:2cm auto;padding:20px}</style></head><body>${html}</body></html>`],{type:'text/html;charset=utf-8'}));a.download=title+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('HTML 파일 저장 완료');}
-  else if(type==='word'){const doc=`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='UTF-8'><meta name=ProgId content=Word.Document><style>body{font-family:'맑은 고딕',sans-serif;font-size:11pt;line-height:2;margin:2cm}
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   터치 최적화 — user-select / touch-action 전략적 배분
-   body: user-select:none 기본 (위 body CSS에서 설정)
-   여기서는 허용/세분화 오버라이드만 선언
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* ── [A] 텍스트 선택 허용 영역 ──────────────────
-   집필 에디터, 입력 필드, contenteditable 전체    */
-input, textarea, select,
-.mbedit, [contenteditable="true"],
-#float-memo-body,
-.settle-grid-inp,
-.writing-field input, .writing-field textarea,
-.tl-edit-input, .cs-field-input,
-.linput, .srch-input {
-  -webkit-user-select: text !important;
-  user-select: text !important;
-  touch-action: auto;
-}
+  // 조판 설정 반영
+  const ts = S.profile.typesetSettings;
+  const p = (ts && ts.applyExport && ts.active !== 'none') ? ts.presets[ts.active] : null;
 
-/* ── [B] touch-action:pan-y — 실제 overflow 스크롤 컨테이너만 ──
-   overflow-y:auto/scroll인 요소에만 적용.
-   레이아웃 래퍼(.panel, .schedbody 등)는 제외 — 자식 click 차단 방지 */
-.treewrap,
-.rm-side-list,
-.settle-side-list, .settle-main,
-.writing-chlist,
-.tl-body,
-.archive-sidebar > *,
-#sched-tracker {
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ── [C] touch-action:manipulation — 클릭 전용 요소 ──
-   더블탭 줌 방지 + 300ms 딜레이 제거.
-   [draggable="true"] 아이템도 여기 포함 — 드래그 핸들은 initTouchDnD가 처리 */
-button, .tbtn, .hbtn, .icobtn, .splitbtn,
-.wt-btn, .mbt, .mnavbtn, .lockbtn,
-.tab-overflow-btn, .tab-overflow-item,
-.titem, .wt-work-item, .wt-ch-item,
-.tools-sheet-node, .tools-work-item,
-.rm-side-item, .ctx-item,
-.settle-contract-item, .settle-year-tab,
-.hm-quick-btn, .home-card,
-.sy-tab-btn, .sy-chip, .gs-tab-btn,
-.archive-item, .archive-work-item,
-[draggable="true"] {
-  touch-action: manipulation;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* ── [D] touch-action:none — 드래그/이동 전용 ──
-   JS가 터치를 완전히 직접 처리하는 요소만.
-   클릭도 해야 하는 [draggable] 아이템은 [C]에서 처리하고 여기서 제외. */
-.rm-char-card, .rm-connect-dot, .rm-canvas-wrap,
-.tl-drag-handle, .im-drag-handle,
-#sched-tracker-resize {
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
-/* ── [E] 읽기 전용 텍스트 — 복사 허용 ──
-   에러 메시지, 통계 수치 등 선택해서 복사 가능하게  */
-.home-stat-val, .wc-bar, .writing-ch-wc,
-.settle-kpi-val, .settling-val {
-  -webkit-user-select: text;
-  user-select: text;
-}
-</style></head><body lang=KO><div class=WordSection1><h1>${title}</h1>${html}</div></body></html>`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+doc],{type:'application/msword;charset=utf-8'}));a.download=title+'.doc';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Word 파일 저장 완료');}
+  if(type==='txt'){
+    // TXT: 서식 없음 — 조판 미적용
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+    a.download=title+'.txt';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    toast('TXT 파일 저장 완료');
+  }
+  else if(type==='html'){
+    let bodyStyle, pStyle;
+    if(p){
+      const ff = p.font==='나눔고딕'
+        ? "'NanumGothic','나눔고딕','Malgun Gothic',sans-serif"
+        : `'${p.font}','Malgun Gothic',sans-serif`;
+      bodyStyle = `font-family:${ff};font-size:${p.size}pt;line-height:${(p.leading/100).toFixed(2)};color:#000;margin:${p.mt}mm ${p.mr}mm ${p.mb}mm ${p.ml}mm`;
+      pStyle    = `p{margin:${p.paraGapBefore}pt 0 ${p.paraGapAfter}pt 0;text-indent:${p.indent}pt}`;
+    } else {
+      bodyStyle = "font-family:'맑은 고딕',sans-serif;font-size:14pt;line-height:2;max-width:800px;margin:2cm auto;padding:20px";
+      pStyle    = "p{margin:0;text-indent:1em}";
+    }
+    const pageStyle = p ? `@page{size:${p.pageW}mm ${p.pageH}mm;margin:${p.mt}mm ${p.mr}mm ${p.mb}mm ${p.ml}mm}` : '';
+    const doc = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${title}</title><style>*{box-sizing:border-box;margin:0;padding:0}${pageStyle}body{${bodyStyle}}${pStyle}h1,h2,h3{margin:1em 0 0.5em}</style></head><body>${html}</body></html>`;
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([doc],{type:'text/html;charset=utf-8'}));
+    a.download=title+'.html';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    toast('HTML 파일 저장 완료');
+  }
+  else if(type==='word'){
+    let bodyStyle, pStyle;
+    if(p){
+      const ff = p.font==='나눔고딕' ? "'NanumGothic','나눔고딕','Malgun Gothic',sans-serif" : `'${p.font}','Malgun Gothic',sans-serif`;
+      const lh = (p.leading/100).toFixed(2);
+      bodyStyle = `font-family:${ff};font-size:${p.size}pt;line-height:${lh};margin:${p.mt}mm ${p.mr}mm ${p.mb}mm ${p.ml}mm`;
+      pStyle    = `p{margin:${p.paraGapBefore}pt 0 ${p.paraGapAfter}pt 0;text-indent:${p.indent}pt}`;
+    } else {
+      bodyStyle = "font-family:'맑은 고딕',sans-serif;font-size:11pt;line-height:2;margin:2cm";
+      pStyle    = "p{margin:0;text-indent:1em}";
+    }
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([doc],{type:'application/msword;charset=utf-8'}));
+    a.download=title+'.doc';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    toast('Word 파일 저장 완료');
+  }
 }
 
 function writingExportAll(){
