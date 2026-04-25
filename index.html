@@ -3835,9 +3835,9 @@ function renderHome(){
     const wc=getWcSnap(y,m)[w.id]||{};
     const cur=parseInt(wc[todayStr])||0;
     const prev=parseInt(wc[prevStr])||0;
-    // base가 있으면 base 기준, 없으면 전날 기준으로 오늘 증분 계산
-    const sessionBase=wc[todayStr+'_base']!==undefined ? (parseInt(wc[todayStr+'_base'])||0) : prev;
-    todayChars+=Math.max(0,cur-sessionBase);
+    // base가 있으면 base 기준(당일 시작점), 없으면 전날 마지막 값 기준
+    const base=wc[todayStr+'_base']!==undefined ? (parseInt(wc[todayStr+'_base'])||0) : prev;
+    todayChars+=Math.max(0,cur-base);
   });}
 
   // 다음 마감 D-day
@@ -4534,8 +4534,8 @@ function saveWcSnapshot(){
   wChapters && wWorks().forEach(w=>{
     const total=wChapters(w.id).reduce((s,ch)=>s+charsOf(ch),0);
     if(!wc[w.id]) wc[w.id]={};
-    // 오늘 최초 저장 시 base값 기록 (오늘 시작 시점 글자수)
-    if(!wc[w.id][dateStr+'_base']) wc[w.id][dateStr+'_base']=total;
+    // 오늘 최초 저장 시 base값 기록 — 이후 변경 안 함
+    if(wc[w.id][dateStr+'_base']===undefined) wc[w.id][dateStr+'_base']=total;
     wc[w.id][dateStr]=total;
   });
 }
@@ -6874,7 +6874,9 @@ async function _fetchDict(query, page, container, clearPrev){
       moreBtn.onclick = () => {
         _utilDictPage++;
         moreBtn.textContent = '불러오는 중...';
-        _fetchDict(query, _utilDictPage, container, false);
+        // id로 최신 DOM 참조 (클로저 stale 방지)
+        const liveContainer = document.getElementById('util-dict-result') || container;
+        _fetchDict(query, _utilDictPage, liveContainer, false);
       };
       container.appendChild(moreBtn);
     }
