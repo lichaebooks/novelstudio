@@ -3466,6 +3466,10 @@ const S={
 
 let _loaded=false;
 let _st;
+const DSAVE_DEBOUNCE_MS = 1200;
+const TOOL_INPUT_SAVE_DEBOUNCE_MS = 900;
+const TOOL_ACTIVITY_LOG_THROTTLE_MS = 3000;
+const _toolActivityLogAt = new Map();
 
 let _saving=false;
 async function save(){
@@ -3504,7 +3508,7 @@ function dsave(){
   _st=setTimeout(()=>{
     if(_saving){ dsave(); return; } // 저장 중이면 재스케줄
     save().then(()=>gdScheduleAuto()).catch(e=>console.warn('dsave err:',e));
-  },500);
+  },DSAVE_DEBOUNCE_MS);
 }
 
 async function load(){
@@ -12157,10 +12161,15 @@ function _writingAutoSave(nodeId, data){
   const node = (S.toolNodes||[]).find(n=>n.id===nodeId);
   if(!node) return;
   node.data = Object.assign({}, node.data||{}, data);
-  const _tw=wNodes().find(n=>n.id===node.workId);
-  logActivity('tools',node.workId,_tw?.name||'',node.name||node.type,'작품도구');
+  const now = Date.now();
+  const lastAt = _toolActivityLogAt.get(node.id) || 0;
+  if(now - lastAt >= TOOL_ACTIVITY_LOG_THROTTLE_MS){
+    const _tw=wNodes().find(n=>n.id===node.workId);
+    logActivity('tools',node.workId,_tw?.name||'',node.name||node.type,'작품도구');
+    _toolActivityLogAt.set(node.id, now);
+  }
   clearTimeout(_writingSaveTimer2);
-  _writingSaveTimer2 = setTimeout(()=>dsave(), 400);
+  _writingSaveTimer2 = setTimeout(()=>dsave(), TOOL_INPUT_SAVE_DEBOUNCE_MS);
 }
 
 // ── 공통 필드 헬퍼 ──
