@@ -3597,6 +3597,7 @@ async function enterApp(){
   document.getElementById('lscreen').style.display='none';
   document.getElementById('app').style.display='flex';
   document.getElementById('lerr').textContent='';
+  bindGlobalHotkeys();
   await IDB.init();
   await load();
   loadTheme();
@@ -9927,13 +9928,35 @@ document.getElementById('float-memo-body')?.addEventListener('input',function(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  KEYBOARD SHORTCUTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-document.addEventListener('keydown',e=>{
-  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();if(_srchOpen)closeSearch();else openSearch();}
-  if((e.ctrlKey||e.metaKey)&&e.key==='m'){e.preventDefault();toggleFloatMemo();}
-  if((e.ctrlKey||e.metaKey)&&e.key==='p'){e.preventDefault();toggleFloatPomo();}
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();gdPush();}
-  if(e.key==='Escape'&&_srchOpen)closeSearch();
-});
+function bindGlobalHotkeys(){
+  if(window.__saveHotkeyBound) return;
+  window.__saveHotkeyBound=true;
+  document.addEventListener('keydown',e=>{
+    const key=(e.key||'').toLowerCase();
+    const isMod=e.ctrlKey||e.metaKey;
+    if(isMod){
+      switch(key){
+        case 'k':
+          e.preventDefault();
+          if(_srchOpen)closeSearch();else openSearch();
+          return;
+        case 'm':
+          e.preventDefault();
+          toggleFloatMemo();
+          return;
+        case 'p':
+          e.preventDefault();
+          toggleFloatPomo();
+          return;
+        case 's':
+          e.preventDefault();
+          gdPush();
+          return;
+      }
+    }
+    if(e.key==='Escape'&&_srchOpen)closeSearch();
+  });
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  MBEDIT (rich text editor — from marketing hub)
@@ -9958,7 +9981,6 @@ class MBEditor{
     ce.addEventListener('mouseup',()=>this._syncBtns());
     ce.addEventListener('keydown',e=>{
       if(e.key==='Tab'){e.preventDefault();document.execCommand('insertHTML',false,'&emsp;');}
-      if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();gdPush();}
       if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();this._exec('bold');}
       if((e.ctrlKey||e.metaKey)&&e.key==='i'){e.preventDefault();this._exec('italic');}
       if((e.ctrlKey||e.metaKey)&&e.key==='u'){e.preventDefault();this._exec('underline');}
