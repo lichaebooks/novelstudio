@@ -16,6 +16,7 @@ button,a,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transpa
   --ac:#388bfd;--ac2:#1f6feb;
   --gn:#3fb950;--yw:#d29922;--rd:#f85149;--pu:#bc8cff;--or:#ffa657;
   --r:6px;
+  --top-offset-extra:0px;
   font-family:'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',-apple-system,'Segoe UI',sans-serif;
 }
 /* ── LIGHT ── */
@@ -152,7 +153,7 @@ body{background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit
 .ghstatbar.ing{background:rgba(56,139,253,.95);color:#fff}
 
 /* Drive newer banner */
-#drive-newer-banner{display:none;position:fixed;top:46px;left:0;right:0;z-index:8000;background:#b45309;color:#fff;padding:8px 16px;font-size:12px;flex-direction:row;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+#drive-newer-banner{display:none;position:fixed;top:calc(46px + var(--top-offset-extra));left:0;right:0;z-index:8000;background:#b45309;color:#fff;padding:8px 16px;font-size:12px;flex-direction:row;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 #drive-newer-banner.show{display:flex}
 #drive-newer-banner .dnb-btns{display:flex;gap:8px;margin-left:auto;flex-shrink:0}
 #drive-newer-banner button{padding:3px 12px;border-radius:5px;font-size:11px;cursor:pointer;border:none;font-family:inherit}
@@ -2633,6 +2634,11 @@ tr:hover .pub-row-del{color:var(--tx3)}
         </div>
       </div>
       <div class="treewrap" id="writing-tree" style="flex:1;overflow-y:auto;min-height:80px"></div>
+      <div style="border-top:1px solid var(--bdr);padding:8px 10px;display:flex;flex-direction:column;gap:6px;max-height:34vh;min-height:90px">
+        <div id="writing-chlist-title" style="font-size:11px;color:var(--tx2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">회차 진행</div>
+        <div id="writing-chlist" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;min-height:0"></div>
+        <div id="writing-total-wc" style="font-size:10px;color:var(--tx3);text-align:right">전체 0자</div>
+      </div>
 
     </div>
 
@@ -3617,8 +3623,11 @@ async function enterApp(){
     _settleSelId=S.settle.works[0].id;
   }
   loadAlarmCfg();
+  gdCleanupLegacyTokenStorage();
   gdLoadToken();
   gdHandleCallback();
+  updateTopOffsetExtra();
+  window.addEventListener('resize',updateTopOffsetExtra);
   setTimeout(checkDriveNewer,2000);
   if(!localStorage.getItem('ws_pw')&&localStorage.getItem('ws_pw_disabled')!=='1'){
     const e=document.getElementById('lerr');e.className='lerr lhint';
@@ -9740,12 +9749,20 @@ function renderSettings(){
 const GD_SCOPE='https://www.googleapis.com/auth/drive.file';
 const GD_FNAME='집필스튜디오_백업.json';
 let _gdToken=null,_gdAutoT=null,_gdDirty=false,_gdBusy=false;
+const GD_TOKEN_KEY='gd_token';
+const GD_TOKEN_EXP_KEY='gd_token_exp';
 
 function gdClientId(){return localStorage.getItem('gd_client_id')||'';}
-function gdSaveToken(access,_r,expiresIn){_gdToken=access;localStorage.setItem('gd_token',access);localStorage.setItem('gd_token_exp',Date.now()+(expiresIn||3600)*1000-60000);}
-function gdLoadToken(){const exp=parseInt(localStorage.getItem('gd_token_exp')||'0');if(Date.now()<exp){_gdToken=localStorage.getItem('gd_token')||null;return _gdToken;}_gdToken=null;return null;}
+function gdSaveToken(access,_r,expiresIn){_gdToken=access;sessionStorage.setItem(GD_TOKEN_KEY,access);sessionStorage.setItem(GD_TOKEN_EXP_KEY,String(Date.now()+(expiresIn||3600)*1000-60000));}
+function gdLoadToken(){const exp=parseInt(sessionStorage.getItem(GD_TOKEN_EXP_KEY)||'0');if(Date.now()<exp){_gdToken=sessionStorage.getItem(GD_TOKEN_KEY)||null;return _gdToken;}_gdToken=null;return null;}
 function gdLog(msg,ok){const el=document.getElementById('gd_log');if(!el)return;el.style.color=ok===false?'var(--rd)':ok?'var(--gn)':'var(--tx3)';el.textContent=msg;}
 function gdBar(msg,type,ms=3500){const el=document.getElementById('ghstatbar');if(!el)return;el.textContent=msg;el.className='ghstatbar '+type+' show';clearTimeout(gdBar._t);if(ms>0)gdBar._t=setTimeout(()=>el.classList.remove('show'),ms);}
+function gdCleanupLegacyTokenStorage(){localStorage.removeItem(GD_TOKEN_KEY);localStorage.removeItem(GD_TOKEN_EXP_KEY);}
+function updateTopOffsetExtra(){
+  const banner=document.getElementById('drive-newer-banner');
+  const topExtra=(banner&&banner.classList.contains('show'))?banner.offsetHeight:0;
+  document.documentElement.style.setProperty('--top-offset-extra', topExtra+'px');
+}
 
 async function gdRefreshUI(){
   const bar=document.getElementById('gd-status-bar');
@@ -9780,8 +9797,8 @@ function gdConnect(){
 function gdHandleCallback(){const params=new URLSearchParams(location.search);if(params.has('code')||params.has('error'))history.replaceState(null,'',location.pathname);}
 
 async function gdSilentRefresh(){return new Promise(resolve=>{const cid=gdClientId();if(!cid||typeof google==='undefined'||!google.accounts){resolve(null);return;}const client=google.accounts.oauth2.initTokenClient({client_id:cid,scope:GD_SCOPE,prompt:'',callback:(resp)=>{if(resp.access_token){gdSaveToken(resp.access_token,null,resp.expires_in);resolve(resp.access_token);}else resolve(null);}});client.requestAccessToken();});}
-async function gdGetValidToken(){const exp=parseInt(localStorage.getItem('gd_token_exp')||'0');if(_gdToken&&Date.now()<exp)return _gdToken;const stored=gdLoadToken();if(stored)return stored;return await gdSilentRefresh();}
-async function gdApiCall(method,url,token,body,ctype){const headers={'Authorization':'Bearer '+token};if(ctype)headers['Content-Type']=ctype;const resp=await fetch(url,{method,headers,body});if(resp.status===401){_gdToken=null;localStorage.removeItem('gd_token');gdRefreshUI();throw new Error('토큰 만료. 다시 연결해주세요.');}if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||resp.status);}const ct=resp.headers.get('Content-Type')||'';if(ct.includes('json'))return resp.json();return resp.text();}
+async function gdGetValidToken(){const exp=parseInt(sessionStorage.getItem(GD_TOKEN_EXP_KEY)||'0');if(_gdToken&&Date.now()<exp)return _gdToken;const stored=gdLoadToken();if(stored)return stored;return await gdSilentRefresh();}
+async function gdApiCall(method,url,token,body,ctype){const headers={'Authorization':'Bearer '+token};if(ctype)headers['Content-Type']=ctype;const resp=await fetch(url,{method,headers,body});if(resp.status===401){_gdToken=null;sessionStorage.removeItem(GD_TOKEN_KEY);sessionStorage.removeItem(GD_TOKEN_EXP_KEY);gdRefreshUI();throw new Error('토큰 만료. 다시 연결해주세요.');}if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||resp.status);}const ct=resp.headers.get('Content-Type')||'';if(ct.includes('json'))return resp.json();return resp.text();}
 async function gdFindFile(token,fname){const q=`name='${fname}' and trashed=false`;const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,modifiedTime)`;const r=await gdApiCall('GET',url,token);return r.files?.[0]||null;}
 
 async function gdPush(auto=false){
@@ -9846,7 +9863,7 @@ async function gdPull(){
 
 async function gdDownloadReport(token,fileId){const url=`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;const resp=await fetch(url,{headers:{'Authorization':'Bearer '+token}});if(!resp.ok)throw new Error(resp.status);return resp.arrayBuffer();}
 
-function gdDisconnect(){_gdToken=null;localStorage.removeItem('gd_token');localStorage.removeItem('gd_token_exp');gdRefreshUI();toast('Drive 연결이 해제되었습니다.');}
+function gdDisconnect(){_gdToken=null;sessionStorage.removeItem(GD_TOKEN_KEY);sessionStorage.removeItem(GD_TOKEN_EXP_KEY);gdRefreshUI();toast('Drive 연결이 해제되었습니다.');}
 function gdToggleAuto(on){localStorage.setItem('gd_auto',on?'1':'0');}
 function gdScheduleAuto(){if(localStorage.getItem('gd_auto')==='1'){_gdDirty=true;clearTimeout(_gdAutoT);_gdAutoT=setTimeout(()=>{if(_gdDirty)gdPush(true);},30000);}}
 
@@ -9858,12 +9875,13 @@ async function checkDriveNewer(){
     const localTime=new Date(localStorage.getItem('gd_last_save')||0).getTime();
     if(driveTime>localTime+5000){
       const banner=document.getElementById('drive-newer-banner');if(banner)banner.classList.add('show');
+      updateTopOffsetExtra();
     }
   }catch(e){}
 }
 
-function dnbPull(){const banner=document.getElementById('drive-newer-banner');if(banner)banner.classList.remove('show');gdPull();}
-function dnbIgnore(){const banner=document.getElementById('drive-newer-banner');if(banner)banner.classList.remove('show');}
+function dnbPull(){const banner=document.getElementById('drive-newer-banner');if(banner)banner.classList.remove('show');updateTopOffsetExtra();gdPull();}
+function dnbIgnore(){const banner=document.getElementById('drive-newer-banner');if(banner)banner.classList.remove('show');updateTopOffsetExtra();}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SEARCH
@@ -9958,7 +9976,7 @@ class MBEditor{
     ce.addEventListener('mouseup',()=>this._syncBtns());
     ce.addEventListener('keydown',e=>{
       if(e.key==='Tab'){e.preventDefault();document.execCommand('insertHTML',false,'&emsp;');}
-      if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();gdPush();}
+      if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();e.stopPropagation();gdPush();}
       if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();this._exec('bold');}
       if((e.ctrlKey||e.metaKey)&&e.key==='i'){e.preventDefault();this._exec('italic');}
       if((e.ctrlKey||e.metaKey)&&e.key==='u'){e.preventDefault();this._exec('underline');}
