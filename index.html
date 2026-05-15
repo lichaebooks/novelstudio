@@ -3702,7 +3702,7 @@ function switchTab(t){
   // 탭 전환 시 조판 모달 닫기
   document.getElementById('ts-modal-bg')?.remove();
   // 집필 탭 진입 시 조판 칩 갱신
-  if(t==='writing') tsUpdateChip();
+  if(t==='writing'){tsUpdateChip();renderWriting();}
   if(t==='settings'){renderSettings();}
   if(t==='home'){renderHome();}
   if(t==='schedule'){renderSched();}
@@ -10355,6 +10355,13 @@ function writingEnsureProgressUI(){
   };
 }
 
+function renderWriting(workId=null){
+  writingEnsureProgressUI();
+  writingRenderTree();
+  const targetWorkId=workId||_writingSelWork||S._lastWritingWork||null;
+  if(targetWorkId) writingUpdateProgress(targetWorkId);
+}
+
 function writingUpdateProgress(workId){
   const ui=writingEnsureProgressUI();
   const listEl=ui?.listEl;if(!listEl)return;
@@ -11798,11 +11805,7 @@ function _adjustEditorForMobile(){
   });
 }
 function initWritingTab(){
-  writingEnsureProgressUI();
-  writingRenderTree();
-  if(S._lastWritingWork){
-    writingUpdateProgress(S._lastWritingWork);
-  }
+  renderWriting();
   // 마지막 화면 복원
   if(S._lastWritingWork && S._lastWritingCh){
     const ch=wNodes().find(n=>n.id===S._lastWritingCh&&!n.deleted);
