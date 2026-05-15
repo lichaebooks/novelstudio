@@ -9739,11 +9739,35 @@ function renderSettings(){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const GD_SCOPE='https://www.googleapis.com/auth/drive.file';
 const GD_FNAME='집필스튜디오_백업.json';
-let _gdToken=null,_gdAutoT=null,_gdDirty=false,_gdBusy=false;
+let _gdToken=null,_gdTokenExp=0,_gdAutoT=null,_gdDirty=false,_gdBusy=false;
 
 function gdClientId(){return localStorage.getItem('gd_client_id')||'';}
-function gdSaveToken(access,_r,expiresIn){_gdToken=access;localStorage.setItem('gd_token',access);localStorage.setItem('gd_token_exp',Date.now()+(expiresIn||3600)*1000-60000);}
-function gdLoadToken(){const exp=parseInt(localStorage.getItem('gd_token_exp')||'0');if(Date.now()<exp){_gdToken=localStorage.getItem('gd_token')||null;return _gdToken;}_gdToken=null;return null;}
+function gdCleanupLegacyTokenStorage(){
+  try{localStorage.removeItem('gd_token');localStorage.removeItem('gd_token_exp');}catch(e){}
+}
+function gdSaveToken(access,_r,expiresIn){
+  _gdToken=access||null;
+  _gdTokenExp=_gdToken?Date.now()+(expiresIn||3600)*1000-60000:0;
+  try{
+    if(_gdToken){
+      sessionStorage.setItem('gd_token',_gdToken);
+      sessionStorage.setItem('gd_token_exp',String(_gdTokenExp));
+    }else{
+      sessionStorage.removeItem('gd_token');
+      sessionStorage.removeItem('gd_token_exp');
+    }
+  }catch(e){}
+  gdCleanupLegacyTokenStorage();
+}
+function gdLoadToken(){
+  let tok=null,exp=0;
+  try{tok=sessionStorage.getItem('gd_token');exp=parseInt(sessionStorage.getItem('gd_token_exp')||'0');}catch(e){}
+  if(tok&&Date.now()<exp){_gdToken=tok;_gdTokenExp=exp;return _gdToken;}
+  _gdToken=null;_gdTokenExp=0;
+  try{sessionStorage.removeItem('gd_token');sessionStorage.removeItem('gd_token_exp');}catch(e){}
+  gdCleanupLegacyTokenStorage();
+  return null;
+}
 function gdLog(msg,ok){const el=document.getElementById('gd_log');if(!el)return;el.style.color=ok===false?'var(--rd)':ok?'var(--gn)':'var(--tx3)';el.textContent=msg;}
 function gdBar(msg,type,ms=3500){const el=document.getElementById('ghstatbar');if(!el)return;el.textContent=msg;el.className='ghstatbar '+type+' show';clearTimeout(gdBar._t);if(ms>0)gdBar._t=setTimeout(()=>el.classList.remove('show'),ms);}
 
@@ -9778,14 +9802,22 @@ function gdConnect(){
 }
 
 function gdHandleCallback(){const params=new URLSearchParams(location.search);if(params.has('code')||params.has('error'))history.replaceState(null,'',location.pathname);}
+gdCleanupLegacyTokenStorage();
 
 async function gdSilentRefresh(){return new Promise(resolve=>{const cid=gdClientId();if(!cid||typeof google==='undefined'||!google.accounts){resolve(null);return;}const client=google.accounts.oauth2.initTokenClient({client_id:cid,scope:GD_SCOPE,prompt:'',callback:(resp)=>{if(resp.access_token){gdSaveToken(resp.access_token,null,resp.expires_in);resolve(resp.access_token);}else resolve(null);}});client.requestAccessToken();});}
-async function gdGetValidToken(){const exp=parseInt(localStorage.getItem('gd_token_exp')||'0');if(_gdToken&&Date.now()<exp)return _gdToken;const stored=gdLoadToken();if(stored)return stored;return await gdSilentRefresh();}
-async function gdApiCall(method,url,token,body,ctype){const headers={'Authorization':'Bearer '+token};if(ctype)headers['Content-Type']=ctype;const resp=await fetch(url,{method,headers,body});if(resp.status===401){_gdToken=null;localStorage.removeItem('gd_token');gdRefreshUI();throw new Error('토큰 만료. 다시 연결해주세요.');}if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||resp.status);}const ct=resp.headers.get('Content-Type')||'';if(ct.includes('json'))return resp.json();return resp.text();}
+async function gdGetValidToken(){if(_gdToken&&Date.now()<_gdTokenExp)return _gdToken;const stored=gdLoadToken();if(stored)return stored;return await gdSilentRefresh();}
+async function gdGetTokenForSave(auto=false){
+  const token=await gdGetValidToken();
+  if(token)return token;
+  toast(auto?'Drive 자동 저장이 중지되었습니다. 다시 연결해주세요.':'Drive 인증이 만료되었습니다. 다시 연결해주세요.',true);
+  return null;
+}
+async function gdApiCall(method,url,token,body,ctype){const headers={'Authorization':'Bearer '+token};if(ctype)headers['Content-Type']=ctype;const resp=await fetch(url,{method,headers,body});if(resp.status===401){gdSaveToken(null);gdRefreshUI();throw new Error('토큰 만료. 다시 연결해주세요.');}if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||resp.status);}const ct=resp.headers.get('Content-Type')||'';if(ct.includes('json'))return resp.json();return resp.text();}
 async function gdFindFile(token,fname){const q=`name='${fname}' and trashed=false`;const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,modifiedTime)`;const r=await gdApiCall('GET',url,token);return r.files?.[0]||null;}
 
 async function gdPush(auto=false){
-  const token=await gdGetValidToken();if(!token){if(!auto)toast('먼저 Google 계정을 연결해주세요.',true);return;}
+  const token=await gdGetTokenForSave(auto);
+  if(!token)return;
   if(_gdBusy){if(!auto)toast('저장 중입니다...');return;}
   _gdBusy=true;if(!auto)gdBar('💾 Google Drive에 저장 중...','ing',0);gdLog('저장 중...');
   try{
@@ -9846,9 +9878,9 @@ async function gdPull(){
 
 async function gdDownloadReport(token,fileId){const url=`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;const resp=await fetch(url,{headers:{'Authorization':'Bearer '+token}});if(!resp.ok)throw new Error(resp.status);return resp.arrayBuffer();}
 
-function gdDisconnect(){_gdToken=null;localStorage.removeItem('gd_token');localStorage.removeItem('gd_token_exp');gdRefreshUI();toast('Drive 연결이 해제되었습니다.');}
+function gdDisconnect(){gdSaveToken(null);gdRefreshUI();toast('Drive 연결이 해제되었습니다.');}
 function gdToggleAuto(on){localStorage.setItem('gd_auto',on?'1':'0');}
-function gdScheduleAuto(){if(localStorage.getItem('gd_auto')==='1'){_gdDirty=true;clearTimeout(_gdAutoT);_gdAutoT=setTimeout(()=>{if(_gdDirty)gdPush(true);},30000);}}
+function gdScheduleAuto(){if(localStorage.getItem('gd_auto')==='1'){_gdDirty=true;clearTimeout(_gdAutoT);_gdAutoT=setTimeout(async ()=>{if(!_gdDirty)return;const tok=await gdGetTokenForSave(true);if(!tok)return;gdPush(true);},30000);}}
 
 async function checkDriveNewer(){
   const token=await gdGetValidToken();if(!token)return;
